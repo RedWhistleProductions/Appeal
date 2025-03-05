@@ -1,0 +1,8 @@
+Audio Load_Play_List PlayAll.txt
+Audio Play_Song "Folk Song"
+
+//Audio Load_SFX Shuffle ShufflingCards.ogg
+
+//Audio Play_SFX
+//Audio Play_SFX_Name Shuffle
+Return
