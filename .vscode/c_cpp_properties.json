@@ -13,6 +13,20 @@
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "c17",
             "intelliSenseMode": "gcc-x64"
+        },
+        {
+            "name": "Windows",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "compilerPath": "C:/MinGW/bin/gcc.exe",
+            "cStandard": "c17",
+            "intelliSenseMode": "gcc-x64"
         }
     ],
     "version": 4

@@ -1,5 +1,5 @@
 Run Config
 Run Test_Audio
-Set_Var Wait 10
-Delay Var Wait
+//Set_Var Wait 10
+//Delay Var Wait
 Done

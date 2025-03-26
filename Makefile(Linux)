@@ -2,7 +2,7 @@
 CXX = g++
 
 # Compiler flags
-CXXFLAGS = -g -Wall	-pthread
+CXXFLAGS = -g -Wall
 
 # Directories
 SRC_DIR = ./Source
@@ -17,15 +17,6 @@ OBJ_FILES = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRC_FILES))
 
 # Executable
 TARGET = $(BIN_DIR)/Appeal
-
-# Detect OS
-ifeq ($(OS),Windows_NT)
-    RM = del /Q
-    MKDIR = if not exist $(OBJ_DIR) mkdir $(OBJ_DIR)
-else
-    RM = rm -rf
-    MKDIR = mkdir -p $(OBJ_DIR)
-endif
 
 # Default target
 all: $(TARGET)

@@ -1,5 +1,6 @@
 #include "Appeal.h"
 
+
 void Appeal::Add_Module(std::string Name, void (*Interpreter)(Data_Source *Data))
 {
     Dictionary_List.Add_Node(Name, Interpreter);
@@ -10,14 +11,26 @@ void Appeal::Add_Dynamic_Module(std::string Name, std::string Plugin_Name)
     std::string Module_Path, Plugin_Path;
     // Load the Dynamic Module
     Dynamic_Modules.Add_Node(Name);
-    Module_Path = Modules_Folder + "/" + Name + "/" + Name + ".so";
+    #ifdef __linux__
+        Module_Path = Modules_Folder + "/" + Name + "/" + Name + ".so";
+    #endif
+    #ifdef __MINGW32__
+        Module_Path = Modules_Folder + "/" + Name + "/" + Name + ".dll";
+    #endif
+    
     Dynamic_Modules.Current->Value.Load(Module_Path);
     
     // Load the Interpreter
     Add_Module(Name, Dynamic_Modules.Current->Value.Interpreter);
 
     // Load the Plugin
-    Plugin_Path = Modules_Folder + "/" + Name + "/" + Plugin_Name + "/" + Plugin_Name + ".so";
+    #ifdef __linux__
+        Plugin_Path = Modules_Folder + "/" + Name + "/" + Plugin_Name + "/" + Plugin_Name + ".so";
+    #endif
+    #ifdef __MINGW32__
+        Plugin_Path = Modules_Folder + "/" + Name + "/" + Plugin_Name + "/" + Plugin_Name + ".dll";
+    #endif
+    
     Dynamic_Modules.Current->Value.Init(Plugin_Path);
 }
 
@@ -57,6 +70,7 @@ void Appeal::Run()
     //while(not Done or Command != "Return")
     while(not Done)
     {
+        
         Command = Data_Manager.Data_Sources.Current->Value->Get_Data();
         if(Command != "")
         {

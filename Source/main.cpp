@@ -3,7 +3,9 @@
 int main(int argc, char* argv[])
 {
     Appeal App;
-    
+
+    App.Run("Main");
+    /*
     if(argc > 1)
     {
         App.Run(argv[1]);
@@ -12,8 +14,8 @@ int main(int argc, char* argv[])
     {
         App.Run("Main");
     }
-    
-    while(App.Done == false){};
+    */
+    //while(App.Done == false){};
     
     return 0;
 }
