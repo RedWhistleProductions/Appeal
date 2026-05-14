@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Audio Module</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f7f7f4;
+      --fg: #1c1d20;
+      --muted: #5d6470;
+      --line: #cfd4d9;
+      --panel: #ffffff;
+      --accent: #15616d;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #15171a;
+        --fg: #eceff3;
+        --muted: #aab2bd;
+        --line: #343a42;
+        --panel: #1f2328;
+        --accent: #4fb3bf;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font: 16px/1.55 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    main {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 34px 22px 56px;
+    }
+
+    nav {
+      margin-bottom: 24px;
+      color: var(--muted);
+    }
+
+    nav a {
+      color: var(--accent);
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin: 34px 0 12px;
+      border-top: 1px solid var(--line);
+      padding-top: 20px;
+      font-size: 1.35rem;
+    }
+
+    p {
+      max-width: 78ch;
+      margin: 0 0 14px;
+    }
+
+    code,
+    pre {
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+    }
+
+    code {
+      padding: 2px 5px;
+      border-radius: 4px;
+      background: color-mix(in srgb, var(--line), transparent 70%);
+    }
+
+    pre {
+      overflow: auto;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 22px;
+      background: var(--panel);
+    }
+
+    th,
+    td {
+      border: 1px solid var(--line);
+      padding: 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <nav><a href="../Index.html">Documentation</a> / Modules / Audio</nav>
+    <h1>Audio Module</h1>
+    <p>The Audio module provides Appeal commands for music, sound effects, playlists, and mute/playback control. The module itself is platform-independent; the loaded plugin provides the actual audio backend.</p>
+
+    <h2>Runtime Layout</h2>
+    <pre><code>Resources/Modules/Audio/Audio.dll
+Resources/Modules/Audio/Test_Audio/Test_Audio.dll
+Resources/Modules/Audio/SDL2_Audio/SDL2_Audio.dll</code></pre>
+
+    <h2>Loading</h2>
+    <p>The module is usually loaded from <code>Config.Appeal</code> with <code>Add_Dynamic_Module</code>.</p>
+    <pre><code>Add_Dynamic_Module Audio Test_Audio</code></pre>
+    <p>The second argument is the plugin name. For example, <code>Test_Audio</code> loads the test plugin, while <code>SDL2_Audio</code> should load the SDL2 backend after it has been built and installed.</p>
+
+    <h2>Appeal Commands</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Command</th>
+          <th>Arguments</th>
+          <th>Behavior</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>Audio Init</code></td>
+          <td><code>pluginPath</code></td>
+          <td>Initializes the module with a plugin. This is normally called by <code>Add_Dynamic_Module</code>.</td>
+        </tr>
+        <tr>
+          <td><code>Audio Set_Paths</code></td>
+          <td><code>resources</code></td>
+          <td>Sets the resource root used by the audio plugin.</td>
+        </tr>
+        <tr>
+          <td><code>Audio Load_Play_List</code></td>
+          <td><code>playlistFile</code></td>
+          <td>Loads a playlist from the music resource folder.</td>
+        </tr>
+        <tr>
+          <td><code>Audio Load_Song</code></td>
+          <td><code>name musicFile</code></td>
+          <td>Loads a song and stores it under a script-facing name.</td>
+        </tr>
+        <tr>
+          <td><code>Audio Load_SFX</code></td>
+          <td><code>name sfxFile</code></td>
+          <td>Loads a sound effect and stores it under a script-facing name.</td>
+        </tr>
+        <tr>
+          <td><code>Audio Play</code></td>
+          <td>none</td>
+          <td>Plays the current track.</td>
+        </tr>
+        <tr>
+          <td><code>Audio Play_Song</code></td>
+          <td><code>name</code></td>
+          <td>Finds and plays a named song.</td>
+        </tr>
+        <tr>
+          <td><code>Audio Play_Track</code></td>
+          <td><code>trackNumber</code></td>
+          <td>Moves to a numbered track and plays it.</td>
+        </tr>
+        <tr>
+          <td><code>Audio Play_SFX</code></td>
+          <td>none</td>
+          <td>Plays the current sound effect.</td>
+        </tr>
+        <tr>
+          <td><code>Audio Play_SFX_Name</code></td>
+          <td><code>name</code></td>
+          <td>Finds and plays a named sound effect.</td>
+        </tr>
+        <tr>
+          <td><code>Audio Stop</code></td>
+          <td>none</td>
+          <td>Stops music playback.</td>
+        </tr>
+        <tr>
+          <td><code>Audio Next</code></td>
+          <td>none</td>
+          <td>Moves to the next track and plays it.</td>
+        </tr>
+        <tr>
+          <td><code>Audio Back</code></td>
+          <td>none</td>
+          <td>Moves to the previous track and plays it.</td>
+        </tr>
+        <tr>
+          <td><code>Audio Mute</code></td>
+          <td>none</td>
+          <td>Mutes sound effects and stops music.</td>
+        </tr>
+        <tr>
+          <td><code>Audio UnMute</code></td>
+          <td>none</td>
+          <td>Enables audio and resumes music.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Plugin Contract</h2>
+    <p>An Audio plugin must export these C-style symbols so the module can assign them at runtime:</p>
+    <pre><code>Constructor()
+Destructor()
+Back()
+Load_Play_List(std::string Play_List)
+Load_SFX(std::string Name, std::string SFX_File)
+Load_Song(std::string Name, std::string Music_File)
+Mute()
+Next()
+Play()
+Play_SFX()
+Play_SFX_Name(std::string Name)
+Play_Song(std::string Name)
+Play_Track(int Track)
+Set_Paths(std::string Resources)
+Stop()
+UnMute()</code></pre>
+
+    <h2>Test Script</h2>
+    <p>The current test script is <code>Resources/Appeal/Test_Audio.Appeal</code>.</p>
+    <pre><code>Audio Load_Play_List PlayAll.txt
+Audio Play_Song "Folk Song"
+Return</code></pre>
+  </main>
+</body>
+</html>

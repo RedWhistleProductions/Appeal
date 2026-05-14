@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Appeal Documentation</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f7f7f4;
+      --fg: #1c1d20;
+      --muted: #5d6470;
+      --line: #cfd4d9;
+      --panel: #ffffff;
+      --accent: #15616d;
+      --accent-2: #7a3b12;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #15171a;
+        --fg: #eceff3;
+        --muted: #aab2bd;
+        --line: #343a42;
+        --panel: #1f2328;
+        --accent: #4fb3bf;
+        --accent-2: #f0a15d;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font: 16px/1.55 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    main {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 40px 22px 56px;
+    }
+
+    header {
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 24px;
+      margin-bottom: 28px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(2rem, 6vw, 4.25rem);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin: 34px 0 14px;
+      font-size: 1.35rem;
+    }
+
+    p {
+      margin: 0 0 14px;
+      max-width: 78ch;
+    }
+
+    .lede {
+      color: var(--muted);
+      font-size: 1.08rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    a.card {
+      display: block;
+      min-height: 150px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      color: inherit;
+      text-decoration: none;
+    }
+
+    a.card:hover,
+    a.card:focus-visible {
+      border-color: var(--accent);
+      outline: none;
+    }
+
+    .card strong {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--accent);
+      font-size: 1.1rem;
+    }
+
+    .card span {
+      color: var(--muted);
+    }
+
+    code {
+      padding: 2px 5px;
+      border-radius: 4px;
+      background: color-mix(in srgb, var(--line), transparent 70%);
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+      font-size: 0.94em;
+    }
+
+    ul {
+      padding-left: 22px;
+    }
+
+    li {
+      margin: 7px 0;
+    }
+
+    footer {
+      margin-top: 40px;
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Appeal Documentation</h1>
+      <p class="lede">Appeal is a general-purpose command-stream language with a cross-platform runtime, platform-independent modules, and platform-specific plugins.</p>
+    </header>
+
+    <section>
+      <h2>Start Here</h2>
+      <div class="grid">
+        <a class="card" href="Appeal.html">
+          <strong>Appeal Runtime</strong>
+          <span>Core concepts, startup flow, scripts, modules, plugins, and data sources.</span>
+        </a>
+        <a class="card" href="Modules/Audio.html">
+          <strong>Audio Module</strong>
+          <span>Music, sound effects, playlists, and the Audio plugin contract.</span>
+        </a>
+        <a class="card" href="Modules/Input.html">
+          <strong>Input Module</strong>
+          <span>Current placeholder status and the intended role for input backends.</span>
+        </a>
+      </div>
+    </section>
+
+    <section>
+      <h2>Project Shape</h2>
+      <p>The current project keeps the Appeal runtime, module source, plugin source, runtime resources, and documentation together while the API is still evolving.</p>
+      <ul>
+        <li><code>Source/</code> contains the Appeal app and core runtime.</li>
+        <li><code>Modules/</code> contains platform-independent module source code.</li>
+        <li><code>Plugins/</code> contains platform-specific plugin source code.</li>
+        <li><code>Resources/Appeal/</code> contains Appeal scripts such as <code>Main.Appeal</code> and <code>Config.Appeal</code>.</li>
+        <li><code>Resources/Modules/</code> contains built module and plugin binaries used at runtime.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Conventions</h2>
+      <p>Each module should eventually have a <code>Test_&lt;Module&gt;.Appeal</code> script and a <code>Test_&lt;Module&gt;</code> plugin. The test plugin exports every function expected by the module and prints function calls to the terminal, making it both a test backend and a template for real plugins.</p>
+    </section>
+
+    <footer>
+      <p>Documentation landing page: <code>Docs/Index.html</code></p>
+    </footer>
+  </main>
+</body>
+</html>

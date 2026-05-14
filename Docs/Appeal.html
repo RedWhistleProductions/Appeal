@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Appeal Runtime</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f7f7f4;
+      --fg: #1c1d20;
+      --muted: #5d6470;
+      --line: #cfd4d9;
+      --panel: #ffffff;
+      --accent: #15616d;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #15171a;
+        --fg: #eceff3;
+        --muted: #aab2bd;
+        --line: #343a42;
+        --panel: #1f2328;
+        --accent: #4fb3bf;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font: 16px/1.55 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    main {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 34px 22px 56px;
+    }
+
+    nav {
+      margin-bottom: 24px;
+      color: var(--muted);
+    }
+
+    nav a {
+      color: var(--accent);
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin: 34px 0 12px;
+      border-top: 1px solid var(--line);
+      padding-top: 20px;
+      font-size: 1.35rem;
+    }
+
+    h3 {
+      margin: 24px 0 10px;
+      font-size: 1.08rem;
+    }
+
+    p {
+      max-width: 78ch;
+      margin: 0 0 14px;
+    }
+
+    ul {
+      padding-left: 22px;
+    }
+
+    li {
+      margin: 7px 0;
+    }
+
+    code,
+    pre {
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+    }
+
+    code {
+      padding: 2px 5px;
+      border-radius: 4px;
+      background: color-mix(in srgb, var(--line), transparent 70%);
+    }
+
+    pre {
+      overflow: auto;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 22px;
+      background: var(--panel);
+    }
+
+    th,
+    td {
+      border: 1px solid var(--line);
+      padding: 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <nav><a href="Index.html">Documentation</a> / Appeal Runtime</nav>
+    <h1>Appeal Runtime</h1>
+    <p>Appeal is designed as a general-purpose programming language built around command streams. A command stream can come from a file today and can later come from a network data source, generated script, package system, editor, replay, or other provider.</p>
+
+    <h2>Runtime Paths</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Path</th>
+          <th>Purpose</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>./Resources</code></td>
+          <td>Default resource root.</td>
+        </tr>
+        <tr>
+          <td><code>./Resources/Appeal</code></td>
+          <td>Default folder for Appeal scripts.</td>
+        </tr>
+        <tr>
+          <td><code>./Resources/Modules</code></td>
+          <td>Default folder for built dynamic modules and their plugins.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Startup Flow</h2>
+    <p>The current executable starts by running <code>Main.Appeal</code>. That script normally runs <code>Config.Appeal</code>, which loads the default modules and plugins.</p>
+    <pre><code>Run Config
+Done</code></pre>
+    <p>Later, the app can accept an alternate startup script for testing or launching directly into a game or tool.</p>
+
+    <h2>Core Commands</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Command</th>
+          <th>Arguments</th>
+          <th>Behavior</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>Run</code></td>
+          <td><code>script</code></td>
+          <td>Loads and switches to another script from <code>Resources/Appeal</code>.</td>
+        </tr>
+        <tr>
+          <td><code>Return</code></td>
+          <td>none</td>
+          <td>Returns from the current data source to the previous one.</td>
+        </tr>
+        <tr>
+          <td><code>Done</code></td>
+          <td>none</td>
+          <td>Stops the current run loop.</td>
+        </tr>
+        <tr>
+          <td><code>Print</code></td>
+          <td><code>text</code></td>
+          <td>Writes text to the terminal.</td>
+        </tr>
+        <tr>
+          <td><code>Add_Dynamic_Module</code></td>
+          <td><code>module plugin</code></td>
+          <td>Loads a module binary, registers its interpreter, and initializes the named plugin.</td>
+        </tr>
+        <tr>
+          <td><code>Delay</code></td>
+          <td><code>seconds</code></td>
+          <td>Pauses execution for an integer number of seconds.</td>
+        </tr>
+        <tr>
+          <td><code>Set_Var</code></td>
+          <td><code>name value</code></td>
+          <td>Stores a variable in the data manager.</td>
+        </tr>
+        <tr>
+          <td><code>Del_Var</code></td>
+          <td><code>name</code></td>
+          <td>Removes a variable from the data manager.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Modules And Plugins</h2>
+    <p>Appeal modules are platform-independent command dictionaries. Plugins are platform-specific implementations loaded by those modules. Appeal scripts call module commands; the module parses arguments and forwards work to the plugin.</p>
+    <pre><code>Add_Dynamic_Module Audio Test_Audio
+Audio Load_Play_List PlayAll.txt
+Audio Play_Song "Folk Song"</code></pre>
+
+    <h2>Design Direction</h2>
+    <p>The long-term goal is to keep the Appeal language universal while letting each platform use optimized native plugins. Bananas will be a game-focused Appeal distribution, and a future browser can use the same module/plugin architecture with stricter security and responsive GUI behavior.</p>
+  </main>
+</body>
+</html>

@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Input Module</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f7f7f4;
+      --fg: #1c1d20;
+      --muted: #5d6470;
+      --line: #cfd4d9;
+      --panel: #ffffff;
+      --accent: #15616d;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #15171a;
+        --fg: #eceff3;
+        --muted: #aab2bd;
+        --line: #343a42;
+        --panel: #1f2328;
+        --accent: #4fb3bf;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font: 16px/1.55 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    main {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 34px 22px 56px;
+    }
+
+    nav {
+      margin-bottom: 24px;
+      color: var(--muted);
+    }
+
+    nav a {
+      color: var(--accent);
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin: 34px 0 12px;
+      border-top: 1px solid var(--line);
+      padding-top: 20px;
+      font-size: 1.35rem;
+    }
+
+    p {
+      max-width: 78ch;
+      margin: 0 0 14px;
+    }
+
+    code,
+    pre {
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+    }
+
+    code {
+      padding: 2px 5px;
+      border-radius: 4px;
+      background: color-mix(in srgb, var(--line), transparent 70%);
+    }
+
+    pre {
+      overflow: auto;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 22px;
+      background: var(--panel);
+    }
+
+    th,
+    td {
+      border: 1px solid var(--line);
+      padding: 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <nav><a href="../Index.html">Documentation</a> / Modules / Input</nav>
+    <h1>Input Module</h1>
+    <p>The Input module is intended to provide platform-independent commands for keyboard, mouse, controller, and action binding systems. In the current source tree, <code>Modules/Input/src/main.cpp</code> is still an Audio-shaped placeholder, so this page documents the current status and the intended direction.</p>
+
+    <h2>Current Status</h2>
+    <p>The current Input module source exports the same command names as the Audio module. It should not yet be treated as a finished input API.</p>
+
+    <h2>Intended Responsibilities</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Area</th>
+          <th>Purpose</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Keyboard</td>
+          <td>Read key state and bind key events to Appeal functions or named actions.</td>
+        </tr>
+        <tr>
+          <td>Mouse</td>
+          <td>Read position, motion, wheel, button down, button up, and click state.</td>
+        </tr>
+        <tr>
+          <td>Controller</td>
+          <td>Read digital buttons, analog triggers, sticks, and controller connection state.</td>
+        </tr>
+        <tr>
+          <td>Control Sets</td>
+          <td>Group bindings into named profiles such as <code>Default</code>, <code>Menu</code>, or <code>Player_1</code>.</td>
+        </tr>
+        <tr>
+          <td>Actions</td>
+          <td>Let scripts ask for gameplay or UI actions without depending on a specific device.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Suggested Future API</h2>
+    <pre><code>Input Init SDL_Input
+Input Add_Control_Set Default
+Input Set_Control_Set Default
+Input Update Default
+
+Input Bind_Key Move_Left Key_A
+Input Bind_Key Move_Right Key_D
+Input Bind_Key Jump Key_Space
+
+Input Down Move_Left
+Input Pressed Jump
+Input Released Jump
+
+Input Set_Key_Down Key_Escape Quit_App
+Input Set_Mouse_Left_Down Select
+Input Set_Joy_Digital Button_A Jump</code></pre>
+
+    <h2>Plugin Convention</h2>
+    <p>The Input module should eventually follow the same plugin pattern as Audio:</p>
+    <pre><code>Plugins/Input/Test_Input/
+Plugins/Input/SDL_Input/</code></pre>
+    <p><code>Test_Input</code> should print every function call to the terminal. <code>SDL_Input</code> should be the default cross-platform backend until specialized platform plugins exist.</p>
+  </main>
+</body>
+</html>
