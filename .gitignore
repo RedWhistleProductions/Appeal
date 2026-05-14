@@ -4,3 +4,15 @@ Resources/Fonts/
 Resources/Textures/
 Resources/Modules/
 .vscode/
+Modules/**/obj/
+Modules/**/*.o
+Modules/**/*.dll
+Modules/**/*.so
+Plugins/**/obj/
+Plugins/**/build/
+Plugins/**/*.o
+Plugins/**/*.dll
+Plugins/**/*.so
+Third_Party/SDL2/Windows/x86_64/include/
+Third_Party/SDL2/Windows/x86_64/lib/
+Third_Party/SDL2/Windows/x86_64/bin/*.dll
