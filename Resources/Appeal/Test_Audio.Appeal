@@ -1,8 +1,16 @@
 Audio Load_Play_List PlayAll.txt
-Audio Play_Song "Folk Song"
+Audio Play
+Delay 5
+Audio Next
+Delay 5
+Audio Next
+Delay 5
+Audio Stop
 
-//Audio Load_SFX Shuffle ShufflingCards.ogg
+Audio Load_SFX Shuffle ShufflingCards.ogg
 
-//Audio Play_SFX
+Audio Play_SFX
+Delay 3
+Audio Stop
 //Audio Play_SFX_Name Shuffle
 Return

@@ -36,7 +36,7 @@ public:
     Music();
     ~Music();
     int Load(std::string);
-    void Play();
+    bool Play();
     void Stop();
 };
 
@@ -65,18 +65,38 @@ int Music::Load(std::string Music_File)
     if(Song != NULL)Mix_FreeMusic( Song );
 
     Song = Mix_LoadMUS( Music_File.c_str());
+    if(Song == NULL)
+    {
+        MUSIC_ON = false;
+        std::cout << "Music did not load" << std::endl
+                  << "Path = " << Music_File << std::endl
+                  << "Mix_Error = " << Mix_GetError() << std::endl;
+        return 1;
+    }
+
     MUSIC_ON = true;
     
     return 0;
 }
 
-void Music::Play()
+bool Music::Play()
 {
     if(MUSIC_ON)
     {
-        if(Loop)Mix_PlayMusic( Song, -1 );
-        else Mix_PlayMusic( Song, 0);
+        int Result;
+        if(Loop)Result = Mix_PlayMusic( Song, -1 );
+        else Result = Mix_PlayMusic( Song, 0);
+
+        if(Result < 0)
+        {
+            std::cout << "Music did not play" << std::endl
+                      << "Track = " << Name << std::endl
+                      << "Mix_Error = " << Mix_GetError() << std::endl;
+            return false;
+        }
+        return true;
     }
+    return false;
 }
 
 void Music::Stop()

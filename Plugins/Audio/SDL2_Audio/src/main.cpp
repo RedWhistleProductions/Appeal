@@ -11,6 +11,9 @@
 	#include <SDL2/SDL_mixer.h>
 #endif
 
+#include <algorithm>
+#include <fstream>
+#include <sstream>
 #include <string>
 #include "Music.h"
 #include "SFX.h"
@@ -24,9 +27,101 @@ std::string Resources, Music_Path, SFX_Path;
 int Frequency, Chanels, Chunksize;
 bool Music_On, SFX_On;
 bool DEBUG = true;
+bool Audio_Ready = false;
 
 Named_List<Music> Sound_Track;
 Named_List<SFX> SFX_List;
+
+std::string Trim(std::string Text)
+{
+	const std::string Whitespace = " \t\r\n";
+	size_t Start = Text.find_first_not_of(Whitespace);
+	if(Start == std::string::npos) return "";
+
+	size_t End = Text.find_last_not_of(Whitespace);
+	return Text.substr(Start, End - Start + 1);
+}
+
+std::string Song_Name_From_File(std::string File)
+{
+	size_t Slash = File.find_last_of("/\\");
+	if(Slash != std::string::npos)
+	{
+		File = File.substr(Slash + 1);
+	}
+
+	size_t Dot = File.find_last_of('.');
+	if(Dot != std::string::npos)
+	{
+		File = File.substr(0, Dot);
+	}
+
+	return File;
+}
+
+bool Read_Playlist_Line(std::string Line, std::string &Name, std::string &File_Name)
+{
+	Line = Trim(Line);
+	if(Line == "" || Line[0] == '#' || Line[0] == '/') return false;
+
+	if(Line[0] == '"')
+	{
+		size_t End_Quote = Line.find('"', 1);
+		if(End_Quote != std::string::npos)
+		{
+			Name = Line.substr(1, End_Quote - 1);
+			File_Name = Trim(Line.substr(End_Quote + 1));
+			return File_Name != "";
+		}
+	}
+
+	std::istringstream Stream(Line);
+	std::string First, Second;
+	Stream >> First;
+	Stream >> Second;
+
+	if(First == "") return false;
+
+	if(Second == "")
+	{
+		File_Name = First;
+		Name = Song_Name_From_File(First);
+	}
+	else
+	{
+		Name = First;
+		File_Name = Second;
+	}
+
+	return true;
+}
+
+bool Ensure_Audio()
+{
+	if(Audio_Ready)
+	{
+		return true;
+	}
+
+	if(SDL_WasInit(SDL_INIT_AUDIO) == 0 && SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
+	{
+		printf("SDL_Audio could not initialize! SDL_Error: %s\n", SDL_GetError());
+		return false;
+	}
+
+	if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+	{
+		printf("SDL_mixer could not open audio! Mix_Error: %s\n", Mix_GetError());
+		return false;
+	}
+
+	Audio_Ready = true;
+	if(DEBUG)
+	{
+		std::cout << "SDL audio driver: " << SDL_GetCurrentAudioDriver() << std::endl;
+	}
+	return true;
+}
 
 extern "C" void Set_Paths(std::string Path_of_Resources)
 {
@@ -44,33 +139,40 @@ extern "C" void Constructor()
     Music_On = true;
     SFX_On = true;
 
-	//Initialize SDL and the sound engine
-	if( SDL_Init( SDL_INIT_AUDIO ) < 0 ) 
+	// Initialize SDL audio, but leave the audio device closed until playback.
+	if(SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
 	{
 		printf( "SDL_Audio could not initialize! SDL_Error: %s\n", SDL_GetError() );
-	}
-	else
-	{
-		//Mix_OpenAudio( Frequency, MIX_DEFAULT_FORMAT, Chanels, Chunksize );
-		Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 2048 );	
 	}
 }
 
 
 extern "C" void Destructor()
 {
-    Mix_CloseAudio();
-	SDL_QuitSubSystem(SDL_INIT_AUDIO);
+	if(Audio_Ready)
+	{
+		Mix_HaltMusic();
+		Mix_HaltChannel(-1);
+		Mix_CloseAudio();
+		Audio_Ready = false;
+	}
+
+	if(SDL_WasInit(SDL_INIT_AUDIO) != 0)
+	{
+		SDL_QuitSubSystem(SDL_INIT_AUDIO);
+	}
 }
 
 extern "C" void Play()
 {
-	if(Music_On)
+	if(Music_On && Ensure_Audio())
 	{
 		if(Sound_Track.Nodes > 0)
 		{
-			if(DEBUG)std::cout << "Playing: " << Sound_Track.Current->Name << std::endl;
-			Sound_Track.Current->Value.Play();
+			if(Sound_Track.Current->Value.Play() && DEBUG)
+			{
+				std::cout << "Playing: " << Sound_Track.Current->Name << std::endl;
+			}
 		}
 		else std::cout << "The playlist is empty" << std::endl;
 	}
@@ -84,13 +186,21 @@ extern "C" void Play_Track(int Track)
 
 extern "C" void Play_Song(std::string Name)
 {
-	Sound_Track.Find(Name);
-	Play();
+	if(Sound_Track.Find(Name))
+	{
+		Play();
+	}
+	else
+	{
+		std::cout << "Song not found: " << Name << std::endl;
+	}
 }
 
 
 extern "C" void Load_Song(std::string Name, std::string Music_File)
 {
+	if(!Ensure_Audio()) return;
+
 	Sound_Track.Add_Node();
 	Sound_Track.Current->Name = Music_File;
 	Sound_Track.Current->Value.Load(Music_File);
@@ -100,7 +210,17 @@ extern "C" void Load_Song(std::string Name, std::string Music_File)
 extern "C" void Stop()
 {
 	Music_On = false;
-	Sound_Track.Current->Value.Stop();
+	if(Sound_Track.Nodes > 0)
+	{
+		Sound_Track.Current->Value.Stop();
+	}
+	if(Audio_Ready)
+	{
+		Mix_HaltMusic();
+		Mix_HaltChannel(-1);
+		Mix_CloseAudio();
+		Audio_Ready = false;
+	}
 }
 
 extern "C" void Next()
@@ -119,19 +239,33 @@ extern "C" void Load_Play_List(std::string Play_List)
 {
 	Play_List = Music_Path + Play_List;
 	std::string Name, File_Name;
-	File_IO File(Play_List);
-		while(File.Good())//not File.End()
+	std::ifstream File(Play_List.c_str());
+
+	if(!File.is_open())
+	{
+		std::cout << "Playlist did not open: " << Play_List << std::endl;
+		return;
+	}
+
+	std::string Line;
+	while(std::getline(File, Line))
+	{
+		if(Read_Playlist_Line(Line, Name, File_Name))
 		{
-			File >> Name;
-			File >> File_Name;
 			Load_Song(Name, File_Name);
 		}
-	File.Close();
-	Sound_Track.Go_To(1);
+	}
+
+	if(Sound_Track.Nodes > 0)
+	{
+		Sound_Track.Go_To(1);
+	}
 }
 
 extern "C" void Load_SFX(std::string Name, std::string SFX_File)
 {
+	if(!Ensure_Audio()) return;
+
 	SFX_List.Add_Node();
 	SFX_List.Current->Value.Load(SFX_File);
 	SFX_List.Current->Name = Name;
@@ -139,7 +273,7 @@ extern "C" void Load_SFX(std::string Name, std::string SFX_File)
 
 extern "C" void Play_SFX()
 {
-	if(SFX_On)SFX_List.Current->Value.Play();
+	if(SFX_On && Ensure_Audio())SFX_List.Current->Value.Play();
 }
 
 extern "C" void Play_SFX_Name(std::string Name)

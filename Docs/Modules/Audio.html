@@ -119,12 +119,17 @@
     <h2>Runtime Layout</h2>
     <pre><code>Resources/Modules/Audio/Audio.dll
 Resources/Modules/Audio/Test_Audio/Test_Audio.dll
-Resources/Modules/Audio/SDL2_Audio/SDL2_Audio.dll</code></pre>
+Resources/Modules/Audio/Appeal_SDL2_Audio/Appeal_SDL2_Audio.dll</code></pre>
 
     <h2>Loading</h2>
     <p>The module is usually loaded from <code>Config.Appeal</code> with <code>Add_Dynamic_Module</code>.</p>
     <pre><code>Add_Dynamic_Module Audio Test_Audio</code></pre>
-    <p>The second argument is the plugin name. For example, <code>Test_Audio</code> loads the test plugin, while <code>SDL2_Audio</code> should load the SDL2 backend after it has been built and installed.</p>
+    <p>The second argument is the plugin name. For example, <code>Test_Audio</code> loads the test plugin, while <code>Appeal_SDL2_Audio</code> loads the SDL2 backend after it has been built and installed.</p>
+
+    <h2>Plugin Naming</h2>
+    <p>Backend plugins should use <code>Appeal_&lt;BackendLibrary&gt;_&lt;Module&gt;</code>. This keeps Appeal plugin DLLs recognizable while still showing the underlying library or platform backend.</p>
+    <pre><code>Appeal_SDL2_Audio.dll
+Appeal_SDL2_Audio.so</code></pre>
 
     <h2>Appeal Commands</h2>
     <table>

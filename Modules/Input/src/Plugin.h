@@ -11,10 +11,10 @@
     class Plugin
     {
     private:
-        void *handle;
-        char *error;
-        void (*Constructor)();
-        void (*Destructor)();
+        void *handle = 0;
+        char *error = nullptr;
+        void (*Constructor)() = nullptr;
+        void (*Destructor)() = nullptr;
 
     public:
 
@@ -48,8 +48,10 @@
 class Plugin
 {
     private:
-    HINSTANCE handle;
-    char *error;
+    HINSTANCE handle = 0;
+    char *error = nullptr;
+    void (*Constructor)() = nullptr;
+    void (*Destructor)() = nullptr;
 
     public:
     void Load(std::string File);

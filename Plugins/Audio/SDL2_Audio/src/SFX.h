@@ -65,7 +65,21 @@ void SFX::Load(std::string File)
 
 void SFX::Play()
 {
+    if(Effect == NULL)
+    {
+        std::cout << "Sound effect did not play" << std::endl
+                  << "Effect = " << Name << std::endl
+                  << "Mix_Error = " << Mix_GetError() << std::endl;
+        return;
+    }
+
     Channel = Mix_PlayChannel( Channel, Effect, 0 );
+    if(Channel < 0)
+    {
+        std::cout << "Sound effect did not play" << std::endl
+                  << "Effect = " << Name << std::endl
+                  << "Mix_Error = " << Mix_GetError() << std::endl;
+    }
 }
 
 void SFX::SetChannel(int X)
@@ -75,7 +89,21 @@ void SFX::SetChannel(int X)
 
 void SFX::Play(int X)
 {
+    if(Effect == NULL)
+    {
+        std::cout << "Sound effect did not play" << std::endl
+                  << "Effect = " << Name << std::endl
+                  << "Mix_Error = " << Mix_GetError() << std::endl;
+        return;
+    }
+
     Channel = Mix_PlayChannel( Channel, Effect, X );
+    if(Channel < 0)
+    {
+        std::cout << "Sound effect did not play" << std::endl
+                  << "Effect = " << Name << std::endl
+                  << "Mix_Error = " << Mix_GetError() << std::endl;
+    }
 }
 
 

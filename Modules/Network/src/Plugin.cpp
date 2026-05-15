@@ -41,18 +41,33 @@
 
 #ifdef __MINGW32__
     void Plugin::Load(std::string File)
-    {    
+    {
+        if(handle != 0)
+        {
+            if(Destructor != nullptr) Destructor();
+            FreeLibrary(handle);
+        }
+
         std::wstring wFile(File.begin(), File.end());
         handle = LoadLibraryW(wFile.c_str());
         if (!handle)
         {
             std::cerr << "Failed to load DLL: " << GetLastError() << std::endl;
             exit(1);
-        }  
+        }
+        else
+        {
+            std::cout << "Loaded: " << File << std::endl;
+        }
+
+        Assign("Constructor", Constructor);
+        Assign("Destructor", Destructor);
+        if(Constructor != nullptr) Constructor();
     }
 
     Plugin::~Plugin()
     {
-        FreeLibrary(handle);
+        if(Destructor != nullptr) Destructor();
+        if(handle != 0) FreeLibrary(handle);
     }
 #endif

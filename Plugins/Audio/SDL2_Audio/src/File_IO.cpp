@@ -75,20 +75,29 @@ void File_IO::Read(std::string &Str)
 
 	std::string Input;
 	std::string Line_With_Spaces;
-	bool GoodLine;
+	bool GoodLine = false;
 		do{
-			iFile >> Input;
-			if(Input.at(0) == '\n' or Input.at(0) == '/' or Input.at(0) == '#')
+			if(!(iFile >> Input))
+			{
+				Str = "";
+				return;
+			}
+
+			if(Input.empty())
+			{
+				GoodLine = false;
+			}
+			else if(Input[0] == '\n' or Input[0] == '/' or Input[0] == '#')
             {
 				GoodLine = false;
 				getline(iFile, Input);
 			}
-			else if(Input.at(0) == '"')
+			else if(Input[0] == '"')
             {
 				Line_With_Spaces = Input;
-				while(Line_With_Spaces.at(Line_With_Spaces.length()-1) != '"')
+				while(!Line_With_Spaces.empty() && Line_With_Spaces[Line_With_Spaces.length()-1] != '"')
                 {
-					iFile >> Input;
+					if(!(iFile >> Input)) break;
 					Line_With_Spaces += " " + Input;
 				}
 				//Line_With_Spaces += Input;

@@ -16,3 +16,4 @@ Plugins/**/*.so
 Third_Party/SDL2/Windows/x86_64/include/
 Third_Party/SDL2/Windows/x86_64/lib/
 Third_Party/SDL2/Windows/x86_64/bin/*.dll
+/SDL2*.dll
