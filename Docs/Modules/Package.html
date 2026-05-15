@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Package Module</title>
+  <style>
+    body { max-width: 980px; margin: 0 auto; padding: 34px 22px 56px; font: 16px/1.55 system-ui, sans-serif; }
+    nav { margin-bottom: 24px; }
+    code, pre { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+    pre { overflow: auto; padding: 14px; border: 1px solid #ccd2d8; border-radius: 8px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ccd2d8; padding: 10px; text-align: left; vertical-align: top; }
+  </style>
+</head>
+<body>
+  <nav><a href="../Index.html">Documentation</a> / Modules / Package</nav>
+  <h1>Package Module</h1>
+  <p>The Package module is the repository and package-management scaffold for modules, plugins, and assets.</p>
+  <h2>Loading</h2>
+  <pre><code>Add_Dynamic_Module Package Test_Package
+Run Test_Package</code></pre>
+  <h2>Commands</h2>
+  <table>
+    <tr><th>Command</th><th>Arguments</th></tr>
+    <tr><td><code>Set_Paths</code></td><td><code>resources</code></td></tr>
+    <tr><td><code>Add_Repo</code></td><td><code>name url</code></td></tr>
+    <tr><td><code>Remove_Repo</code></td><td><code>name</code></td></tr>
+    <tr><td><code>Update_Repos</code></td><td>none</td></tr>
+    <tr><td><code>Search</code></td><td><code>query</code></td></tr>
+    <tr><td><code>Install</code>, <code>Remove</code>, <code>Info</code>, <code>Verify</code></td><td><code>package</code></td></tr>
+    <tr><td><code>List</code>, <code>Upgrade</code></td><td>none</td></tr>
+    <tr><td><code>Load_Module</code>, <code>Unload_Module</code></td><td><code>module</code></td></tr>
+    <tr><td><code>Load_Plugin</code></td><td><code>module plugin</code></td></tr>
+    <tr><td><code>Unload_Plugin</code></td><td><code>module</code></td></tr>
+  </table>
+</body>
+</html>

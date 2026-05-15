@@ -1,0 +1,31 @@
+Input Set_Paths ./Resources
+Input Add_Control_Set Default
+Input Set_Control_Set Default
+Input Bind_Key Move_Left Key_A
+Input Bind_Key Move_Right Key_D
+Input Bind_Key Jump Key_Space
+Input Bind_Mouse Select Left
+Input Bind_Button Confirm Button_A
+Input Bind_Axis Move_X Left_Stick_X
+Input Update Default
+Input Down Move_Left
+Input Pressed Jump
+Input Released Jump
+Input Axis Move_X
+Input Mouse_X
+Input Mouse_Y
+Input Mouse_Delta_X
+Input Mouse_Delta_Y
+Input Mouse_Wheel
+Input Mouse_Down Left
+Input Mouse_Pressed Left
+Input Mouse_Released Left
+Input Set_Key_Down Key_Escape Quit_App
+Input Set_Key_Up Key_Escape Release_Escape
+Input Set_Mouse_Down Left Select
+Input Set_Mouse_Up Left Release_Select
+Input Set_Controller_Button_Down Button_A Confirm
+Input Set_Controller_Button_Up Button_A Release_Confirm
+Input Set_Controller_Axis Left_Stick_X Move_X
+Input Unbind Move_Right
+Return

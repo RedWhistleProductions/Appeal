@@ -1,6 +1,11 @@
-//Net_Client Init SDL_Net_Client
 //Add_Dynamic_Module Audio Test_Audio
-Add_Dynamic_Module Graphics Test_Graphics
+//Add_Dynamic_Module Graphics Test_Graphics
+//Add_Dynamic_Module Input Test_Input
+//Add_Dynamic_Module Network Test_Network
+//Add_Dynamic_Module Package Test_Package
+//Add_Dynamic_Module Storage Test_Storage
+//Add_Dynamic_Module World Test_World
+
 
 //Input Init SDL2_Input
 //Renderer Init SDL2_Renderer

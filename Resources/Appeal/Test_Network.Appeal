@@ -1,0 +1,18 @@
+Network Set_Paths ./Resources
+Network Listen GameServer 5000
+Network Connect HostPlayer 127.0.0.1 5000
+Network Accept GameServer Player2
+Network Send HostPlayer Ready
+Network Send Player2 Welcome
+Network Receive HostPlayer
+Network Receive Player2
+Network Poll
+Network Has_Data HostPlayer
+Network Has_Command Player2
+Network Read_Command Player2
+Network Run Player2
+Network Download HostPlayer Assets.zip ./Resources/Downloads/Assets.zip
+Network Disconnect HostPlayer
+Network Disconnect Player2
+Network Stop_Listening GameServer
+Return

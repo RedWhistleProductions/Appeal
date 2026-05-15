@@ -1,6 +1,13 @@
 Run Config
 //Run Test_Audio
-Run Test_Graphics
+//Run Test_Graphics
+//Run Test_Input
+
+//Run Test_Network
+//Run Test_Package
+//Run Test_Storage
+Run Test_World
+
 //Set_Var Wait 10
 //Delay Var Wait
 Done

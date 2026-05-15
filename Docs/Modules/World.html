@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>World Module</title>
+  <style>
+    body { max-width: 980px; margin: 0 auto; padding: 34px 22px 56px; font: 16px/1.55 system-ui, sans-serif; }
+    nav { margin-bottom: 24px; }
+    code, pre { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+    pre { overflow: auto; padding: 14px; border: 1px solid #ccd2d8; border-radius: 8px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ccd2d8; padding: 10px; text-align: left; vertical-align: top; }
+  </style>
+</head>
+<body>
+  <nav><a href="../Index.html">Documentation</a> / Modules / World</nav>
+  <h1>World Module</h1>
+  <p>The World module is the first scene/entity scaffold for Bananas-style apps.</p>
+  <h2>Loading</h2>
+  <pre><code>Add_Dynamic_Module World Test_World
+Run Test_World</code></pre>
+  <h2>Commands</h2>
+  <table>
+    <tr><th>Command</th><th>Arguments</th></tr>
+    <tr><td><code>Set_Paths</code></td><td><code>resources</code></td></tr>
+    <tr><td><code>Create</code>, <code>Load</code>, <code>Save</code>, <code>Switch</code>, <code>Update</code>, <code>Draw</code></td><td><code>world</code></td></tr>
+    <tr><td><code>Entity_Create</code>, <code>Entity_Destroy</code></td><td><code>entity</code></td></tr>
+    <tr><td><code>Entity_Set_Active</code></td><td><code>entity active</code></td></tr>
+    <tr><td><code>Entity_Set_Tag</code></td><td><code>entity tag</code></td></tr>
+    <tr><td><code>Set_Position</code>, <code>Set_Rotation</code>, <code>Set_Scale</code>, <code>Move</code>, <code>Rotate</code></td><td><code>entity x y z</code></td></tr>
+    <tr><td><code>Add_Component</code>, <code>Remove_Component</code></td><td><code>entity component</code></td></tr>
+    <tr><td><code>Query</code></td><td><code>tag</code></td></tr>
+  </table>
+</body>
+</html>

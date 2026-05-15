@@ -1,0 +1,13 @@
+Storage Set_Paths ./Resources
+Storage Open Settings
+Storage Set Player Billy
+Storage Set Volume 80
+Storage Get Player
+Storage Write Settings ./Resources/Storage/settings.txt
+Storage Exists ./Resources/Storage/settings.txt
+Storage Read ./Resources/Storage/settings.txt
+Storage Save Settings
+Storage Load Settings
+Storage Delete ./Resources/Storage/settings.txt
+Storage Close Settings
+Return

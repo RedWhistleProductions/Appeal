@@ -1,0 +1,20 @@
+World Set_Paths ./Resources
+World Create Main
+World Load Main
+World Switch Main
+World Entity_Create Player
+World Entity_Set_Tag Player Hero
+World Entity_Set_Active Player 1
+World Set_Position Player 0.0 1.0 2.0
+World Set_Rotation Player 0.0 0.0 0.0
+World Set_Scale Player 1.0 1.0 1.0
+World Move Player 1.0 0.0 0.0
+World Rotate Player 0.0 1.0 0.0
+World Add_Component Player Transform
+World Query Hero
+World Update Main
+World Draw Main
+World Remove_Component Player Transform
+World Entity_Destroy Player
+World Save Main
+Return

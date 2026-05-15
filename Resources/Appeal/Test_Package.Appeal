@@ -1,0 +1,17 @@
+Package Set_Paths ./Resources
+Package Add_Repo Core https://example.invalid/core
+Package Add_Repo Bananas https://example.invalid/bananas
+Package Update_Repos
+Package Search Audio
+Package Info Audio
+Package Install Audio
+Package Verify Audio
+Package List
+Package Upgrade
+Package Load_Module Audio
+Package Load_Plugin Audio Test_Audio
+Package Unload_Plugin Audio
+Package Unload_Module Audio
+Package Remove Audio
+Package Remove_Repo Bananas
+Return
