@@ -1,0 +1,28 @@
+Graphics Set_Paths ./Resources
+Graphics Add_Window Main "Appeal Graphics Test" 1280 720
+Graphics Set_FPS 60
+Graphics Set_View_Port Main 0 0 1280 720
+Graphics Set_Perspective Main 45.0 0.1 100.0
+Graphics Set_Camera_Location Main 0.0 0.0 -5.0
+Graphics Set_Camera_Orientation Main 0.0 0.0 0.0
+Graphics Update_Camera Main
+Graphics Load_Shader Default Default.Config
+Graphics Load_Texture Test Test.bmp
+Graphics Load_Font MainFont Tuffy.ttf 18
+Graphics Load_Mesh Cube cube.dat
+Graphics Load_Asset Cube cube.dat
+Graphics Set_Texture Cube Test
+Graphics Set_Shader Cube Default
+Graphics Set_Location Cube 0.0 0.0 -10.0
+Graphics Set_Orientation Cube 0.0 0.0 0.0
+Graphics Set_Scale Cube 1.0 1.0 1.0
+Graphics Move_Asset Cube 1.0 0.0 0.0
+Graphics Rotate_Asset Cube 0.0 1.0 0.0
+Graphics Draw_Text MainFont Hello 20.0 20.0
+Graphics GUI_Begin Main
+Graphics GUI_Text Title Hello
+Graphics GUI_Button Start Start
+Graphics GUI_End
+Graphics Render
+Graphics Update
+Return

@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Graphics Module</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f7f7f4;
+      --fg: #1c1d20;
+      --muted: #5d6470;
+      --line: #cfd4d9;
+      --panel: #ffffff;
+      --accent: #15616d;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #15171a;
+        --fg: #eceff3;
+        --muted: #aab2bd;
+        --line: #343a42;
+        --panel: #1f2328;
+        --accent: #4fb3bf;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font: 16px/1.55 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    main {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 34px 22px 56px;
+    }
+
+    nav {
+      margin-bottom: 24px;
+      color: var(--muted);
+    }
+
+    nav a {
+      color: var(--accent);
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin: 34px 0 12px;
+      border-top: 1px solid var(--line);
+      padding-top: 20px;
+      font-size: 1.35rem;
+    }
+
+    p {
+      max-width: 78ch;
+      margin: 0 0 14px;
+    }
+
+    code,
+    pre {
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+    }
+
+    code {
+      padding: 2px 5px;
+      border-radius: 4px;
+      background: color-mix(in srgb, var(--line), transparent 70%);
+    }
+
+    pre {
+      overflow: auto;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 22px;
+      background: var(--panel);
+    }
+
+    th,
+    td {
+      border: 1px solid var(--line);
+      padding: 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <nav><a href="../Index.html">Documentation</a> / Modules / Graphics</nav>
+    <h1>Graphics Module</h1>
+    <p>The Graphics module is the visual system scaffold for Appeal and Bananas. It is intended to cover windows, cameras, 2D and 3D resources, text, GUI commands, render, and update behavior through a stable Appeal-facing API.</p>
+
+    <h2>Loading</h2>
+    <pre><code>Add_Dynamic_Module Graphics Test_Graphics
+Run Test_Graphics</code></pre>
+
+    <h2>Runtime Layout</h2>
+    <pre><code>Resources/Modules/Graphics/Graphics.dll
+Resources/Modules/Graphics/Test_Graphics/Test_Graphics.dll</code></pre>
+
+    <h2>Command Groups</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Group</th>
+          <th>Commands</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Setup</td>
+          <td><code>Set_Paths</code>, <code>Set_FPS</code></td>
+        </tr>
+        <tr>
+          <td>Windows</td>
+          <td><code>Add_Window</code>, <code>Add_Full_Screen_Window</code>, <code>Delete_Window</code>, <code>Show</code>, <code>Hide</code>, <code>Set_Focus</code>, <code>Set_Monitor</code></td>
+        </tr>
+        <tr>
+          <td>Viewport</td>
+          <td><code>Set_View_Port</code>, <code>Set_Perspective</code>, <code>Set_Ortho</code></td>
+        </tr>
+        <tr>
+          <td>Camera</td>
+          <td><code>Set_Camera_Location</code>, <code>Set_Camera_Orientation</code>, <code>Move_Camera</code>, <code>Rotate_Camera</code>, <code>Update_Camera</code></td>
+        </tr>
+        <tr>
+          <td>Resources</td>
+          <td><code>Load_Shader</code>, <code>Load_Texture</code>, <code>Load_Font</code>, <code>Load_Mesh</code>, <code>Load_Asset</code></td>
+        </tr>
+        <tr>
+          <td>Assets</td>
+          <td><code>Set_Texture</code>, <code>Set_Shader</code>, <code>Set_Location</code>, <code>Set_Orientation</code>, <code>Set_Scale</code>, <code>Move_Asset</code>, <code>Rotate_Asset</code></td>
+        </tr>
+        <tr>
+          <td>Text And GUI</td>
+          <td><code>Draw_Text</code>, <code>GUI_Begin</code>, <code>GUI_Text</code>, <code>GUI_Button</code>, <code>GUI_End</code></td>
+        </tr>
+        <tr>
+          <td>Frame</td>
+          <td><code>Render</code>, <code>Update</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Test Script</h2>
+    <p>The current test script is <code>Resources/Appeal/Test_Graphics.Appeal</code>. It exercises every command in the first Graphics API scaffold against <code>Test_Graphics</code>.</p>
+  </main>
+</body>
+</html>

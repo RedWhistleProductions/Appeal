@@ -1,5 +1,6 @@
 Run Config
 //Run Test_Audio
+Run Test_Graphics
 //Set_Var Wait 10
 //Delay Var Wait
 Done

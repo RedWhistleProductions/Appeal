@@ -1,5 +1,7 @@
 //Net_Client Init SDL_Net_Client
-Add_Dynamic_Module Audio Test_Audio
+//Add_Dynamic_Module Audio Test_Audio
+Add_Dynamic_Module Graphics Test_Graphics
+
 //Input Init SDL2_Input
 //Renderer Init SDL2_Renderer
 
