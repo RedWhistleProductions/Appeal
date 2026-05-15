@@ -4,7 +4,7 @@
 void Dynamic_Module::Load(std::string Module_Name)
     {
         if(handle != 0){
-            dlclose(handle);
+            Unload();
         }
         
 
@@ -24,12 +24,20 @@ void Dynamic_Module::Load(std::string Module_Name)
         
     }
 
-    Dynamic_Module::~Dynamic_Module()
+    void Dynamic_Module::Unload()
     {
         if(handle != 0)
         {
             dlclose(handle);
-        }   
+            handle = 0;
+        }
+        Init = nullptr;
+        Interpreter = nullptr;
+    }
+
+    Dynamic_Module::~Dynamic_Module()
+    {
+        Unload();
     }
 #endif
 
@@ -37,7 +45,7 @@ void Dynamic_Module::Load(std::string Module_Name)
 void Dynamic_Module::Load(std::string Module_Name)
 {
     if(handle != 0){
-        FreeLibrary(handle);
+        Unload();
     }
     
     handle = LoadLibraryW(std::wstring(Module_Name.begin(), Module_Name.end()).c_str());
@@ -54,11 +62,19 @@ void Dynamic_Module::Load(std::string Module_Name)
     } 
 }
 
-Dynamic_Module::~Dynamic_Module()
+void Dynamic_Module::Unload()
 {
     if(handle != 0)
     {
         FreeLibrary(handle);
-    }   
+        handle = 0;
+    }
+    Init = nullptr;
+    Interpreter = nullptr;
+}
+
+Dynamic_Module::~Dynamic_Module()
+{
+    Unload();
 }
 #endif

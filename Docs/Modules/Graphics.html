@@ -124,6 +124,19 @@ Run Test_Graphics</code></pre>
     <pre><code>Resources/Modules/Graphics/Graphics.dll
 Resources/Modules/Graphics/Test_Graphics/Test_Graphics.dll</code></pre>
 
+    <h2>SDL2 Backend</h2>
+    <p><code>Appeal_SDL2_Graphics</code> uses SDL2 for windows and rendering, Dear ImGui for GUI commands, SDL2_ttf for text, SDL2_image for image loading, and Assimp for model loading when a built Assimp library is available.</p>
+    <pre><code>Resources/Modules/Graphics/Appeal_SDL2_Graphics/Appeal_SDL2_Graphics.dll</code></pre>
+
+    <h2>Resource Layout</h2>
+    <p>Graphics resources live under <code>Resources/Graphics</code>, with subfolders for each resource type.</p>
+    <pre><code>Resources/Graphics/Textures/
+Resources/Graphics/Fonts/
+Resources/Graphics/Shaders/
+Resources/Graphics/Meshes/
+Resources/Graphics/Materials/
+Resources/Graphics/GUI/</code></pre>
+
     <h2>Command Groups</h2>
     <table>
       <thead>
@@ -169,7 +182,7 @@ Resources/Modules/Graphics/Test_Graphics/Test_Graphics.dll</code></pre>
     </table>
 
     <h2>Test Script</h2>
-    <p>The current test script is <code>Resources/Appeal/Test_Graphics.Appeal</code>. It exercises every command in the first Graphics API scaffold against <code>Test_Graphics</code>.</p>
+    <p>The current test script is <code>Resources/Appeal/Test_Graphics.Appeal</code>. It exercises the SDL2 backend, including texture loading, text, Dear ImGui GUI commands, camera state, mesh loading, and wireframe rendering.</p>
   </main>
 </body>
 </html>

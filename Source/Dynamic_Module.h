@@ -6,13 +6,14 @@
     class Dynamic_Module
     {
     private:
-        void *handle;
-        char *error;
+        void *handle = 0;
+        char *error = nullptr;
     public:
         Plugin Module_Plugin;
         void (*Init)(std::string Plugin_Name);
         void (*Interpreter)(Data_Source *Data);
         void Load(std::string Module_Name);
+        void Unload();
         template<typename T>void Assign(std::string Key, T &func);
 
         ~Dynamic_Module();
@@ -36,12 +37,13 @@
     class Dynamic_Module
     {
     private:
-        HINSTANCE handle;
+        HINSTANCE handle = 0;
     public:
         Plugin Module_Plugin;
         void (*Init)(std::string Plugin_Name);
         void (*Interpreter)(Data_Source *Data);
         void Load(std::string Module_Name);
+        void Unload();
         template<typename T>void Assign(std::string Key, T &func);
 
         ~Dynamic_Module();

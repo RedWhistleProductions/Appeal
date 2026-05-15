@@ -1,28 +1,58 @@
+Add_Dynamic_Module Graphics Appeal_SDL2_Graphics
 Graphics Set_Paths ./Resources
-Graphics Add_Window Main "Appeal Graphics Test" 1280 720
+Graphics Add_Window Main "Appeal Graphics Test" 640 360
 Graphics Set_FPS 60
-Graphics Set_View_Port Main 0 0 1280 720
+Graphics Show Main
+Graphics Set_Focus Main
+Graphics Set_View_Port Main 0 0 640 360
 Graphics Set_Perspective Main 45.0 0.1 100.0
-Graphics Set_Camera_Location Main 0.0 0.0 -5.0
+Graphics Set_Camera_Location Main 0.0 0.0 -6.0
 Graphics Set_Camera_Orientation Main 0.0 0.0 0.0
 Graphics Update_Camera Main
-Graphics Load_Shader Default Default.Config
-Graphics Load_Texture Test Test.bmp
+
+Graphics Load_Texture Box Box.bmp
 Graphics Load_Font MainFont Tuffy.ttf 18
+Graphics Load_Shader Wire Default.Config
 Graphics Load_Mesh Cube cube.dat
-Graphics Load_Asset Cube cube.dat
-Graphics Set_Texture Cube Test
-Graphics Set_Shader Cube Default
-Graphics Set_Location Cube 0.0 0.0 -10.0
-Graphics Set_Orientation Cube 0.0 0.0 0.0
+Graphics Load_Asset Box Box.bmp
+Graphics Set_Texture Box Box
+Graphics Set_Location Box 260.0 90.0 0.0
+Graphics Set_Orientation Box 0.0 0.0 15.0
+Graphics Set_Scale Box 0.5 0.5 1.0
+Graphics Load_Asset Cube Cube
+Graphics Set_Shader Cube Wire
+Graphics Set_Location Cube 0.0 0.0 6.0
+Graphics Set_Orientation Cube 25.0 20.0 0.0
 Graphics Set_Scale Cube 1.0 1.0 1.0
-Graphics Move_Asset Cube 1.0 0.0 0.0
-Graphics Rotate_Asset Cube 0.0 1.0 0.0
-Graphics Draw_Text MainFont Hello 20.0 20.0
+Graphics Draw_Text MainFont "Appeal SDL2 Graphics" 24.0 24.0
 Graphics GUI_Begin Main
-Graphics GUI_Text Title Hello
+Graphics GUI_Text Title "GUI Text"
 Graphics GUI_Button Start Start
 Graphics GUI_End
+
 Graphics Render
 Graphics Update
-Return
+Delay 3
+Graphics Hide Main
+Graphics Show Main
+Graphics Move_Asset Box 80.0 20.0 0.0
+Graphics Rotate_Asset Box 0.0 0.0 30.0
+Graphics Move_Camera Main 0.0 0.0 0.5
+Graphics Rotate_Asset Cube 15.0 25.0 0.0
+Graphics Draw_Text MainFont "Moved Asset" 24.0 56.0
+Graphics Render
+Graphics Update
+Delay 1
+Graphics Delete_Window Main
+
+// Manual Window Tests
+//Graphics Add_Full_Screen_Window FullScreen 0
+//Graphics Set_Monitor Main 0
+
+// Alternate Projection Test
+//Graphics Set_Ortho Main 0.0 640.0 360.0 0.0 -1.0 1.0
+
+// Extra Camera Test
+//Graphics Rotate_Camera Main 0.0 1.0 0.0
+
+Done

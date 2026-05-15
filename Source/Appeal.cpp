@@ -58,7 +58,8 @@ void Appeal::Run(std::string Script)
 
 void Appeal::Run()
 {
-    std::cout << "Running: " << Data_Manager.Data_Sources.Current->Name << std::endl;
+    std::string Running_Source = Data_Manager.Data_Sources.Current->Name;
+    std::cout << "Running: " << Running_Source << std::endl;
     
     Done = false;
     if(Data_Manager.Data_Sources.Nodes == 0)
@@ -78,6 +79,9 @@ void Appeal::Run()
             if(Command == "Done")
             {
                 Done = true;
+                Shutdown();
+                std::cout << "Done Running: " << Running_Source << std::endl;
+                return;
             }
             else if(Command == "Add_Dynamic_Module")
             {
@@ -180,5 +184,22 @@ void Appeal::Run()
             }   
         }
     }
-    std::cout << "Done Running: " << Data_Manager.Data_Sources.Current->Name << std::endl;
+    std::cout << "Done Running: " << Running_Source << std::endl;
+}
+
+void Appeal::Shutdown()
+{
+    if(Shutting_Down)
+    {
+        return;
+    }
+
+    Shutting_Down = true;
+
+    while(Dynamic_Modules.Nodes > 0)
+    {
+        Dynamic_Modules.Last();
+        Dynamic_Modules.Current->Value.Unload();
+        Dynamic_Modules.Remove();
+    }
 }

@@ -13,7 +13,5 @@ int main(int argc, char* argv[])
         App.Run("Main");
     }
     
-    while(App.Done == false){};
-    
     return 0;
 }

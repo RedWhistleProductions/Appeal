@@ -19,6 +19,7 @@
     public:
 
         void Load(std::string File);
+        void Unload();
         template<typename T>void Assign(std::string Key, T &func);
 
         ~Plugin();
@@ -55,6 +56,7 @@ class Plugin
 
     public:
     void Load(std::string File);
+    void Unload();
     template<typename T>
     void Assign(std::string Key, T &func);
     ~Plugin();

@@ -35,6 +35,7 @@ class Appeal
     void Add_Script(std::string Name);
     void Run();
     void Run(std::string Name);
+    void Shutdown();
     
     private: 
     Named_List<File_Data_Source> Appeal_Scripts;
@@ -42,6 +43,7 @@ class Appeal
     std::string Command;
     Named_List<Appeal_Dictionary> Dictionary_List;
     void (*Interpreter)(Data_Source *Data);
+    bool Shutting_Down = false;
     
     // The App terminates if Command_Error == Command_Error_Limit
     const int Command_Error_Limit = 3;
