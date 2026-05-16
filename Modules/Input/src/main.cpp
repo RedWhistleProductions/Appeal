@@ -2,7 +2,9 @@
 #include "Data_Source.h"
 
 Plugin Module;
+bool Module_Debug = true;
 
+void (*Debug)(bool Enable);
 void (*Set_Paths)(std::string Resources);
 void (*Add_Control_Set)(std::string Name);
 void (*Set_Control_Set)(std::string Name);
@@ -35,6 +37,16 @@ void (*Set_Mouse_Up)(std::string Button, std::string Function);
 void (*Set_Controller_Button_Down)(std::string Button, std::string Function);
 void (*Set_Controller_Button_Up)(std::string Button, std::string Function);
 void (*Set_Controller_Axis)(std::string Axis, std::string Function);
+void (*Open_Controller)(int Controller);
+void (*Close_Controller)(int Controller);
+bool (*Controller_Down)(int Controller, std::string Button);
+bool (*Controller_Pressed)(int Controller, std::string Button);
+bool (*Controller_Released)(int Controller, std::string Button);
+int (*Controller_Axis)(int Controller, std::string Axis);
+void (*Set_Controller_Button_Down_For)(int Controller, std::string Button, std::string Function);
+void (*Set_Controller_Button_Up_For)(int Controller, std::string Button, std::string Function);
+void (*Set_Controller_Axis_For)(int Controller, std::string Axis, std::string Function);
+void (*Set_Controller_Axis_Range)(int Controller, std::string Axis, int Min, int Max, std::string Function);
 
 template<typename T>
 void Assign(std::string Name, T &Function)
@@ -46,6 +58,7 @@ extern "C" void Init(std::string Name)
 {
     Module.Load(Name);
 
+    Assign("Debug", Debug);
     Assign("Set_Paths", Set_Paths);
     Assign("Add_Control_Set", Add_Control_Set);
     Assign("Set_Control_Set", Set_Control_Set);
@@ -78,6 +91,26 @@ extern "C" void Init(std::string Name)
     Assign("Set_Controller_Button_Down", Set_Controller_Button_Down);
     Assign("Set_Controller_Button_Up", Set_Controller_Button_Up);
     Assign("Set_Controller_Axis", Set_Controller_Axis);
+    Assign("Open_Controller", Open_Controller);
+    Assign("Close_Controller", Close_Controller);
+    Assign("Controller_Down", Controller_Down);
+    Assign("Controller_Pressed", Controller_Pressed);
+    Assign("Controller_Released", Controller_Released);
+    Assign("Controller_Axis", Controller_Axis);
+    Assign("Set_Controller_Button_Down_For", Set_Controller_Button_Down_For);
+    Assign("Set_Controller_Button_Up_For", Set_Controller_Button_Up_For);
+    Assign("Set_Controller_Axis_For", Set_Controller_Axis_For);
+    Assign("Set_Controller_Axis_Range", Set_Controller_Axis_Range);
+}
+
+extern "C" void Set_Function_Runner(void (*Run_Function)(std::string), void (*Run_Analog_Function)(std::string, int))
+{
+    void (*Plugin_Set_Function_Runner)(void (*Run_Function)(std::string), void (*Run_Analog_Function)(std::string, int));
+    Module.Assign("Set_Function_Runner", Plugin_Set_Function_Runner);
+    if(Plugin_Set_Function_Runner != nullptr)
+    {
+        Plugin_Set_Function_Runner(Run_Function, Run_Analog_Function);
+    }
 }
 
 extern "C" void Interpreter(Data_Source *Data)
@@ -90,6 +123,13 @@ extern "C" void Interpreter(Data_Source *Data)
         std::string Name;
         *Data >> Name;
         Init(Name);
+    }
+    else if(Command == "Debug")
+    {
+        int Enable;
+        *Data >> Enable;
+        Module_Debug = Enable != 0;
+        if(Debug != nullptr) Debug(Module_Debug);
     }
     else if(Command == "Set_Paths")
     {
@@ -153,63 +193,63 @@ extern "C" void Interpreter(Data_Source *Data)
     {
         std::string Action;
         *Data >> Action;
-        std::cout << Down(Action) << std::endl;
+        if(Module_Debug) std::cout << Down(Action) << std::endl;
     }
     else if(Command == "Pressed")
     {
         std::string Action;
         *Data >> Action;
-        std::cout << Pressed(Action) << std::endl;
+        if(Module_Debug) std::cout << Pressed(Action) << std::endl;
     }
     else if(Command == "Released")
     {
         std::string Action;
         *Data >> Action;
-        std::cout << Released(Action) << std::endl;
+        if(Module_Debug) std::cout << Released(Action) << std::endl;
     }
     else if(Command == "Axis")
     {
         std::string Action;
         *Data >> Action;
-        std::cout << Axis(Action) << std::endl;
+        if(Module_Debug) std::cout << Axis(Action) << std::endl;
     }
     else if(Command == "Mouse_X")
     {
-        std::cout << Mouse_X() << std::endl;
+        if(Module_Debug) std::cout << Mouse_X() << std::endl;
     }
     else if(Command == "Mouse_Y")
     {
-        std::cout << Mouse_Y() << std::endl;
+        if(Module_Debug) std::cout << Mouse_Y() << std::endl;
     }
     else if(Command == "Mouse_Delta_X")
     {
-        std::cout << Mouse_Delta_X() << std::endl;
+        if(Module_Debug) std::cout << Mouse_Delta_X() << std::endl;
     }
     else if(Command == "Mouse_Delta_Y")
     {
-        std::cout << Mouse_Delta_Y() << std::endl;
+        if(Module_Debug) std::cout << Mouse_Delta_Y() << std::endl;
     }
     else if(Command == "Mouse_Wheel")
     {
-        std::cout << Mouse_Wheel() << std::endl;
+        if(Module_Debug) std::cout << Mouse_Wheel() << std::endl;
     }
     else if(Command == "Mouse_Down")
     {
         std::string Button;
         *Data >> Button;
-        std::cout << Mouse_Down(Button) << std::endl;
+        if(Module_Debug) std::cout << Mouse_Down(Button) << std::endl;
     }
     else if(Command == "Mouse_Pressed")
     {
         std::string Button;
         *Data >> Button;
-        std::cout << Mouse_Pressed(Button) << std::endl;
+        if(Module_Debug) std::cout << Mouse_Pressed(Button) << std::endl;
     }
     else if(Command == "Mouse_Released")
     {
         std::string Button;
         *Data >> Button;
-        std::cout << Mouse_Released(Button) << std::endl;
+        if(Module_Debug) std::cout << Mouse_Released(Button) << std::endl;
     }
     else if(Command == "Set_Key_Down")
     {
@@ -260,8 +300,90 @@ extern "C" void Interpreter(Data_Source *Data)
         *Data >> Function;
         Set_Controller_Axis(Axis_Name, Function);
     }
+    else if(Command == "Open_Controller")
+    {
+        int Controller;
+        *Data >> Controller;
+        Open_Controller(Controller);
+    }
+    else if(Command == "Close_Controller")
+    {
+        int Controller;
+        *Data >> Controller;
+        Close_Controller(Controller);
+    }
+    else if(Command == "Controller_Down")
+    {
+        int Controller;
+        std::string Button;
+        *Data >> Controller;
+        *Data >> Button;
+        if(Module_Debug) std::cout << Controller_Down(Controller, Button) << std::endl;
+    }
+    else if(Command == "Controller_Pressed")
+    {
+        int Controller;
+        std::string Button;
+        *Data >> Controller;
+        *Data >> Button;
+        if(Module_Debug) std::cout << Controller_Pressed(Controller, Button) << std::endl;
+    }
+    else if(Command == "Controller_Released")
+    {
+        int Controller;
+        std::string Button;
+        *Data >> Controller;
+        *Data >> Button;
+        if(Module_Debug) std::cout << Controller_Released(Controller, Button) << std::endl;
+    }
+    else if(Command == "Controller_Axis")
+    {
+        int Controller;
+        std::string Axis_Name;
+        *Data >> Controller;
+        *Data >> Axis_Name;
+        if(Module_Debug) std::cout << Controller_Axis(Controller, Axis_Name) << std::endl;
+    }
+    else if(Command == "Set_Controller_Button_Down_For")
+    {
+        int Controller;
+        std::string Button, Function;
+        *Data >> Controller;
+        *Data >> Button;
+        *Data >> Function;
+        Set_Controller_Button_Down_For(Controller, Button, Function);
+    }
+    else if(Command == "Set_Controller_Button_Up_For")
+    {
+        int Controller;
+        std::string Button, Function;
+        *Data >> Controller;
+        *Data >> Button;
+        *Data >> Function;
+        Set_Controller_Button_Up_For(Controller, Button, Function);
+    }
+    else if(Command == "Set_Controller_Axis_For")
+    {
+        int Controller;
+        std::string Axis_Name, Function;
+        *Data >> Controller;
+        *Data >> Axis_Name;
+        *Data >> Function;
+        Set_Controller_Axis_For(Controller, Axis_Name, Function);
+    }
+    else if(Command == "Set_Controller_Axis_Range")
+    {
+        int Controller, Min, Max;
+        std::string Axis_Name, Function;
+        *Data >> Controller;
+        *Data >> Axis_Name;
+        *Data >> Min;
+        *Data >> Max;
+        *Data >> Function;
+        Set_Controller_Axis_Range(Controller, Axis_Name, Min, Max, Function);
+    }
     else
     {
-        std::cout << "\tError: " << Command << " not found in Input Dictionary" << std::endl;
+        if(Module_Debug) std::cout << "\tError: " << Command << " not found in Input Dictionary" << std::endl;
     }
 }

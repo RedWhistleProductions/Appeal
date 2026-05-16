@@ -193,6 +193,7 @@
     <section>
       <h2>Conventions</h2>
       <p>Each module should eventually have a <code>Test_&lt;Module&gt;.Appeal</code> script and a <code>Test_&lt;Module&gt;</code> plugin. The test plugin exports every function expected by the module and prints function calls to the terminal, making it both a test backend and a template for real plugins.</p>
+      <p>Every module should include a standard <code>Debug 0</code> / <code>Debug 1</code> command. Module wrappers should keep their own debug flag and forward it to a plugin export named <code>Debug(bool Enable)</code> when the plugin provides one.</p>
     </section>
 
     <footer>

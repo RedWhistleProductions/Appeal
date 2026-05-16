@@ -1,4 +1,6 @@
 #include <iostream>
+extern "C" void Debug(bool Enable) { (void)Enable; }
+
 #include <string>
 
 extern "C" void Constructor() { std::cout << "Test_Storage Constructor()" << std::endl; }
@@ -14,3 +16,4 @@ extern "C" void Set(std::string Key, std::string Value) { std::cout << "Set(" <<
 extern "C" void Get(std::string Key) { std::cout << "Get(" << Key << ")" << std::endl; }
 extern "C" void Save(std::string Name) { std::cout << "Save(" << Name << ")" << std::endl; }
 extern "C" void Load(std::string Name) { std::cout << "Load(" << Name << ")" << std::endl; }
+

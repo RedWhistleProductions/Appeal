@@ -1,15 +1,16 @@
 //Add_Dynamic_Module Audio Test_Audio
 //Add_Dynamic_Module Audio Appeal_SDL2_Audio
 //Add_Dynamic_Module Graphics Test_Graphics
-Add_Dynamic_Module Graphics Appeal_SDL2_Graphics
 //Add_Dynamic_Module Input Test_Input
+//Add_Dynamic_Module Input Appeal_SDL2_Input
 //Add_Dynamic_Module Network Test_Network
 //Add_Dynamic_Module Package Test_Package
 //Add_Dynamic_Module Storage Test_Storage
 //Add_Dynamic_Module World Test_World
 
+Add_Dynamic_Module Graphics Appeal_SDL2_Graphics
+Add_Dynamic_Module Input Appeal_SDL2_Input
+Add_Dynamic_Module Audio Appeal_SDL2_Audio
 
-//Input Init SDL2_Input
-//Renderer Init SDL2_Renderer
 
 Return

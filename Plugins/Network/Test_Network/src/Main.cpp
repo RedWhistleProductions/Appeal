@@ -1,4 +1,6 @@
 #include <iostream>
+extern "C" void Debug(bool Enable) { (void)Enable; }
+
 #include <string>
 
 extern "C" void Constructor()
@@ -80,3 +82,4 @@ extern "C" void Download(std::string Session, std::string Remote, std::string Lo
 {
     std::cout << "Download(" << Session << ", " << Remote << ", " << Local << ")" << std::endl;
 }
+

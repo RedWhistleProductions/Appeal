@@ -1,0 +1,47 @@
+Add_Dynamic_Module Input Appeal_SDL2_Input
+Input Set_Paths ./Resources
+Input Add_Control_Set Default
+Input Set_Control_Set Default
+Input Open_Controller -1
+Input Set_Controller_Axis_For 0 Left_Stick_X Player_One_Move_X
+Input Set_Controller_Axis_For 0 Left_Stick_Y Player_One_Move_Y
+Input Set_Controller_Axis_Range 0 Left_Stick_Y -12000 -4000 Player_One_Stealth_Forward
+Input Set_Controller_Axis_Range 0 Left_Stick_Y -24000 -12001 Player_One_Walk_Forward
+Input Set_Controller_Axis_Range 0 Left_Stick_Y -32768 -24001 Player_One_Run_Forward
+
+Print Slowly_Move_Left_Stick_Forward_And_Hold_Each_Position
+Delay 1
+Input Update Default
+Input Controller_Axis 0 Left_Stick_X
+Input Controller_Axis 0 Left_Stick_Y
+Delay 1
+Input Update Default
+Input Controller_Axis 0 Left_Stick_X
+Input Controller_Axis 0 Left_Stick_Y
+Delay 1
+Input Update Default
+Input Controller_Axis 0 Left_Stick_X
+Input Controller_Axis 0 Left_Stick_Y
+Delay 1
+Input Update Default
+Input Controller_Axis 0 Left_Stick_X
+Input Controller_Axis 0 Left_Stick_Y
+Delay 1
+Input Update Default
+Input Controller_Axis 0 Left_Stick_X
+Input Controller_Axis 0 Left_Stick_Y
+Delay 1
+Input Update Default
+Input Controller_Axis 0 Left_Stick_X
+Input Controller_Axis 0 Left_Stick_Y
+Delay 1
+Input Update Default
+Input Controller_Axis 0 Left_Stick_X
+Input Controller_Axis 0 Left_Stick_Y
+Delay 1
+Input Update Default
+Input Controller_Axis 0 Left_Stick_X
+Input Controller_Axis 0 Left_Stick_Y
+
+Input Close_Controller -1
+Done

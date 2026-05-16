@@ -4,11 +4,11 @@ UNAME_S := $(shell uname -s)
 # Compiler and flags
 ifeq ($(UNAME_S),Linux)
 	CXX = g++
-	CXXFLAGS = -shared -fPIC
+	CXXFLAGS = -shared -fPIC -I../../Source
 	TARGET = Audio.so
 else
 	CXX = x86_64-w64-mingw32-g++
-	CXXFLAGS = -shared
+	CXXFLAGS = -shared -I../../Source
 	TARGET = Audio.dll
 endif
 

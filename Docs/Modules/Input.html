@@ -114,10 +114,14 @@
   <main>
     <nav><a href="../Index.html">Documentation</a> / Modules / Input</nav>
     <h1>Input Module</h1>
-    <p>The Input module provides platform-independent commands for keyboard, mouse, controller, and action binding systems. The first implementation is a command scaffold with a <code>Test_Input</code> plugin that prints every call and returns neutral state values.</p>
+    <p>The Input module provides platform-independent commands for keyboard, mouse, controller, and action binding systems.</p>
 
     <h2>Current Status</h2>
-    <p>The current Input module loads and dispatches through the Appeal dynamic module system. <code>Test_Input</code> is available as the template plugin; an SDL-backed plugin can replace the print-only functions over time.</p>
+    <p><code>Test_Input</code> is available as the template plugin. <code>Appeal_SDL2_Input</code> currently supports keyboard, mouse, and SDL game controller actions, button state queries, mouse position/delta/wheel, named function bindings, and controller axis range bindings.</p>
+
+    <h2>Resource Layout</h2>
+    <pre><code>Resources/Input/Bindings/
+Resources/Input/Profiles/</code></pre>
 
     <h2>Intended Responsibilities</h2>
     <table>
@@ -152,7 +156,7 @@
     </table>
 
     <h2>Appeal API</h2>
-    <pre><code>Input Init SDL_Input
+    <pre><code>Add_Dynamic_Module Input Appeal_SDL2_Input
 Input Add_Control_Set Default
 Input Set_Control_Set Default
 Input Update Default
@@ -166,14 +170,32 @@ Input Pressed Jump
 Input Released Jump
 
 Input Set_Key_Down Key_Escape Quit_App
-Input Set_Mouse_Left_Down Select
-Input Set_Joy_Digital Button_A Jump</code></pre>
+Input Set_Key_Up Key_Escape Release_Escape
+Input Set_Mouse_Down Left Select
+Input Set_Mouse_Up Left Release_Select
+
+Input Open_Controller -1
+Input Bind_Button Confirm 0:Button_A
+Input Bind_Axis Move_X 0:Left_Stick_X
+Input Set_Controller_Button_Down Button_A Confirm
+Input Set_Controller_Button_Up Button_A Release_Confirm
+Input Set_Controller_Button_Down_For 0 Button_A Player_One_Confirm
+Input Set_Controller_Axis_For 0 Left_Stick_X Player_One_Move_X
+Input Set_Controller_Axis_Range 0 Left_Stick_Y -12000 -4000 Player_One_Stealth_Forward
+Input Set_Controller_Axis_Range 0 Left_Stick_Y -24000 -12001 Player_One_Walk_Forward
+Input Set_Controller_Axis_Range 0 Left_Stick_Y -32768 -24001 Player_One_Run_Forward</code></pre>
+
+    <h2>SDL2 Backend</h2>
+    <p><code>Appeal_SDL2_Input</code> uses SDL2 events and state queries. Key names may be written as SDL names such as <code>A</code>, <code>Space</code>, and <code>Escape</code>, or with the Appeal prefix such as <code>Key_A</code>, <code>Key_Space</code>, and <code>Key_Escape</code>.</p>
+    <p>Mouse buttons currently supported are <code>Left</code>, <code>Middle</code>, <code>Right</code>, <code>X1</code>, and <code>X2</code>.</p>
+    <p>Controllers use SDL game controller names such as <code>Button_A</code>, <code>Button_Start</code>, <code>DPad_Up</code>, <code>Left_Stick_X</code>, <code>Left_Stick_Y</code>, <code>Right_Stick_X</code>, <code>Right_Stick_Y</code>, <code>Left_Trigger</code>, and <code>Right_Trigger</code>. Prefix controller-specific bindings with the controller number, such as <code>0:Button_A</code>.</p>
+    <p><code>Open_Controller -1</code> enables automatic controller management. If a controller disconnects and SDL reports it again later, the backend reopens it during the next <code>Input Update</code>. Numbered controller opens are also remembered until the matching <code>Close_Controller</code> call.</p>
 
     <h2>Plugin Convention</h2>
-    <p>The Input module should eventually follow the same plugin pattern as Audio:</p>
+    <p>The Input module follows the same plugin pattern as Audio and Graphics:</p>
     <pre><code>Plugins/Input/Test_Input/
-Plugins/Input/SDL_Input/</code></pre>
-    <p><code>Test_Input</code> should print every function call to the terminal. <code>SDL_Input</code> should be the default cross-platform backend until specialized platform plugins exist.</p>
+Plugins/Input/SDL2_Input/</code></pre>
+    <p><code>Test_Input</code> prints every function call to the terminal. <code>Appeal_SDL2_Input</code> is the default cross-platform backend until specialized platform plugins exist.</p>
   </main>
 </body>
 </html>

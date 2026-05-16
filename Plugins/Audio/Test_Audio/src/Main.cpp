@@ -4,6 +4,8 @@
 ***************************************************/
 
 #include <iostream>
+extern "C" void Debug(bool Enable) { (void)Enable; }
+
 #include <string>
 
 std::string Resources, Music_Path, SFX_Path;
@@ -92,5 +94,29 @@ extern "C" void Mute()
 
 extern "C" void UnMute()
 {
-	std::cout << "UnMute()" << std::endl;
+    std::cout << "UnMute()" << std::endl;
 }
+
+extern "C" void Set_Volume(int Volume)
+{
+    std::cout << "Set_Volume(" << Volume << ")" << std::endl;
+}
+
+extern "C" int Get_Volume()
+{
+    std::cout << "Get_Volume()" << std::endl;
+    return 128;
+}
+
+extern "C" std::string Current_Song()
+{
+    std::cout << "Current_Song()" << std::endl;
+    return "";
+}
+
+extern "C" bool Is_Muted()
+{
+    std::cout << "Is_Muted()" << std::endl;
+    return false;
+}
+

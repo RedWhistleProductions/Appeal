@@ -1,0 +1,22 @@
+Print Start_If_Loop_Test
+Set_Var Flag yes
+If 1 == 1 {
+Print If_True_Ran
+}
+If 1 == 2 {
+Print If_False_Should_Not_Run
+}
+If Var Flag == yes {
+Print If_Var_True_Ran
+}
+Loop Until 1 == 1 Test_Loop_Body
+Loop While 1 == 2 Test_Loop_Body
+Set_Var Keep_Looping yes
+Loop While Var Keep_Looping == yes Test_Loop_Change_Var
+Set_Var Block_Loop yes
+Loop While Var Block_Loop == yes {
+Print Loop_Block_Ran
+Set_Var Block_Loop no
+}
+Print End_If_Loop_Test
+Done

@@ -1,4 +1,6 @@
 #include <iostream>
+extern "C" void Debug(bool Enable) { (void)Enable; }
+
 #include <string>
 
 extern "C" void Constructor() { std::cout << "Test_World Constructor()" << std::endl; }
@@ -22,3 +24,4 @@ extern "C" void Rotate(std::string Name, float X, float Y, float Z) { std::cout 
 extern "C" void Add_Component(std::string Entity, std::string Component) { std::cout << "Add_Component(" << Entity << ", " << Component << ")" << std::endl; }
 extern "C" void Remove_Component(std::string Entity, std::string Component) { std::cout << "Remove_Component(" << Entity << ", " << Component << ")" << std::endl; }
 extern "C" void Query(std::string Tag) { std::cout << "Query(" << Tag << ")" << std::endl; }
+

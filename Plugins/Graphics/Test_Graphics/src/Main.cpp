@@ -1,4 +1,6 @@
 #include <iostream>
+extern "C" void Debug(bool Enable) { (void)Enable; }
+
 #include <string>
 
 extern "C" void Constructor()
@@ -29,6 +31,11 @@ extern "C" void Add_Full_Screen_Window(std::string Name, int Monitor)
 extern "C" void Delete_Window(std::string Name)
 {
     std::cout << "Delete_Window(" << Name << ")" << std::endl;
+}
+
+extern "C" void Close_All()
+{
+    std::cout << "Close_All()" << std::endl;
 }
 
 extern "C" void Show(std::string Name)
@@ -176,6 +183,29 @@ extern "C" void GUI_Button(std::string Name, std::string Text)
     std::cout << "GUI_Button(" << Name << ", " << Text << ")" << std::endl;
 }
 
+extern "C" bool GUI_Button_Clicked(std::string Name)
+{
+    std::cout << "GUI_Button_Clicked(" << Name << ")" << std::endl;
+    return false;
+}
+
+extern "C" void GUI_Slider_Int(std::string Name, std::string Text, int Value, int Min, int Max)
+{
+    std::cout << "GUI_Slider_Int(" << Name << ", " << Text << ", " << Value << ", " << Min << ", " << Max << ")" << std::endl;
+}
+
+extern "C" int GUI_Slider_Int_Value(std::string Name)
+{
+    std::cout << "GUI_Slider_Int_Value(" << Name << ")" << std::endl;
+    return 0;
+}
+
+extern "C" bool GUI_Slider_Int_Changed(std::string Name)
+{
+    std::cout << "GUI_Slider_Int_Changed(" << Name << ")" << std::endl;
+    return false;
+}
+
 extern "C" void GUI_End()
 {
     std::cout << "GUI_End()" << std::endl;
@@ -190,3 +220,15 @@ extern "C" void Update()
 {
     std::cout << "Update()" << std::endl;
 }
+
+extern "C" void Wait_Until_Close(std::string Window)
+{
+    std::cout << "Wait_Until_Close(" << Window << ")" << std::endl;
+}
+
+extern "C" bool Window_Open(std::string Window)
+{
+    std::cout << "Window_Open(" << Window << ")" << std::endl;
+    return false;
+}
+

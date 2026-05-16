@@ -1,0 +1,63 @@
+Debug 0
+Run Config
+Graphics Debug 0
+Input Debug 0
+Audio Debug 0
+
+Audio Load_Play_List PlayAll.txt
+Audio Play
+Set_Var_Global Song Audio.Current_Song
+Set_Var_Global Volume Audio.Volume_Percent
+Set_Var_Global Looping Audio.Current_Looping
+Set_Var_Global Auto_Playing Audio.Auto_Playing
+
+Graphics Set_Paths ./Resources
+Graphics Add_Window Main "Appeal Media Player" 640 360
+Graphics Add_Window second "Second Window" 640 360
+Graphics Set_FPS 60
+Graphics Show Main
+Graphics Show second
+Graphics Set_Focus Main
+Graphics Set_View_Port Main 0 0 640 360
+Graphics Set_GUI_Button_Function Back Audio.Back
+Graphics Set_GUI_Button_Function Stop Audio.Stop
+Graphics Set_GUI_Button_Function Play Audio.Play
+Graphics Set_GUI_Button_Function Next Audio.Next
+Graphics Set_GUI_Button_Function Mute Audio.Toggle_Mute
+Graphics Set_GUI_Slider_Int_Function Volume Audio.Set_Volume_Percent
+Graphics Set_GUI_Checkbox_Function Loop_Current Audio.Set_Current_Loop
+Graphics Set_GUI_Checkbox_Function Auto_Play Audio.Set_Auto_Play
+Graphics Window_Open Main
+Set_Var_Global Main_Open Graphics.Window.Main.Open
+
+Loop While Var Main_Open == 1 {
+Set_Var_Global Song Audio.Current_Song
+Set_Var_Global Volume Audio.Volume_Percent
+Set_Var_Global Muted Audio.Muted
+Set_Var_Global Looping Audio.Current_Looping
+Set_Var_Global Auto_Playing Audio.Auto_Playing
+Graphics GUI_Begin Media_Player
+Graphics GUI_Text Song Var Song
+Graphics GUI_Slider_Int Volume Volume Var Volume 0 100
+Graphics GUI_Checkbox Loop_Current Loop Var Looping
+Graphics GUI_Checkbox Auto_Play Auto_Play Var Auto_Playing
+Graphics GUI_Button Back Back
+Graphics GUI_Button Stop Stop
+Graphics GUI_Button Play Play
+Graphics GUI_Button Next Next
+If Var Muted == 1 {
+Graphics GUI_Button Mute Unmute
+}
+If Var Muted == 0 {
+Graphics GUI_Button Mute Mute
+}
+Graphics GUI_End
+Graphics Render
+Audio Update
+Graphics Update
+Graphics Window_Open Main
+Set_Var_Global Main_Open Graphics.Window.Main.Open
+}
+
+Graphics Close_All
+Done

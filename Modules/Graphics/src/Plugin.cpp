@@ -16,7 +16,7 @@
         }
         else
         {
-            std::cout << "Loaded: " << File << std::endl;
+            // Plugin load messages are intentionally quiet by default. Use module Debug for diagnostics.
         }
 
         Assign("Constructor", Constructor);
@@ -61,7 +61,7 @@
         }
         else
         {
-            std::cout << "Loaded: " << File << std::endl;
+            // Plugin load messages are intentionally quiet by default. Use module Debug for diagnostics.
         }
 
         Assign("Constructor", Constructor);
@@ -87,3 +87,4 @@
         Unload();
     }
 #endif
+

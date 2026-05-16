@@ -26,8 +26,11 @@ std::string Resources, Music_Path, SFX_Path;
 
 int Frequency, Chanels, Chunksize;
 bool Music_On, SFX_On;
+bool Auto_Play = false;
+bool Track_Was_Playing = false;
 bool DEBUG = true;
 bool Audio_Ready = false;
+int Music_Volume = MIX_MAX_VOLUME;
 
 Named_List<Music> Sound_Track;
 Named_List<SFX> SFX_List;
@@ -116,6 +119,7 @@ bool Ensure_Audio()
 	}
 
 	Audio_Ready = true;
+	Mix_VolumeMusic(Music_Volume);
 	if(DEBUG)
 	{
 		std::cout << "SDL audio driver: " << SDL_GetCurrentAudioDriver() << std::endl;
@@ -163,8 +167,14 @@ extern "C" void Destructor()
 	}
 }
 
+extern "C" void Debug(bool Enable)
+{
+	DEBUG = Enable;
+}
+
 extern "C" void Play()
 {
+	Music_On = true;
 	if(Music_On && Ensure_Audio())
 	{
 		if(Sound_Track.Nodes > 0)
@@ -173,6 +183,7 @@ extern "C" void Play()
 			{
 				std::cout << "Playing: " << Sound_Track.Current->Name << std::endl;
 			}
+			Track_Was_Playing = Mix_PlayingMusic() != 0;
 		}
 		else std::cout << "The playlist is empty" << std::endl;
 	}
@@ -210,6 +221,7 @@ extern "C" void Load_Song(std::string Name, std::string Music_File)
 extern "C" void Stop()
 {
 	Music_On = false;
+	Track_Was_Playing = false;
 	if(Sound_Track.Nodes > 0)
 	{
 		Sound_Track.Current->Value.Stop();
@@ -293,4 +305,99 @@ extern "C" void UnMute()
 	SFX_On = true;
 	Music_On = true;
 	Play();
+}
+
+extern "C" void Set_Volume(int Volume)
+{
+	if(Volume < 0) Volume = 0;
+	if(Volume > 128) Volume = 128;
+	Music_Volume = Volume;
+	if(Audio_Ready)
+	{
+		Mix_VolumeMusic(Music_Volume);
+	}
+}
+
+extern "C" int Get_Volume()
+{
+	return Music_Volume;
+}
+
+extern "C" void Set_Volume_Percent(int Percent)
+{
+	if(Percent < 0) Percent = 0;
+	if(Percent > 100) Percent = 100;
+	Set_Volume((Percent * MIX_MAX_VOLUME + 50) / 100);
+}
+
+extern "C" int Get_Volume_Percent()
+{
+	return (Music_Volume * 100 + (MIX_MAX_VOLUME / 2)) / MIX_MAX_VOLUME;
+}
+
+extern "C" void Set_Current_Loop(int Loop)
+{
+	if(Sound_Track.Nodes > 0)
+	{
+		Sound_Track.Current->Value.Loop = Loop != 0;
+		if(Music_On && Audio_Ready && Mix_PlayingMusic())
+		{
+			Play();
+		}
+	}
+}
+
+extern "C" bool Current_Looping()
+{
+	if(Sound_Track.Nodes > 0)
+	{
+		return Sound_Track.Current->Value.Loop;
+	}
+	return false;
+}
+
+extern "C" void Set_Auto_Play(int Auto_Play_On)
+{
+	Auto_Play = Auto_Play_On != 0;
+}
+
+extern "C" bool Auto_Playing()
+{
+	return Auto_Play;
+}
+
+extern "C" void Update()
+{
+	if(!Auto_Play || !Music_On || !Audio_Ready || Sound_Track.Nodes < 1)
+	{
+		if(Audio_Ready)
+		{
+			Track_Was_Playing = Mix_PlayingMusic() != 0;
+		}
+		return;
+	}
+
+	bool Playing = Mix_PlayingMusic() != 0;
+	if(Track_Was_Playing && !Playing)
+	{
+		Sound_Track.Next();
+		Play();
+		return;
+	}
+
+	Track_Was_Playing = Playing;
+}
+
+extern "C" std::string Current_Song()
+{
+	if(Sound_Track.Nodes > 0)
+	{
+		return Sound_Track.Current->Name;
+	}
+	return "";
+}
+
+extern "C" bool Is_Muted()
+{
+	return !Music_On;
 }

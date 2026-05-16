@@ -1,13 +1,18 @@
 #include "Plugin.h"
 #include "Data_Source.h"
+#include "Module_Data.h"
+#include "Named_List.h"
 
 Plugin Module;
+bool Module_Debug = true;
 
+void (*Debug)(bool Enable);
 void (*Set_Paths)(std::string Resources);
 
 void (*Add_Window)(std::string Name, std::string Title, int Width, int Height);
 void (*Add_Full_Screen_Window)(std::string Name, int Monitor);
 void (*Delete_Window)(std::string Name);
+void (*Close_All)();
 void (*Show)(std::string Name);
 void (*Hide)(std::string Name);
 void (*Set_Focus)(std::string Name);
@@ -42,10 +47,73 @@ void (*Draw_Text)(std::string Font, std::string Text, float X, float Y);
 void (*GUI_Begin)(std::string Name);
 void (*GUI_Text)(std::string Name, std::string Text);
 void (*GUI_Button)(std::string Name, std::string Text);
+bool (*GUI_Button_Clicked)(std::string Name);
+void (*Set_GUI_Button_Function)(std::string Name, std::string Function);
+void (*GUI_Slider_Int)(std::string Name, std::string Text, int Value, int Min, int Max);
+int (*GUI_Slider_Int_Value)(std::string Name);
+bool (*GUI_Slider_Int_Changed)(std::string Name);
+void (*Set_GUI_Slider_Int_Function)(std::string Name, std::string Function);
+void (*GUI_Checkbox)(std::string Name, std::string Text, int Value);
+int (*GUI_Checkbox_Value)(std::string Name);
+bool (*GUI_Checkbox_Changed)(std::string Name);
+void (*Set_GUI_Checkbox_Function)(std::string Name, std::string Function);
 void (*GUI_End)();
 
 void (*Render)();
 void (*Update)();
+void (*Wait_Until_Close)(std::string Window);
+bool (*Window_Open)(std::string Window);
+
+Named_List<Module_Data> *Globals = nullptr;
+
+void Set_Global(std::string Name, std::string Type, std::string Value)
+{
+    if(Globals == nullptr) return;
+
+    std::string Full_Name = "Graphics." + Name;
+    Module_Data Data;
+    Data.Module_Name = "Graphics";
+    Data.Name = Name;
+    Data.Type = Type;
+    Data.Value = Value;
+
+    if(Globals->Find(Full_Name))
+    {
+        Globals->Current->Value = Data;
+    }
+    else
+    {
+        Globals->Add_Node(Full_Name, Data);
+    }
+}
+
+void Update_Window_Global(std::string Name)
+{
+    if(Window_Open != nullptr)
+    {
+        Set_Global("Window." + Name + ".Open", "bool", Window_Open(Name) ? "1" : "0");
+    }
+}
+
+void Update_GUI_Button_Global(std::string Name)
+{
+    if(GUI_Button_Clicked != nullptr)
+    {
+        Set_Global("GUI." + Name + ".Clicked", "bool", GUI_Button_Clicked(Name) ? "1" : "0");
+    }
+}
+
+void Update_GUI_Slider_Global(std::string Name)
+{
+    if(GUI_Slider_Int_Value != nullptr)
+    {
+        Set_Global("GUI." + Name + ".Value", "int", std::to_string(GUI_Slider_Int_Value(Name)));
+    }
+    if(GUI_Slider_Int_Changed != nullptr)
+    {
+        Set_Global("GUI." + Name + ".Changed", "bool", GUI_Slider_Int_Changed(Name) ? "1" : "0");
+    }
+}
 
 template<typename T>
 void Assign(std::string Name, T &Function)
@@ -53,15 +121,18 @@ void Assign(std::string Name, T &Function)
     Module.Assign(Name, Function);
 }
 
-extern "C" void Init(std::string Name)
+extern "C" void Init_Globals(std::string Name, Named_List<Module_Data> *Shared_Globals)
 {
+    Globals = Shared_Globals;
     Module.Load(Name);
 
+    Assign("Debug", Debug);
     Assign("Set_Paths", Set_Paths);
 
     Assign("Add_Window", Add_Window);
     Assign("Add_Full_Screen_Window", Add_Full_Screen_Window);
     Assign("Delete_Window", Delete_Window);
+    Assign("Close_All", Close_All);
     Assign("Show", Show);
     Assign("Hide", Hide);
     Assign("Set_Focus", Set_Focus);
@@ -96,11 +167,59 @@ extern "C" void Init(std::string Name)
     Assign("GUI_Begin", GUI_Begin);
     Assign("GUI_Text", GUI_Text);
     Assign("GUI_Button", GUI_Button);
+    Assign("GUI_Button_Clicked", GUI_Button_Clicked);
+    Assign("Set_GUI_Button_Function", Set_GUI_Button_Function);
+    Assign("GUI_Slider_Int", GUI_Slider_Int);
+    Assign("GUI_Slider_Int_Value", GUI_Slider_Int_Value);
+    Assign("GUI_Slider_Int_Changed", GUI_Slider_Int_Changed);
+    Assign("Set_GUI_Slider_Int_Function", Set_GUI_Slider_Int_Function);
+    Assign("GUI_Checkbox", GUI_Checkbox);
+    Assign("GUI_Checkbox_Value", GUI_Checkbox_Value);
+    Assign("GUI_Checkbox_Changed", GUI_Checkbox_Changed);
+    Assign("Set_GUI_Checkbox_Function", Set_GUI_Checkbox_Function);
     Assign("GUI_End", GUI_End);
 
     Assign("Render", Render);
     Assign("Update", Update);
+    Assign("Wait_Until_Close", Wait_Until_Close);
+    Assign("Window_Open", Window_Open);
+
+    Set_Global("Window.Main.Open", "bool", "0");
 }
+
+extern "C" void Init(std::string Name)
+{
+    Init_Globals(Name, nullptr);
+}
+
+extern "C" void Set_Function_Runner(void (*Run_Function)(std::string), void (*Run_Analog_Function)(std::string, int))
+{
+    void (*Plugin_Set_Function_Runner)(void (*Run_Function)(std::string), void (*Run_Analog_Function)(std::string, int));
+    Module.Assign("Set_Function_Runner", Plugin_Set_Function_Runner);
+    if(Plugin_Set_Function_Runner != nullptr)
+    {
+        Plugin_Set_Function_Runner(Run_Function, Run_Analog_Function);
+    }
+}
+
+extern "C" void Graphics_GUI_Begin(std::string Name) { GUI_Begin(Name); }
+extern "C" void Graphics_GUI_Text(std::string Name, std::string Text) { GUI_Text(Name, Text); }
+extern "C" void Graphics_GUI_Button(std::string Name, std::string Text) { GUI_Button(Name, Text); }
+extern "C" void Graphics_GUI_End() { GUI_End(); }
+extern "C" bool Graphics_GUI_Button_Clicked(std::string Name) { return GUI_Button_Clicked(Name); }
+extern "C" void Graphics_Set_GUI_Button_Function(std::string Name, std::string Function) { Set_GUI_Button_Function(Name, Function); }
+extern "C" void Graphics_GUI_Slider_Int(std::string Name, std::string Text, int Value, int Min, int Max) { GUI_Slider_Int(Name, Text, Value, Min, Max); }
+extern "C" int Graphics_GUI_Slider_Int_Value(std::string Name) { return GUI_Slider_Int_Value(Name); }
+extern "C" bool Graphics_GUI_Slider_Int_Changed(std::string Name) { return GUI_Slider_Int_Changed(Name); }
+extern "C" void Graphics_Set_GUI_Slider_Int_Function(std::string Name, std::string Function) { Set_GUI_Slider_Int_Function(Name, Function); }
+extern "C" void Graphics_GUI_Checkbox(std::string Name, std::string Text, int Value) { GUI_Checkbox(Name, Text, Value); }
+extern "C" int Graphics_GUI_Checkbox_Value(std::string Name) { return GUI_Checkbox_Value(Name); }
+extern "C" bool Graphics_GUI_Checkbox_Changed(std::string Name) { return GUI_Checkbox_Changed(Name); }
+extern "C" void Graphics_Set_GUI_Checkbox_Function(std::string Name, std::string Function) { Set_GUI_Checkbox_Function(Name, Function); }
+extern "C" void Graphics_Close_All() { Close_All(); }
+extern "C" void Graphics_Render() { Render(); }
+extern "C" void Graphics_Update() { Update(); }
+extern "C" bool Graphics_Window_Open(std::string Window) { return Window_Open(Window); }
 
 extern "C" void Interpreter(Data_Source *Data)
 {
@@ -112,6 +231,13 @@ extern "C" void Interpreter(Data_Source *Data)
         std::string Name;
         *Data >> Name;
         Init(Name);
+    }
+    else if(Command == "Debug")
+    {
+        int Enable;
+        *Data >> Enable;
+        Module_Debug = Enable != 0;
+        if(Debug != nullptr) Debug(Module_Debug);
     }
     else if(Command == "Set_Paths")
     {
@@ -128,6 +254,7 @@ extern "C" void Interpreter(Data_Source *Data)
         *Data >> Width;
         *Data >> Height;
         Add_Window(Name, Title, Width, Height);
+        Update_Window_Global(Name);
     }
     else if(Command == "Add_Full_Screen_Window")
     {
@@ -136,12 +263,19 @@ extern "C" void Interpreter(Data_Source *Data)
         *Data >> Name;
         *Data >> Monitor;
         Add_Full_Screen_Window(Name, Monitor);
+        Update_Window_Global(Name);
     }
     else if(Command == "Delete_Window")
     {
         std::string Name;
         *Data >> Name;
         Delete_Window(Name);
+        Update_Window_Global(Name);
+    }
+    else if(Command == "Close_All")
+    {
+        Close_All();
+        Set_Global("Window.Main.Open", "bool", "0");
     }
     else if(Command == "Show")
     {
@@ -386,6 +520,91 @@ extern "C" void Interpreter(Data_Source *Data)
         *Data >> Text;
         GUI_Button(Name, Text);
     }
+    else if(Command == "GUI_Button_Clicked")
+    {
+        std::string Name;
+        *Data >> Name;
+        bool Clicked = GUI_Button_Clicked(Name);
+        if(Module_Debug) std::cout << Clicked << std::endl;
+        Set_Global("GUI." + Name + ".Clicked", "bool", Clicked ? "1" : "0");
+    }
+    else if(Command == "Set_GUI_Button_Function")
+    {
+        std::string Name, Function;
+        *Data >> Name;
+        *Data >> Function;
+        Set_GUI_Button_Function(Name, Function);
+    }
+    else if(Command == "GUI_Slider_Int")
+    {
+        std::string Name, Text;
+        int Value, Min, Max;
+        *Data >> Name;
+        *Data >> Text;
+        *Data >> Value;
+        *Data >> Min;
+        *Data >> Max;
+        GUI_Slider_Int(Name, Text, Value, Min, Max);
+        Update_GUI_Slider_Global(Name);
+    }
+    else if(Command == "GUI_Slider_Int_Value")
+    {
+        std::string Name;
+        *Data >> Name;
+        int Value = GUI_Slider_Int_Value(Name);
+        if(Module_Debug) std::cout << Value << std::endl;
+        Set_Global("GUI." + Name + ".Value", "int", std::to_string(Value));
+    }
+    else if(Command == "GUI_Slider_Int_Changed")
+    {
+        std::string Name;
+        *Data >> Name;
+        bool Changed = GUI_Slider_Int_Changed(Name);
+        if(Module_Debug) std::cout << Changed << std::endl;
+        Set_Global("GUI." + Name + ".Changed", "bool", Changed ? "1" : "0");
+        Set_Global("GUI." + Name + ".Value", "int", std::to_string(GUI_Slider_Int_Value(Name)));
+    }
+    else if(Command == "Set_GUI_Slider_Int_Function")
+    {
+        std::string Name, Function;
+        *Data >> Name;
+        *Data >> Function;
+        Set_GUI_Slider_Int_Function(Name, Function);
+    }
+    else if(Command == "GUI_Checkbox")
+    {
+        std::string Name, Text;
+        int Value;
+        *Data >> Name;
+        *Data >> Text;
+        *Data >> Value;
+        GUI_Checkbox(Name, Text, Value);
+        Set_Global("GUI." + Name + ".Value", "bool", GUI_Checkbox_Value(Name) ? "1" : "0");
+    }
+    else if(Command == "GUI_Checkbox_Value")
+    {
+        std::string Name;
+        *Data >> Name;
+        int Value = GUI_Checkbox_Value(Name);
+        if(Module_Debug) std::cout << Value << std::endl;
+        Set_Global("GUI." + Name + ".Value", "bool", Value ? "1" : "0");
+    }
+    else if(Command == "GUI_Checkbox_Changed")
+    {
+        std::string Name;
+        *Data >> Name;
+        bool Changed = GUI_Checkbox_Changed(Name);
+        if(Module_Debug) std::cout << Changed << std::endl;
+        Set_Global("GUI." + Name + ".Changed", "bool", Changed ? "1" : "0");
+        Set_Global("GUI." + Name + ".Value", "bool", GUI_Checkbox_Value(Name) ? "1" : "0");
+    }
+    else if(Command == "Set_GUI_Checkbox_Function")
+    {
+        std::string Name, Function;
+        *Data >> Name;
+        *Data >> Function;
+        Set_GUI_Checkbox_Function(Name, Function);
+    }
     else if(Command == "GUI_End")
     {
         GUI_End();
@@ -397,9 +616,23 @@ extern "C" void Interpreter(Data_Source *Data)
     else if(Command == "Update")
     {
         Update();
+        Set_Global("Updated", "bool", "1");
+    }
+    else if(Command == "Wait_Until_Close")
+    {
+        std::string Window;
+        *Data >> Window;
+        Wait_Until_Close(Window);
+    }
+    else if(Command == "Window_Open")
+    {
+        std::string Window;
+        *Data >> Window;
+        if(Module_Debug) std::cout << Window_Open(Window) << std::endl;
+        Update_Window_Global(Window);
     }
     else
     {
-        std::cout << "\tError: " << Command << " not found in Graphics Dictionary" << std::endl;
+        if(Module_Debug) std::cout << "\tError: " << Command << " not found in Graphics Dictionary" << std::endl;
     }
 }

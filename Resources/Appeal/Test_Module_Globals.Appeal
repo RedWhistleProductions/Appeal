@@ -1,0 +1,15 @@
+Run Config
+Audio Load_Play_List PlayAll.txt
+Audio Play
+Print_Global Audio.Current_Song
+Audio Set_Volume 64
+Print_Global Audio.Volume
+Set_Var_Global Test_Volume Audio.Volume
+Print Var Test_Volume
+Audio Mute
+Print_Global Audio.Muted
+Graphics Add_Window Main "Globals Test" 320 180
+Print_Global Graphics.Window.Main.Open
+Graphics Delete_Window Main
+Print_Global Graphics.Window.Main.Open
+Done

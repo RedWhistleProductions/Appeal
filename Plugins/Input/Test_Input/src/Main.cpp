@@ -1,4 +1,6 @@
 #include <iostream>
+extern "C" void Debug(bool Enable) { (void)Enable; }
+
 #include <string>
 
 extern "C" void Constructor()
@@ -162,3 +164,58 @@ extern "C" void Set_Controller_Axis(std::string Axis, std::string Function)
 {
     std::cout << "Set_Controller_Axis(" << Axis << ", " << Function << ")" << std::endl;
 }
+
+extern "C" void Open_Controller(int Controller)
+{
+    std::cout << "Open_Controller(" << Controller << ")" << std::endl;
+}
+
+extern "C" void Close_Controller(int Controller)
+{
+    std::cout << "Close_Controller(" << Controller << ")" << std::endl;
+}
+
+extern "C" bool Controller_Down(int Controller, std::string Button)
+{
+    std::cout << "Controller_Down(" << Controller << ", " << Button << ")" << std::endl;
+    return false;
+}
+
+extern "C" bool Controller_Pressed(int Controller, std::string Button)
+{
+    std::cout << "Controller_Pressed(" << Controller << ", " << Button << ")" << std::endl;
+    return false;
+}
+
+extern "C" bool Controller_Released(int Controller, std::string Button)
+{
+    std::cout << "Controller_Released(" << Controller << ", " << Button << ")" << std::endl;
+    return false;
+}
+
+extern "C" int Controller_Axis(int Controller, std::string Axis)
+{
+    std::cout << "Controller_Axis(" << Controller << ", " << Axis << ")" << std::endl;
+    return 0;
+}
+
+extern "C" void Set_Controller_Button_Down_For(int Controller, std::string Button, std::string Function)
+{
+    std::cout << "Set_Controller_Button_Down_For(" << Controller << ", " << Button << ", " << Function << ")" << std::endl;
+}
+
+extern "C" void Set_Controller_Button_Up_For(int Controller, std::string Button, std::string Function)
+{
+    std::cout << "Set_Controller_Button_Up_For(" << Controller << ", " << Button << ", " << Function << ")" << std::endl;
+}
+
+extern "C" void Set_Controller_Axis_For(int Controller, std::string Axis, std::string Function)
+{
+    std::cout << "Set_Controller_Axis_For(" << Controller << ", " << Axis << ", " << Function << ")" << std::endl;
+}
+
+extern "C" void Set_Controller_Axis_Range(int Controller, std::string Axis, int Min, int Max, std::string Function)
+{
+    std::cout << "Set_Controller_Axis_Range(" << Controller << ", " << Axis << ", " << Min << ", " << Max << ", " << Function << ")" << std::endl;
+}
+

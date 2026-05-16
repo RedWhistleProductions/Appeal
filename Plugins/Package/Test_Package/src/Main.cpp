@@ -1,4 +1,6 @@
 #include <iostream>
+extern "C" void Debug(bool Enable) { (void)Enable; }
+
 #include <string>
 
 extern "C" void Constructor() { std::cout << "Test_Package Constructor()" << std::endl; }
@@ -18,3 +20,4 @@ extern "C" void Load_Module(std::string Name) { std::cout << "Load_Module(" << N
 extern "C" void Unload_Module(std::string Name) { std::cout << "Unload_Module(" << Name << ")" << std::endl; }
 extern "C" void Load_Plugin(std::string Module, std::string Plugin) { std::cout << "Load_Plugin(" << Module << ", " << Plugin << ")" << std::endl; }
 extern "C" void Unload_Plugin(std::string Module) { std::cout << "Unload_Plugin(" << Module << ")" << std::endl; }
+

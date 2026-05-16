@@ -118,6 +118,8 @@ struct GUI_Command
     std::string Kind;
     std::string Name;
     std::string Text;
+    int Min = 0;
+    int Max = 0;
 };
 
 std::string Resources = "./Resources";
@@ -137,6 +139,16 @@ std::map<std::string, std::string> Shaders;
 std::map<std::string, Mesh_State> Meshes;
 std::vector<Text_Command> Text_Commands;
 std::vector<GUI_Command> GUI_Commands;
+std::map<std::string, bool> GUI_Clicked;
+std::map<std::string, int> GUI_Slider_Values;
+std::map<std::string, bool> GUI_Slider_Changed;
+std::map<std::string, bool> GUI_Checkbox_Values;
+std::map<std::string, bool> GUI_Checkbox_Changed_Values;
+std::map<std::string, std::string> GUI_Button_Functions;
+std::map<std::string, std::string> GUI_Slider_Functions;
+std::map<std::string, std::string> GUI_Checkbox_Functions;
+void (*Run_Function_Callback)(std::string Function) = nullptr;
+void (*Run_Analog_Function_Callback)(std::string Function, int Value) = nullptr;
 
 std::string Focused_Window;
 int Target_FPS = 60;
@@ -144,6 +156,7 @@ bool SDL_Ready = false;
 bool IMG_Ready = false;
 bool TTF_Ready = false;
 bool ImGui_Ready = false;
+bool DEBUG = true;
 
 extern "C" void Delete_Window(std::string Name);
 
@@ -156,7 +169,7 @@ bool Ensure_SDL()
 
     if(SDL_InitSubSystem(SDL_INIT_VIDEO | SDL_INIT_EVENTS) < 0)
     {
-        std::cout << "SDL video could not initialize: " << SDL_GetError() << std::endl;
+        if(DEBUG) std::cout << "SDL video could not initialize: " << SDL_GetError() << std::endl;
         return false;
     }
 
@@ -166,7 +179,7 @@ bool Ensure_SDL()
     int Image_Result = IMG_Init(Image_Flags);
     if((Image_Result & Image_Flags) != Image_Flags)
     {
-        std::cout << "SDL_image partial initialization: " << IMG_GetError() << std::endl;
+        if(DEBUG) std::cout << "SDL_image partial initialization: " << IMG_GetError() << std::endl;
     }
     IMG_Ready = Image_Result != 0;
 
@@ -176,7 +189,7 @@ bool Ensure_SDL()
     }
     else
     {
-        std::cout << "SDL_ttf could not initialize: " << TTF_GetError() << std::endl;
+        if(DEBUG) std::cout << "SDL_ttf could not initialize: " << TTF_GetError() << std::endl;
     }
 
     return true;
@@ -187,11 +200,21 @@ Window_State *Find_Window(std::string Name)
     auto It = Windows.find(Name);
     if(It == Windows.end())
     {
-        std::cout << "Graphics window not found: " << Name << std::endl;
+        if(DEBUG) std::cout << "Graphics window not found: " << Name << std::endl;
         return nullptr;
     }
 
     return &It->second;
+}
+
+bool Window_Exists(std::string Name)
+{
+    return Windows.find(Name) != Windows.end();
+}
+
+extern "C" bool Window_Open(std::string Name)
+{
+    return Window_Exists(Name);
 }
 
 void Destroy_Window(Window_State &State)
@@ -354,7 +377,7 @@ Mesh_State Load_Mesh_File(std::string File)
     }
     else
     {
-        std::cout << "Assimp did not load mesh: " << File << std::endl
+        if(DEBUG) std::cout << "Assimp did not load mesh: " << File << std::endl
                   << "Assimp Error: " << Importer.GetErrorString() << std::endl;
     }
 #endif
@@ -437,13 +460,13 @@ bool Ensure_ImGui(Window_State &Window)
 
     if(!ImGui_ImplSDL2_InitForSDLRenderer(Window.Window, Window.Renderer))
     {
-        std::cout << "Dear ImGui SDL2 backend could not initialize" << std::endl;
+        if(DEBUG) std::cout << "Dear ImGui SDL2 backend could not initialize" << std::endl;
         return false;
     }
 
     if(!ImGui_ImplSDLRenderer2_Init(Window.Renderer))
     {
-        std::cout << "Dear ImGui SDL_Renderer backend could not initialize" << std::endl;
+        if(DEBUG) std::cout << "Dear ImGui SDL_Renderer backend could not initialize" << std::endl;
         ImGui_ImplSDL2_Shutdown();
         return false;
     }
@@ -476,13 +499,13 @@ void Draw_Text_Command(Window_State &Window, const Text_Command &Command)
     {
         if(Fonts.empty())
         {
-            std::cout << "Font not loaded: " << Command.Font << std::endl;
+            if(DEBUG) std::cout << "Font not loaded: " << Command.Font << std::endl;
             return;
         }
         It = Fonts.begin();
         if(It->second.Font == nullptr)
         {
-            std::cout << "Font not loaded: " << Command.Font << std::endl;
+            if(DEBUG) std::cout << "Font not loaded: " << Command.Font << std::endl;
             return;
         }
     }
@@ -490,14 +513,14 @@ void Draw_Text_Command(Window_State &Window, const Text_Command &Command)
     SDL_Surface *Surface = TTF_RenderUTF8_Blended(It->second.Font, Command.Text.c_str(), Command.Color);
     if(Surface == nullptr)
     {
-        std::cout << "Text surface could not be created: " << TTF_GetError() << std::endl;
+        if(DEBUG) std::cout << "Text surface could not be created: " << TTF_GetError() << std::endl;
         return;
     }
 
     SDL_Texture *Texture = SDL_CreateTextureFromSurface(Window.Renderer, Surface);
     if(Texture == nullptr)
     {
-        std::cout << "Text texture could not be created: " << SDL_GetError() << std::endl;
+        if(DEBUG) std::cout << "Text texture could not be created: " << SDL_GetError() << std::endl;
         SDL_FreeSurface(Surface);
         return;
     }
@@ -522,7 +545,7 @@ void Draw_GUI(Window_State &Window)
                 ImGui::End();
             }
             ImGui::SetNextWindowPos(ImVec2(16.0f, 16.0f), ImGuiCond_Once);
-            ImGui::SetNextWindowSize(ImVec2(260.0f, 130.0f), ImGuiCond_Once);
+            ImGui::SetNextWindowSize(ImVec2(420.0f, 240.0f), ImGuiCond_Once);
             ImGui::Begin(Command.Name.c_str());
             In_Window = true;
         }
@@ -542,7 +565,50 @@ void Draw_GUI(Window_State &Window)
                 ImGui::Begin("Appeal");
                 In_Window = true;
             }
-            ImGui::Button(Command.Text.c_str(), ImVec2(180.0f, 0.0f));
+            if(ImGui::Button(Command.Text.c_str(), ImVec2(180.0f, 0.0f)))
+            {
+                GUI_Clicked[Command.Name] = true;
+                if(Run_Function_Callback != nullptr && GUI_Button_Functions[Command.Name] != "")
+                {
+                    Run_Function_Callback(GUI_Button_Functions[Command.Name]);
+                }
+            }
+        }
+        else if(Command.Kind == "Slider_Int")
+        {
+            if(!In_Window)
+            {
+                ImGui::Begin("Appeal");
+                In_Window = true;
+            }
+            int Value = GUI_Slider_Values[Command.Name];
+            if(ImGui::SliderInt(Command.Text.c_str(), &Value, Command.Min, Command.Max))
+            {
+                GUI_Slider_Values[Command.Name] = Value;
+                GUI_Slider_Changed[Command.Name] = true;
+                if(Run_Analog_Function_Callback != nullptr && GUI_Slider_Functions[Command.Name] != "")
+                {
+                    Run_Analog_Function_Callback(GUI_Slider_Functions[Command.Name], Value);
+                }
+            }
+        }
+        else if(Command.Kind == "Checkbox")
+        {
+            if(!In_Window)
+            {
+                ImGui::Begin("Appeal");
+                In_Window = true;
+            }
+            bool Value = GUI_Checkbox_Values[Command.Name];
+            if(ImGui::Checkbox(Command.Text.c_str(), &Value))
+            {
+                GUI_Checkbox_Values[Command.Name] = Value;
+                GUI_Checkbox_Changed_Values[Command.Name] = true;
+                if(Run_Analog_Function_Callback != nullptr && GUI_Checkbox_Functions[Command.Name] != "")
+                {
+                    Run_Analog_Function_Callback(GUI_Checkbox_Functions[Command.Name], Value ? 1 : 0);
+                }
+            }
         }
     }
 
@@ -682,14 +748,14 @@ extern "C" void Add_Window(std::string Name, std::string Title, int Width, int H
 
     if(State.Window == nullptr)
     {
-        std::cout << "SDL window could not be created: " << SDL_GetError() << std::endl;
+        if(DEBUG) std::cout << "SDL window could not be created: " << SDL_GetError() << std::endl;
         return;
     }
 
     State.Renderer = SDL_CreateRenderer(State.Window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if(State.Renderer == nullptr)
     {
-        std::cout << "SDL renderer could not be created: " << SDL_GetError() << std::endl;
+        if(DEBUG) std::cout << "SDL renderer could not be created: " << SDL_GetError() << std::endl;
         SDL_DestroyWindow(State.Window);
         return;
     }
@@ -709,7 +775,7 @@ extern "C" void Add_Full_Screen_Window(std::string Name, int Monitor)
     SDL_DisplayMode Mode;
     if(SDL_GetCurrentDisplayMode(Monitor, &Mode) != 0)
     {
-        std::cout << "SDL display mode unavailable: " << SDL_GetError() << std::endl;
+        if(DEBUG) std::cout << "SDL display mode unavailable: " << SDL_GetError() << std::endl;
         Add_Window(Name, "Appeal", 1280, 720);
         return;
     }
@@ -741,6 +807,20 @@ extern "C" void Delete_Window(std::string Name)
     if(Focused_Window == Name)
     {
         Focused_Window = Windows.empty() ? "" : Windows.begin()->first;
+    }
+}
+
+extern "C" void Close_All()
+{
+    std::vector<std::string> Names;
+    for(const auto &Item : Windows)
+    {
+        Names.push_back(Item.first);
+    }
+
+    for(const std::string &Name : Names)
+    {
+        Delete_Window(Name);
     }
 }
 
@@ -874,7 +954,7 @@ extern "C" void Load_Texture(std::string Name, std::string File)
     Window_State *Window = Render_Window();
     if(Window == nullptr)
     {
-        std::cout << "Load_Texture needs a window before loading: " << Name << std::endl;
+        if(DEBUG) std::cout << "Load_Texture needs a window before loading: " << Name << std::endl;
         return;
     }
 
@@ -897,7 +977,7 @@ extern "C" void Load_Texture(std::string Name, std::string File)
 
     if(State.Texture == nullptr)
     {
-        std::cout << "Texture did not load: " << State.File << std::endl
+        if(DEBUG) std::cout << "Texture did not load: " << State.File << std::endl
                   << "SDL_image Error: " << IMG_GetError() << std::endl
                   << "SDL Error: " << SDL_GetError() << std::endl;
         return;
@@ -918,7 +998,7 @@ extern "C" void Load_Font(std::string Name, std::string File, int Size)
 
     if(State.Font == nullptr)
     {
-        std::cout << "Font did not load: " << State.File << std::endl
+        if(DEBUG) std::cout << "Font did not load: " << State.File << std::endl
                   << "TTF Error: " << TTF_GetError() << std::endl;
     }
 }
@@ -1012,27 +1092,90 @@ extern "C" void GUI_Button(std::string Name, std::string Text)
     GUI_Commands.push_back({"Button", Name, Text});
 }
 
+extern "C" void Set_GUI_Button_Function(std::string Name, std::string Function)
+{
+    GUI_Button_Functions[Name] = Function;
+}
+
+extern "C" void GUI_Slider_Int(std::string Name, std::string Text, int Value, int Min, int Max)
+{
+    if(GUI_Slider_Values.find(Name) == GUI_Slider_Values.end())
+    {
+        GUI_Slider_Values[Name] = Value;
+    }
+    GUI_Commands.push_back({"Slider_Int", Name, Text, Min, Max});
+}
+
+extern "C" void Set_GUI_Slider_Int_Function(std::string Name, std::string Function)
+{
+    GUI_Slider_Functions[Name] = Function;
+}
+
+extern "C" void GUI_Checkbox(std::string Name, std::string Text, int Value)
+{
+    GUI_Checkbox_Values[Name] = Value != 0;
+    GUI_Commands.push_back({"Checkbox", Name, Text});
+}
+
+extern "C" int GUI_Checkbox_Value(std::string Name)
+{
+    return GUI_Checkbox_Values[Name] ? 1 : 0;
+}
+
+extern "C" bool GUI_Checkbox_Changed(std::string Name)
+{
+    bool Changed = GUI_Checkbox_Changed_Values[Name];
+    GUI_Checkbox_Changed_Values[Name] = false;
+    return Changed;
+}
+
+extern "C" void Set_GUI_Checkbox_Function(std::string Name, std::string Function)
+{
+    GUI_Checkbox_Functions[Name] = Function;
+}
+
+extern "C" int GUI_Slider_Int_Value(std::string Name)
+{
+    return GUI_Slider_Values[Name];
+}
+
+extern "C" bool GUI_Slider_Int_Changed(std::string Name)
+{
+    bool Changed = GUI_Slider_Changed[Name];
+    GUI_Slider_Changed[Name] = false;
+    return Changed;
+}
+
+extern "C" bool GUI_Button_Clicked(std::string Name)
+{
+    bool Clicked = GUI_Clicked[Name];
+    GUI_Clicked[Name] = false;
+    return Clicked;
+}
+
 extern "C" void GUI_End()
 {
 }
 
+extern "C" void Set_Function_Runner(void (*Run_Function)(std::string), void (*Run_Analog_Function)(std::string, int))
+{
+    Run_Function_Callback = Run_Function;
+    Run_Analog_Function_Callback = Run_Analog_Function;
+}
+
+extern "C" void Debug(bool Enable)
+{
+    DEBUG = Enable;
+}
+
 extern "C" void Render()
 {
-    int Offset = 0;
     for(auto &Item : Windows)
     {
         Window_State &State = Item.second;
         SDL_SetRenderDrawColor(State.Renderer, State.Clear_Color.r, State.Clear_Color.g, State.Clear_Color.b, State.Clear_Color.a);
         SDL_RenderClear(State.Renderer);
         Begin_ImGui_Frame(State);
-
-        SDL_SetRenderDrawColor(State.Renderer, 72, 156, 214, 255);
-        SDL_Rect Test_Rect = {48 + Offset, 48 + Offset, 180, 120};
-        SDL_RenderFillRect(State.Renderer, &Test_Rect);
-
-        SDL_SetRenderDrawColor(State.Renderer, 245, 196, 66, 255);
-        SDL_Rect Accent_Rect = {88 + Offset, 88 + Offset, 180, 120};
-        SDL_RenderDrawRect(State.Renderer, &Accent_Rect);
 
         for(auto &Asset_Item : Assets)
         {
@@ -1060,7 +1203,6 @@ extern "C" void Render()
         Draw_GUI(State);
         End_ImGui_Frame(State);
         SDL_RenderPresent(State.Renderer);
-        Offset += 24;
     }
 }
 
@@ -1114,5 +1256,14 @@ extern "C" void Update()
     if(Target_FPS > 0)
     {
         SDL_Delay(1000 / Target_FPS);
+    }
+}
+
+extern "C" void Wait_Until_Close(std::string Name)
+{
+    while(Window_Exists(Name))
+    {
+        Render();
+        Update();
     }
 }

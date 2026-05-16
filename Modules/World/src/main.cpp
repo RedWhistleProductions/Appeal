@@ -2,7 +2,9 @@
 #include "Data_Source.h"
 
 Plugin Module;
+bool Module_Debug = true;
 
+void (*Debug)(bool Enable);
 void (*Set_Paths)(std::string Resources);
 void (*Create)(std::string Name);
 void (*Load)(std::string Name);
@@ -32,6 +34,7 @@ void Assign(std::string Name, T &Function)
 extern "C" void Init(std::string Name)
 {
     Module.Load(Name);
+    Assign("Debug", Debug);
     Assign("Set_Paths", Set_Paths);
     Assign("Create", Create);
     Assign("Load", Load);
@@ -63,6 +66,13 @@ extern "C" void Interpreter(Data_Source *Data)
         std::string Name;
         *Data >> Name;
         Init(Name);
+    }
+    else if(Command == "Debug")
+    {
+        int Enable;
+        *Data >> Enable;
+        Module_Debug = Enable != 0;
+        if(Debug != nullptr) Debug(Module_Debug);
     }
     else if(Command == "Set_Paths")
     {
@@ -205,6 +215,6 @@ extern "C" void Interpreter(Data_Source *Data)
     }
     else
     {
-        std::cout << "\tError: " << Command << " not found in World Dictionary" << std::endl;
+        if(Module_Debug) std::cout << "\tError: " << Command << " not found in World Dictionary" << std::endl;
     }
 }
