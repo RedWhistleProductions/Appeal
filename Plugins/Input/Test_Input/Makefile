@@ -1,5 +1,5 @@
 # Compiler
-CXX = g++
+CXX ?= g++
 
 # Compiler flags
 CXXFLAGS = -shared -fPIC -Wall
@@ -13,7 +13,7 @@ OBJS = $(SRCS:./src/%.cpp=$(OBJDIR)/%.o)
 
 ifeq ($(OS),Windows_NT)
 	TARGET = $(TARGET_WINDOWS)
-	COMPILER = x86_64-w64-mingw32-g++
+	COMPILER = $(CXX)
 	LINKFLAGS = -lmingw32
 else
 	TARGET = $(TARGET_LINUX)

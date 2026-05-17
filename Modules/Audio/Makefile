@@ -3,11 +3,11 @@ UNAME_S := $(shell uname -s)
 
 # Compiler and flags
 ifeq ($(UNAME_S),Linux)
-	CXX = g++
+CXX ?= g++
 	CXXFLAGS = -shared -fPIC -I../../Source
 	TARGET = Audio.so
 else
-	CXX = x86_64-w64-mingw32-g++
+CXX ?= g++
 	CXXFLAGS = -shared -I../../Source
 	TARGET = Audio.dll
 endif
@@ -33,7 +33,13 @@ $(OBJDIR)/%.o: ./src/%.cpp
 	@mkdir -p $(OBJDIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
+install: all
+	@mkdir -p ../../Resources/Modules/Audio
+	cp $(TARGET) ../../Resources/Modules/Audio/$(TARGET)
+
 # Clean
 clean:
 	rm -f $(OBJS) $(TARGET)
 	rm -rf $(OBJDIR)
+
+.PHONY: all install clean

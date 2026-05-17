@@ -24,7 +24,7 @@ OBJS := $(OBJS:$(IMGUI_DIR)/%.cpp=$(OBJ_DIR)/imgui/%.o)
 PLUGIN_NAME := Appeal_SDL2_Graphics
 
 ifeq ($(OS),Windows_NT)
-	CXX := x86_64-w64-mingw32-g++
+CXX ?= g++
 	TARGET := $(PLUGIN_NAME).dll
 	SDL_ROOT ?= ../../../Third_Party/SDL2/Windows/x86_64
 	SDL_INCLUDE ?= $(SDL_ROOT)/include
@@ -66,7 +66,7 @@ ifeq ($(OS),Windows_NT)
 	LDLIBS := -lSDL2_image -lSDL2_ttf -lSDL2 $(LDLIBS_ASSIMP)
 	RUNTIME_DIR := ../../../Resources/Modules/Graphics/$(PLUGIN_NAME)
 else
-	CXX ?= g++
+CXX ?= g++
 	SDL2_CONFIG ?= sdl2-config
 	TARGET := $(PLUGIN_NAME).so
 	ASSIMP_CFLAGS := $(shell pkg-config --cflags assimp 2>/dev/null)

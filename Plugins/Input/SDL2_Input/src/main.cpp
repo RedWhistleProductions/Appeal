@@ -186,7 +186,7 @@ bool Ensure_SDL()
         return true;
     }
 
-    if(SDL_InitSubSystem(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_GAMECONTROLLER) < 0)
+    if(SDL_InitSubSystem(SDL_INIT_EVENTS | SDL_INIT_GAMECONTROLLER) < 0)
     {
         if(DEBUG) std::cout << "SDL input could not initialize: " << SDL_GetError() << std::endl;
         return false;
@@ -429,7 +429,7 @@ extern "C" void Destructor()
             return;
         }
 #endif
-        SDL_QuitSubSystem(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_GAMECONTROLLER);
+        SDL_QuitSubSystem(SDL_INIT_EVENTS | SDL_INIT_GAMECONTROLLER);
         SDL_Ready = false;
     }
 }

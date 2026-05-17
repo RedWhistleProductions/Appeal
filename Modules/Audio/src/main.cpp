@@ -129,6 +129,8 @@ extern "C" void Shutdown()
     {
         Stop();
     }
+    Module.Unload();
+    Globals = nullptr;
 }
 
 extern "C" void Interpreter(Data_Source *Data)

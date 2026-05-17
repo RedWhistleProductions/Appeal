@@ -2,6 +2,24 @@
 
 static Appeal *Active_Appeal = nullptr;
 
+namespace
+{
+    bool Try_Float(const std::string &Value, float &Result)
+    {
+        try
+        {
+            Result = std::stof(Value);
+            return true;
+        }
+        catch(const std::exception &)
+        {
+            std::cerr << "Evaluation error: expected number but got '" << Value << "'" << std::endl;
+            Result = 0.0f;
+            return false;
+        }
+    }
+}
+
 static void Appeal_Function_Callback(std::string Function)
 {
     if(Active_Appeal != nullptr)
@@ -119,217 +137,226 @@ void Appeal::Run()
         Done = true;
     }
 
-    //while(not Done or Command != "Return")
-    while(not Done)
+    try
     {
-        
-        Command = Data_Manager.Data_Sources.Current->Value->Get_Data();
-        if(Command != "")
+        //while(not Done or Command != "Return")
+        while(not Done)
         {
-            //If the Command is "Done" the program will exit
-            if(Command == "Done")
+            Command = Data_Manager.Data_Sources.Current->Value->Get_Data();
+            if(Command != "")
             {
-                Done = true;
-                Shutdown();
-                if(Debug_Mode) std::cout << "Done Running: " << Running_Source << std::endl;
-                return;
-            }
-            else if(Command == "Debug")
-            {
-                int Enable;
-                Data_Manager >> Enable;
-                Debug_Mode = Enable != 0;
-            }
-            else if(Command == "Add_Dynamic_Module")
-            {
-                std::string Name;
-                std::string Plugin_Name;
-                Data_Manager >> Name;
-                Data_Manager >> Plugin_Name;
-                Add_Dynamic_Module(Name, Plugin_Name);
-            }
-            else if(Command == "Print")
-            {
-                std::string Str;
-                Data_Manager >> Str;
-                std::cout << Str << std::endl;
-            }
-            else if( Command == "Run" )
-            {
-                std::string Name;
-                Data_Manager >> Name;
-                Add_Script(Name);
-                if(Debug_Mode) std::cout << "Running: " << Name << std::endl;
-            }
-            else if( Command == "Define_Function" )
-            {
-                std::string Function_Name;
-                Data_Manager >> Function_Name;
-                Appeal_Functions.Add_Node(Function_Name);
-                while( Command != "End_Function" and Command != "Done")
+                //If the Command is "Done" the program will exit
+                if(Command == "Done")
                 {
-                    Data_Manager >> Command;
-                    if( Command == "End_Function" or Command == "Done")
-                    {
-                        break;
-                    }
-                    Appeal_Functions.Current->Value.Add_Command(Command);
-                }
-            }
-            else if( Command == "Call" )
-            {
-                std::string Function_Name;
-                Data_Manager >> Function_Name;
-                Appeal_Functions.Find("Function_Name");
-                Data_Manager.Add_Source("Function_Name", &Appeal_Functions.Current->Value);
-            }
-            else if( Command == "Return" )
-            {
-                std::string Returning_Source = Data_Manager.Data_Sources.Current->Name;
-                auto Previous_Source = Data_Manager.Data_Sources.Current->Back_Node;
-                if(Debug_Mode) std::cout << "Returning From: " << Returning_Source << std::endl;
-                // Remove removes the current Data Source and goes back to the previous one
-                Data_Manager.Data_Sources.Remove();
-                if(Data_Manager.Data_Sources.Nodes > 0 && Previous_Source != nullptr)
-                {
-                    Data_Manager.Data_Sources.Current = Previous_Source;
-                    Data_Manager.Data_Sources.Current_Name = Previous_Source->Name;
-                }
-                if(Returning_Source == Running_Source)
-                {
+                    Done = true;
+                    Shutdown();
+                    if(Debug_Mode) std::cout << "Done Running: " << Running_Source << std::endl;
                     return;
                 }
-            }
-            else if( Command == "Add_Module" )
-            {
-                std::string Name;
-                Data_Manager >> Name;
-                Add_Module(Name, Dynamic_Modules.Current->Value.Interpreter);
-            }
-            else if( Command == "Add_Data_Source" )
-            {
-                std::string Name;
-                Data_Manager >> Name;
-                Data_Manager.Add_Source(Name, &Appeal_Scripts.Current->Value);
-            }
-            else if(Command == "Delay")
-            {
-                int seconds;
-                Data_Manager >> seconds;
-                std::this_thread::sleep_for(std::chrono::seconds(seconds));
-            }
-            else if(Command == "Loop")
-            {
-                std::string Loop_Type, Value_1, Op, Value_2, Loop_Target;
-                Data_Manager >> Loop_Type; //While or Until
-                Value_1 = Read_Condition_Value();
-                Data_Manager >> Op;
-                Value_2 = Read_Condition_Value();
-                Data_Manager >> Loop_Target;
-
-                bool Use_Function = false;
-                if(Loop_Target == "{")
+                else if(Command == "Debug")
                 {
-                    Use_Function = true;
-                    Capture_Block("Loop_Function");
+                    int Enable;
+                    Data_Manager >> Enable;
+                    Debug_Mode = Enable != 0;
                 }
-
-                if( Loop_Type == "While")
+                else if(Command == "Add_Dynamic_Module")
                 {
-                    while(Evaluate(Value_1, Op, Value_2))
+                    std::string Name;
+                    std::string Plugin_Name;
+                    Data_Manager >> Name;
+                    Data_Manager >> Plugin_Name;
+                    Add_Dynamic_Module(Name, Plugin_Name);
+                }
+                else if(Command == "Print")
+                {
+                    std::string Str;
+                    Data_Manager >> Str;
+                    std::cout << Str << std::endl;
+                }
+                else if( Command == "Run" )
+                {
+                    std::string Name;
+                    Data_Manager >> Name;
+                    Add_Script(Name);
+                    if(Debug_Mode) std::cout << "Running: " << Name << std::endl;
+                }
+                else if( Command == "Define_Function" )
+                {
+                    std::string Function_Name;
+                    Data_Manager >> Function_Name;
+                    Appeal_Functions.Add_Node(Function_Name);
+                    while( Command != "End_Function" and Command != "Done")
                     {
-                        if(Use_Function)
+                        Data_Manager >> Command;
+                        if( Command == "End_Function" or Command == "Done")
                         {
-                            Run_Function("Loop_Function");
+                            break;
                         }
-                        else
-                        {
-                            Run(Loop_Target);
-                        }
+                        Appeal_Functions.Current->Value.Add_Command(Command);
                     }
                 }
-                else if(Loop_Type == "Until")
-                {   
-                    do
+                else if( Command == "Call" )
+                {
+                    std::string Function_Name;
+                    Data_Manager >> Function_Name;
+                    Appeal_Functions.Find("Function_Name");
+                    Data_Manager.Add_Source("Function_Name", &Appeal_Functions.Current->Value);
+                }
+                else if( Command == "Return" )
+                {
+                    std::string Returning_Source = Data_Manager.Data_Sources.Current->Name;
+                    auto Previous_Source = Data_Manager.Data_Sources.Current->Back_Node;
+                    if(Debug_Mode) std::cout << "Returning From: " << Returning_Source << std::endl;
+                    // Remove removes the current Data Source and goes back to the previous one
+                    Data_Manager.Data_Sources.Remove();
+                    if(Data_Manager.Data_Sources.Nodes > 0 && Previous_Source != nullptr)
                     {
-                        if(Use_Function)
-                        {
-                            Run_Function("Loop_Function");
-                        }
-                        else
-                        {
-                            Run(Loop_Target);
-                        }
-                    } while (Evaluate(Value_1, Op, Value_2) == false);
-                }
-
-            }
-            else if(Command == "If")
-            {
-                std::string Value_1, Op, Value_2;
-                Value_1 = Read_Condition_Value();
-                Data_Manager >> Op;
-                Value_2 = Read_Condition_Value();
-                Data_Manager >> Command;
-                
-                if(Command == "{")
-                {
-                    Capture_Block("If_Function");
-                }
-
-                if(Evaluate(Value_1, Op, Value_2))
-                {
-                    Run_Function("If_Function");
-                }
-            }
-
-            else if( Command == "Set_Var")
-            {
-                //Sets a variable in the Data_Manager 
-                std::string Name, Value;
-                Data_Manager >> Name;
-                Data_Manager >> Value;
-                Data_Manager.Variables[Name] = Value;   
-            }
-            else if( Command == "Del_Var")
-            {
-                std::string Name;
-                Data_Manager >> Name;
-                Data_Manager.Variables.erase(Name);
-            }
-            else if(Command == "Print_Global")
-            {
-                std::string Name;
-                Data_Manager >> Name;
-                std::cout << Get_Global_Value(Name) << std::endl;
-            }
-            else if(Command == "Set_Var_Global")
-            {
-                std::string Variable, Global;
-                Data_Manager >> Variable;
-                Data_Manager >> Global;
-                Data_Manager.Variables[Variable] = Get_Global_Value(Global);
-            }
-            //Check if the Command is the name of a Dictionary
-            else 
-            {
-                if(Dictionary_List.Find(Command))
-                {
-                    Interpreter = Dictionary_List.Current->Value;
-                    Runtime_Data_Source Module_Data(&Data_Manager);
-                    Interpreter(&Module_Data);
-                }
-                else
-                {
-                    if(Debug_Mode) std::cout << "\tCommand Not Found: " << Command << std::endl;
-                    Command_Error++;
-                    if(Command_Error > Command_Error_Limit)
+                        Data_Manager.Data_Sources.Current = Previous_Source;
+                        Data_Manager.Data_Sources.Current_Name = Previous_Source->Name;
+                    }
+                    if(Returning_Source == Running_Source)
                     {
-                        Done = true;
+                        return;
                     }
                 }
-            }   
+                else if( Command == "Add_Module" )
+                {
+                    std::string Name;
+                    Data_Manager >> Name;
+                    Add_Module(Name, Dynamic_Modules.Current->Value.Interpreter);
+                }
+                else if( Command == "Add_Data_Source" )
+                {
+                    std::string Name;
+                    Data_Manager >> Name;
+                    Data_Manager.Add_Source(Name, &Appeal_Scripts.Current->Value);
+                }
+                else if(Command == "Delay")
+                {
+                    int seconds;
+                    Data_Manager >> seconds;
+                    std::this_thread::sleep_for(std::chrono::seconds(seconds));
+                }
+                else if(Command == "Loop")
+                {
+                    std::string Loop_Type, Value_1, Op, Value_2, Loop_Target;
+                    Data_Manager >> Loop_Type; //While or Until
+                    Value_1 = Read_Condition_Value();
+                    Data_Manager >> Op;
+                    Value_2 = Read_Condition_Value();
+                    Data_Manager >> Loop_Target;
+
+                    bool Use_Function = false;
+                    if(Loop_Target == "{")
+                    {
+                        Use_Function = true;
+                        Capture_Block("Loop_Function");
+                    }
+
+                    if( Loop_Type == "While")
+                    {
+                        while(Evaluate(Value_1, Op, Value_2))
+                        {
+                            if(Use_Function)
+                            {
+                                Run_Function("Loop_Function");
+                            }
+                            else
+                            {
+                                Run(Loop_Target);
+                            }
+                        }
+                    }
+                    else if(Loop_Type == "Until")
+                    {   
+                        do
+                        {
+                            if(Use_Function)
+                            {
+                                Run_Function("Loop_Function");
+                            }
+                            else
+                            {
+                                Run(Loop_Target);
+                            }
+                        } while (Evaluate(Value_1, Op, Value_2) == false);
+                    }
+
+                }
+                else if(Command == "If")
+                {
+                    std::string Value_1, Op, Value_2;
+                    Value_1 = Read_Condition_Value();
+                    Data_Manager >> Op;
+                    Value_2 = Read_Condition_Value();
+                    Data_Manager >> Command;
+                    
+                    if(Command == "{")
+                    {
+                        Capture_Block("If_Function");
+                    }
+
+                    if(Evaluate(Value_1, Op, Value_2))
+                    {
+                        Run_Function("If_Function");
+                    }
+                }
+
+                else if( Command == "Set_Var")
+                {
+                    //Sets a variable in the Data_Manager 
+                    std::string Name, Value;
+                    Data_Manager >> Name;
+                    Data_Manager >> Value;
+                    Data_Manager.Variables[Name] = Value;   
+                }
+                else if( Command == "Del_Var")
+                {
+                    std::string Name;
+                    Data_Manager >> Name;
+                    Data_Manager.Variables.erase(Name);
+                }
+                else if(Command == "Print_Global")
+                {
+                    std::string Name;
+                    Data_Manager >> Name;
+                    std::cout << Get_Global_Value(Name) << std::endl;
+                }
+                else if(Command == "Set_Var_Global")
+                {
+                    std::string Variable, Global;
+                    Data_Manager >> Variable;
+                    Data_Manager >> Global;
+                    Data_Manager.Variables[Variable] = Get_Global_Value(Global);
+                }
+                //Check if the Command is the name of a Dictionary
+                else 
+                {
+                    if(Dictionary_List.Find(Command))
+                    {
+                        Interpreter = Dictionary_List.Current->Value;
+                        Runtime_Data_Source Module_Data(&Data_Manager);
+                        Interpreter(&Module_Data);
+                    }
+                    else
+                    {
+                        if(Debug_Mode) std::cout << "\tCommand Not Found: " << Command << std::endl;
+                        Command_Error++;
+                        if(Command_Error > Command_Error_Limit)
+                        {
+                            Done = true;
+                        }
+                    }
+                }   
+            }
         }
+    }
+    catch(const std::exception &Error)
+    {
+        std::cerr << "Runtime error while running '" << Running_Source
+                  << "' near command '" << Command << "': " << Error.what() << std::endl;
+        Done = true;
+        Shutdown();
     }
     if(Debug_Mode) std::cout << "Done Running: " << Running_Source << std::endl;
 }
@@ -341,10 +368,16 @@ bool Appeal::Evaluate(std::string V1, std::string Op, std::string V2)
 
     if(Op == "==") return V1 == V2;
     else if(Op == "!=") return V1 != V2;
-    else if(Op == "<=") return std::stof(V1) <= std::stof(V2);
-    else if(Op == "<") return std::stof(V1) < std::stof(V2);
-    else if(Op == ">=") return std::stof(V1) >= std::stof(V2);
-    else if(Op == ">") return std::stof(V1) > std::stof(V2);
+    else if(Op == "<=" || Op == "<" || Op == ">=" || Op == ">")
+    {
+        float N1 = 0.0f;
+        float N2 = 0.0f;
+        if(!Try_Float(V1, N1) || !Try_Float(V2, N2)) return false;
+        if(Op == "<=") return N1 <= N2;
+        if(Op == "<") return N1 < N2;
+        if(Op == ">=") return N1 >= N2;
+        return N1 > N2;
+    }
     else
     {
         if(Debug_Mode) std::cout << "Evaluation error: " << Op << " is not a valid operator!" << std::endl;

@@ -1,11 +1,11 @@
 UNAME_S := $(shell uname -s)
 
 ifeq ($(UNAME_S),Linux)
-	CXX = g++
+CXX ?= g++
 	CXXFLAGS = -shared -fPIC -Wall
 	TARGET = Network.so
 else
-	CXX = x86_64-w64-mingw32-g++
+CXX ?= g++
 	CXXFLAGS = -shared -Wall
 	TARGET = Network.dll
 endif

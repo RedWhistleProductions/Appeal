@@ -1,4 +1,4 @@
-CXX = g++
+CXX ?= g++
 CXXFLAGS = -shared -fPIC -Wall
 
 TARGET_LINUX = Test_Network.so
@@ -9,7 +9,7 @@ OBJS = $(SRCS:./src/%.cpp=$(OBJDIR)/%.o)
 
 ifeq ($(OS),Windows_NT)
 	TARGET = $(TARGET_WINDOWS)
-	COMPILER = x86_64-w64-mingw32-g++
+	COMPILER = $(CXX)
 	LINKFLAGS = -lmingw32
 else
 	TARGET = $(TARGET_LINUX)

@@ -3,11 +3,11 @@ UNAME_S := $(shell uname -s)
 
 # Compiler and flags
 ifeq ($(UNAME_S),Linux)
-	CXX = g++
+CXX ?= g++
 	CXXFLAGS = -shared -fPIC -Wall
 	TARGET = Input.so
 else
-	CXX = x86_64-w64-mingw32-g++
+CXX ?= g++
 	CXXFLAGS = -shared -Wall
 	TARGET = Input.dll
 endif

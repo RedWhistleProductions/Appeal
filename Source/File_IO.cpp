@@ -115,7 +115,15 @@ void File_IO::Read(int &num)
 {
 	std::string Input;
 	Read(Input);
-	num = std::stoi(Input);
+	try
+	{
+		num = std::stoi(Input);
+	}
+	catch(const std::exception &)
+	{
+		std::cerr << "Warning: expected integer but got '" << Input << "'. Using 0." << std::endl;
+		num = 0;
+	}
 }
 
 File_IO& File_IO::operator>>(int &num)
@@ -128,7 +136,15 @@ void File_IO::Read(float &num)
 {
 	std::string Input;
 	Read(Input);
-	num = std::stof(Input);
+	try
+	{
+		num = std::stof(Input);
+	}
+	catch(const std::exception &)
+	{
+		std::cerr << "Warning: expected float but got '" << Input << "'. Using 0." << std::endl;
+		num = 0.0f;
+	}
 }
 
 File_IO& File_IO::operator>>(float &num)
@@ -140,7 +156,15 @@ void File_IO::Read(double &num)
 {
 	std::string Input;
 	Read(Input);
-	num = std::stod(Input);
+	try
+	{
+		num = std::stod(Input);
+	}
+	catch(const std::exception &)
+	{
+		std::cerr << "Warning: expected double but got '" << Input << "'. Using 0." << std::endl;
+		num = 0.0;
+	}
 }
 
 File_IO& File_IO::operator>>(double &num)
@@ -244,12 +268,28 @@ float File_IO::F()
 {
 	std::string Input;
 	Read(Input);
-	return std::stof(Input);
+	try
+	{
+		return std::stof(Input);
+	}
+	catch(const std::exception &)
+	{
+		std::cerr << "Warning: expected float but got '" << Input << "'. Using 0." << std::endl;
+		return 0.0f;
+	}
 }
 
 double File_IO::D()
 {
 	std::string Input;
 	Read(Input);
-	return std::stod(Input);
+	try
+	{
+		return std::stod(Input);
+	}
+	catch(const std::exception &)
+	{
+		std::cerr << "Warning: expected double but got '" << Input << "'. Using 0." << std::endl;
+		return 0.0;
+	}
 }

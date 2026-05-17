@@ -28,7 +28,7 @@ OBJS := $(SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 PLUGIN_NAME := Appeal_SDL2_Audio
 
 ifeq ($(OS),Windows_NT)
-	CXX := x86_64-w64-mingw32-g++
+CXX ?= g++
 	TARGET := $(PLUGIN_NAME).dll
 	SDL_ROOT ?= ../../../Third_Party/SDL2/Windows/x86_64
 	SDL_INCLUDE ?= $(SDL_ROOT)/include
@@ -50,7 +50,7 @@ ifeq ($(OS),Windows_NT)
 	LDLIBS := -lSDL2_mixer -lSDL2
 	RUNTIME_DIR := ../../../Resources/Modules/Audio/$(PLUGIN_NAME)
 else
-	CXX ?= g++
+CXX ?= g++
 	SDL2_CONFIG ?= sdl2-config
 	TARGET := $(PLUGIN_NAME).so
 	CPPFLAGS := $(shell $(SDL2_CONFIG) --cflags)

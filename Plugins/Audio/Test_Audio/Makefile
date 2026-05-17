@@ -1,5 +1,5 @@
 # Compiler
-CXX = g++
+CXX ?= g++
 
 # Compiler flags
 CXXFLAGS = -shared -fPIC
@@ -18,7 +18,7 @@ OBJS = $(SRCS:./src/%.cpp=$(OBJDIR)/%.o)
 # Detect operating system
 ifeq ($(OS),Windows_NT)
 	TARGET = $(TARGET_WINDOWS)
-	COMPILER = x86_64-w64-mingw32-g++
+	COMPILER = $(CXX)
 	LINKFLAGS = -lmingw32
 else
 	TARGET = $(TARGET_LINUX)
@@ -38,8 +38,13 @@ $(OBJDIR)/%.o: ./src/%.cpp
 	@mkdir -p $(OBJDIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
+install: all
+	@mkdir -p ../../../Resources/Modules/Audio/Test_Audio
+	cp $(TARGET) ../../../Resources/Modules/Audio/Test_Audio/$(TARGET)
+
 # Clean target
 clean:
 	rm -f $(TARGET_LINUX) $(TARGET_WINDOWS) $(OBJDIR)/*.o
+	rm -rf $(OBJDIR)
 
-.PHONY: all clean
+.PHONY: all install clean

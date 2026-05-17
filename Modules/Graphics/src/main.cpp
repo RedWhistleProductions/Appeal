@@ -221,6 +221,16 @@ extern "C" void Graphics_Render() { Render(); }
 extern "C" void Graphics_Update() { Update(); }
 extern "C" bool Graphics_Window_Open(std::string Window) { return Window_Open(Window); }
 
+extern "C" void Shutdown()
+{
+    if(Close_All != nullptr)
+    {
+        Close_All();
+    }
+    Module.Unload();
+    Globals = nullptr;
+}
+
 extern "C" void Interpreter(Data_Source *Data)
 {
     std::string Command;

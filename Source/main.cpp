@@ -1,16 +1,26 @@
 #include "Appeal.h"
+#include <exception>
+#include <iostream>
 
 int main(int argc, char* argv[])
 {
-    Appeal App;
+    try
+    {
+        Appeal App;
 
-    if(argc > 1)
-    {
-        App.Run(argv[1]);
+        if(argc > 1)
+        {
+            App.Run(argv[1]);
+        }
+        else
+        {
+            App.Run("Main");
+        }
     }
-    else
+    catch(const std::exception &Error)
     {
-        App.Run("Main");
+        std::cerr << "Fatal runtime error: " << Error.what() << std::endl;
+        return 1;
     }
     
     return 0;

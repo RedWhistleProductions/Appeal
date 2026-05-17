@@ -113,6 +113,11 @@ extern "C" void Set_Function_Runner(void (*Run_Function)(std::string), void (*Ru
     }
 }
 
+extern "C" void Shutdown()
+{
+    Module.Unload();
+}
+
 extern "C" void Interpreter(Data_Source *Data)
 {
     std::string Command;
