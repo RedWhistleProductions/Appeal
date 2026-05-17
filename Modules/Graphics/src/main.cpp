@@ -42,6 +42,9 @@ void (*Set_Orientation)(std::string Name, float Yaw, float Pitch, float Roll);
 void (*Set_Scale)(std::string Name, float X, float Y, float Z);
 void (*Move_Asset)(std::string Name, float X, float Y, float Z);
 void (*Rotate_Asset)(std::string Name, float Yaw, float Pitch, float Roll);
+void (*Set_Active_Asset)(std::string Name);
+void (*Rotate_Active_Yaw_Input)(int Value);
+void (*Move_Active_Forward_Input)(int Value);
 
 void (*Draw_Text)(std::string Font, std::string Text, float X, float Y);
 void (*GUI_Begin)(std::string Name);
@@ -162,6 +165,9 @@ extern "C" void Init_Globals(std::string Name, Named_List<Module_Data> *Shared_G
     Assign("Set_Scale", Set_Scale);
     Assign("Move_Asset", Move_Asset);
     Assign("Rotate_Asset", Rotate_Asset);
+    Assign("Set_Active_Asset", Set_Active_Asset);
+    Assign("Rotate_Active_Yaw_Input", Rotate_Active_Yaw_Input);
+    Assign("Move_Active_Forward_Input", Move_Active_Forward_Input);
 
     Assign("Draw_Text", Draw_Text);
     Assign("GUI_Begin", GUI_Begin);
@@ -500,6 +506,24 @@ extern "C" void Interpreter(Data_Source *Data)
         *Data >> Roll;
         Rotate_Asset(Name, Yaw, Pitch, Roll);
     }
+    else if(Command == "Set_Active_Asset")
+    {
+        std::string Name;
+        *Data >> Name;
+        Set_Active_Asset(Name);
+    }
+    else if(Command == "Rotate_Active_Yaw_Input")
+    {
+        int Value;
+        *Data >> Value;
+        Rotate_Active_Yaw_Input(Value);
+    }
+    else if(Command == "Move_Active_Forward_Input")
+    {
+        int Value;
+        *Data >> Value;
+        Move_Active_Forward_Input(Value);
+    }
     else if(Command == "Draw_Text")
     {
         std::string Font, Text;
@@ -535,7 +559,6 @@ extern "C" void Interpreter(Data_Source *Data)
         std::string Name;
         *Data >> Name;
         bool Clicked = GUI_Button_Clicked(Name);
-        if(Module_Debug) std::cout << Clicked << std::endl;
         Set_Global("GUI." + Name + ".Clicked", "bool", Clicked ? "1" : "0");
     }
     else if(Command == "Set_GUI_Button_Function")
@@ -562,7 +585,6 @@ extern "C" void Interpreter(Data_Source *Data)
         std::string Name;
         *Data >> Name;
         int Value = GUI_Slider_Int_Value(Name);
-        if(Module_Debug) std::cout << Value << std::endl;
         Set_Global("GUI." + Name + ".Value", "int", std::to_string(Value));
     }
     else if(Command == "GUI_Slider_Int_Changed")
@@ -570,7 +592,6 @@ extern "C" void Interpreter(Data_Source *Data)
         std::string Name;
         *Data >> Name;
         bool Changed = GUI_Slider_Int_Changed(Name);
-        if(Module_Debug) std::cout << Changed << std::endl;
         Set_Global("GUI." + Name + ".Changed", "bool", Changed ? "1" : "0");
         Set_Global("GUI." + Name + ".Value", "int", std::to_string(GUI_Slider_Int_Value(Name)));
     }
@@ -596,7 +617,6 @@ extern "C" void Interpreter(Data_Source *Data)
         std::string Name;
         *Data >> Name;
         int Value = GUI_Checkbox_Value(Name);
-        if(Module_Debug) std::cout << Value << std::endl;
         Set_Global("GUI." + Name + ".Value", "bool", Value ? "1" : "0");
     }
     else if(Command == "GUI_Checkbox_Changed")
@@ -604,7 +624,6 @@ extern "C" void Interpreter(Data_Source *Data)
         std::string Name;
         *Data >> Name;
         bool Changed = GUI_Checkbox_Changed(Name);
-        if(Module_Debug) std::cout << Changed << std::endl;
         Set_Global("GUI." + Name + ".Changed", "bool", Changed ? "1" : "0");
         Set_Global("GUI." + Name + ".Value", "bool", GUI_Checkbox_Value(Name) ? "1" : "0");
     }
@@ -638,7 +657,6 @@ extern "C" void Interpreter(Data_Source *Data)
     {
         std::string Window;
         *Data >> Window;
-        if(Module_Debug) std::cout << Window_Open(Window) << std::endl;
         Update_Window_Global(Window);
     }
     else

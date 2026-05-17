@@ -2,17 +2,19 @@
     #include "SDL2/SDL.h"
     #include "SDL2/SDL_image.h"
     #include "SDL2/SDL_ttf.h"
+    #include "SDL2/SDL_opengl.h"
 #endif
 
 #ifdef __linux__
     #include <SDL2/SDL.h>
     #include <SDL2/SDL_image.h>
     #include <SDL2/SDL_ttf.h>
+    #include <SDL2/SDL_opengl.h>
 #endif
 
 #include "imgui.h"
 #include "imgui_impl_sdl2.h"
-#include "imgui_impl_sdlrenderer2.h"
+#include "imgui_impl_opengl2.h"
 
 #ifdef APPEAL_USE_ASSIMP
     #include <assimp/Importer.hpp>
@@ -21,6 +23,8 @@
 #endif
 
 #include <cmath>
+#include <algorithm>
+#include <array>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -42,10 +46,16 @@ struct Vec3
     float Z = 0.0f;
 };
 
+struct Vec2
+{
+    float X = 0.0f;
+    float Y = 0.0f;
+};
+
 struct Window_State
 {
     SDL_Window *Window = nullptr;
-    SDL_Renderer *Renderer = nullptr;
+    SDL_GLContext GL_Context = nullptr;
     int Width = 0;
     int Height = 0;
     SDL_Color Clear_Color = {24, 28, 34, 255};
@@ -63,6 +73,21 @@ struct Window_State
     float Ortho_Top = 0.0f;
     Vec3 Camera_Location = {0.0f, 0.0f, -6.0f};
     Vec3 Camera_Orientation = {0.0f, 0.0f, 0.0f};
+};
+
+struct Mesh_Triangle
+{
+    int A = 0;
+    int B = 0;
+    int C = 0;
+    int Material = 0;
+};
+
+struct Mesh_Material
+{
+    std::string Texture_File;
+    GLuint Texture_ID = 0;
+    SDL_Color Diffuse = {120, 220, 170, 255};
 };
 
 struct Asset_State
@@ -86,13 +111,17 @@ struct Mesh_State
 {
     std::string File;
     std::vector<Vec3> Vertices;
+    std::vector<Vec3> Normals;
+    std::vector<Vec2> UVs;
     std::vector<std::pair<int, int>> Edges;
+    std::vector<Mesh_Triangle> Triangles;
+    std::vector<Mesh_Material> Materials;
 };
 
 struct Texture_State
 {
     std::string File;
-    SDL_Texture *Texture = nullptr;
+    GLuint Texture = 0;
     int Width = 0;
     int Height = 0;
 };
@@ -149,6 +178,7 @@ std::map<std::string, std::string> GUI_Slider_Functions;
 std::map<std::string, std::string> GUI_Checkbox_Functions;
 void (*Run_Function_Callback)(std::string Function) = nullptr;
 void (*Run_Analog_Function_Callback)(std::string Function, int Value) = nullptr;
+std::string Active_Asset;
 
 std::string Focused_Window;
 int Target_FPS = 60;
@@ -159,6 +189,186 @@ bool ImGui_Ready = false;
 bool DEBUG = true;
 
 extern "C" void Delete_Window(std::string Name);
+
+std::string Directory_Name(std::string File)
+{
+    size_t Slash = File.find_last_of("/\\");
+    if(Slash == std::string::npos)
+    {
+        return "";
+    }
+    return File.substr(0, Slash + 1);
+}
+
+std::string Normalize_Path(std::string Path)
+{
+    for(char &Character : Path)
+    {
+        if(Character == '\\') Character = '/';
+    }
+    return Path;
+}
+
+GLuint Create_GL_Texture_From_Surface(SDL_Surface *Loaded, int *Width = nullptr, int *Height = nullptr)
+{
+    SDL_Surface *Surface = SDL_ConvertSurfaceFormat(Loaded, SDL_PIXELFORMAT_ABGR8888, 0);
+    SDL_FreeSurface(Loaded);
+    if(Surface == nullptr)
+    {
+        if(DEBUG) std::cout << "Texture format conversion failed: " << SDL_GetError() << std::endl;
+        return 0;
+    }
+
+    GLuint Texture = 0;
+    glGenTextures(1, &Texture);
+    glBindTexture(GL_TEXTURE_2D, Texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Surface->w, Surface->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, Surface->pixels);
+
+    if(Width != nullptr) *Width = Surface->w;
+    if(Height != nullptr) *Height = Surface->h;
+    SDL_FreeSurface(Surface);
+    return Texture;
+}
+
+GLuint Load_GL_Texture_File(const std::string &File, int *Width = nullptr, int *Height = nullptr)
+{
+    SDL_Surface *Loaded = IMG_Load(File.c_str());
+    if(Loaded == nullptr)
+    {
+        Loaded = SDL_LoadBMP(File.c_str());
+    }
+
+    if(Loaded == nullptr)
+    {
+        if(DEBUG) std::cout << "Texture did not load: " << File << std::endl
+                  << "SDL_image Error: " << IMG_GetError() << std::endl
+                  << "SDL Error: " << SDL_GetError() << std::endl;
+        return 0;
+    }
+
+    return Create_GL_Texture_From_Surface(Loaded, Width, Height);
+}
+
+#ifdef APPEAL_USE_ASSIMP
+GLuint Load_Assimp_Embedded_Texture(const aiScene *Scene, const aiString &Texture_Path)
+{
+    std::string Path = Texture_Path.C_Str();
+    if(Path.size() < 2 || Path[0] != '*')
+    {
+        return 0;
+    }
+
+    int Texture_Index = -1;
+    try
+    {
+        Texture_Index = std::stoi(Path.substr(1));
+    }
+    catch(...)
+    {
+        return 0;
+    }
+
+    if(Texture_Index < 0 || static_cast<unsigned int>(Texture_Index) >= Scene->mNumTextures)
+    {
+        return 0;
+    }
+
+    const aiTexture *Texture = Scene->mTextures[Texture_Index];
+    if(Texture == nullptr)
+    {
+        return 0;
+    }
+
+    if(Texture->mHeight == 0)
+    {
+        SDL_RWops *RW = SDL_RWFromConstMem(Texture->pcData, Texture->mWidth);
+        if(RW == nullptr)
+        {
+            return 0;
+        }
+        SDL_Surface *Surface = IMG_Load_RW(RW, 1);
+        if(Surface == nullptr)
+        {
+            if(DEBUG) std::cout << "Embedded texture did not load: " << Path << std::endl
+                      << "SDL_image Error: " << IMG_GetError() << std::endl;
+            return 0;
+        }
+        return Create_GL_Texture_From_Surface(Surface);
+    }
+
+    SDL_Surface *Surface = SDL_CreateRGBSurfaceWithFormatFrom(
+        Texture->pcData,
+        Texture->mWidth,
+        Texture->mHeight,
+        32,
+        Texture->mWidth * 4,
+        SDL_PIXELFORMAT_ABGR8888
+    );
+    if(Surface == nullptr)
+    {
+        return 0;
+    }
+
+    SDL_Surface *Copy = SDL_ConvertSurfaceFormat(Surface, SDL_PIXELFORMAT_ABGR8888, 0);
+    SDL_FreeSurface(Surface);
+    if(Copy == nullptr)
+    {
+        return 0;
+    }
+    return Create_GL_Texture_From_Surface(Copy);
+}
+#endif
+
+void Set_Viewport_Projection(const Window_State &Window)
+{
+    int View_W = Window.View_W > 0 ? Window.View_W : Window.Width;
+    int View_H = Window.View_H > 0 ? Window.View_H : Window.Height;
+    int View_X = Window.View_X;
+    int View_Y = Window.View_Y;
+    if(View_H <= 0) View_H = 1;
+
+    glViewport(View_X, View_Y, View_W, View_H);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+
+    if(Window.Perspective)
+    {
+        double Aspect = static_cast<double>(View_W) / static_cast<double>(View_H);
+        double Top = std::tan(Degrees_To_Radians(Window.Fovy) * 0.5) * Window.Near;
+        double Bottom = -Top;
+        double Right = Top * Aspect;
+        double Left = -Right;
+        glFrustum(Left, Right, Bottom, Top, Window.Near, Window.Far);
+    }
+    else
+    {
+        glOrtho(Window.Ortho_Left, Window.Ortho_Right, Window.Ortho_Bottom, Window.Ortho_Top, Window.Near, Window.Far);
+    }
+}
+
+void Set_Model_View(const Window_State &Window)
+{
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glRotatef(-Window.Camera_Orientation.Z, 0.0f, 0.0f, 1.0f);
+    glRotatef(-Window.Camera_Orientation.Y, 1.0f, 0.0f, 0.0f);
+    glRotatef(-Window.Camera_Orientation.X, 0.0f, 1.0f, 0.0f);
+    glScalef(1.0f, 1.0f, -1.0f);
+    glTranslatef(-Window.Camera_Location.X, -Window.Camera_Location.Y, -Window.Camera_Location.Z);
+}
+
+void Set_2D_Projection(const Window_State &Window)
+{
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(0.0, Window.Width, Window.Height, 0.0, -1.0, 1.0);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+}
 
 bool Ensure_SDL()
 {
@@ -219,10 +429,10 @@ extern "C" bool Window_Open(std::string Name)
 
 void Destroy_Window(Window_State &State)
 {
-    if(State.Renderer != nullptr)
+    if(State.GL_Context != nullptr)
     {
-        SDL_DestroyRenderer(State.Renderer);
-        State.Renderer = nullptr;
+        SDL_GL_DeleteContext(State.GL_Context);
+        State.GL_Context = nullptr;
     }
 
     if(State.Window != nullptr)
@@ -320,12 +530,66 @@ Mesh_State Make_Cube_Mesh(std::string File)
         {-1.0f, -1.0f, -1.0f}, {1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, -1.0f}, {-1.0f, 1.0f, -1.0f},
         {-1.0f, -1.0f, 1.0f}, {1.0f, -1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {-1.0f, 1.0f, 1.0f}
     };
+    Mesh.Normals = {
+        {-0.577f, -0.577f, -0.577f}, {0.577f, -0.577f, -0.577f}, {0.577f, 0.577f, -0.577f}, {-0.577f, 0.577f, -0.577f},
+        {-0.577f, -0.577f, 0.577f}, {0.577f, -0.577f, 0.577f}, {0.577f, 0.577f, 0.577f}, {-0.577f, 0.577f, 0.577f}
+    };
+    Mesh.UVs = {
+        {0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f},
+        {0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f}
+    };
     Mesh.Edges = {
         {0, 1}, {1, 2}, {2, 3}, {3, 0},
         {4, 5}, {5, 6}, {6, 7}, {7, 4},
         {0, 4}, {1, 5}, {2, 6}, {3, 7}
     };
+    Mesh.Materials.push_back({"", 0, {120, 220, 170, 255}});
+    Mesh.Triangles = {
+        {0, 1, 2, 0}, {0, 2, 3, 0},
+        {4, 6, 5, 0}, {4, 7, 6, 0},
+        {0, 4, 5, 0}, {0, 5, 1, 0},
+        {1, 5, 6, 0}, {1, 6, 2, 0},
+        {2, 6, 7, 0}, {2, 7, 3, 0},
+        {3, 7, 4, 0}, {3, 4, 0, 0}
+    };
     return Mesh;
+}
+
+int Parse_Obj_Vertex_Index(const std::string &Token, int Vertex_Count)
+{
+    if(Token.empty())
+    {
+        return -1;
+    }
+
+    size_t Slash = Token.find('/');
+    std::string Index_Text = Slash == std::string::npos ? Token : Token.substr(0, Slash);
+    if(Index_Text.empty())
+    {
+        return -1;
+    }
+
+    int Index = 0;
+    try
+    {
+        Index = std::stoi(Index_Text);
+    }
+    catch(...)
+    {
+        return -1;
+    }
+
+    if(Index > 0)
+    {
+        return Index - 1;
+    }
+
+    if(Index < 0)
+    {
+        return Vertex_Count + Index;
+    }
+
+    return -1;
 }
 
 Mesh_State Load_Mesh_File(std::string File)
@@ -339,21 +603,88 @@ Mesh_State Load_Mesh_File(std::string File)
         File,
         aiProcess_Triangulate |
         aiProcess_JoinIdenticalVertices |
+        aiProcess_PreTransformVertices |
         aiProcess_GenNormals |
         aiProcess_SortByPType
     );
 
     if(Scene != nullptr && Scene->HasMeshes())
     {
+        std::string Base_Directory = Directory_Name(File);
+        if(Scene->HasMaterials())
+        {
+            for(unsigned int Material_Index = 0; Material_Index < Scene->mNumMaterials; ++Material_Index)
+            {
+                aiMaterial *Imported_Material = Scene->mMaterials[Material_Index];
+                Mesh_Material Material;
+
+                aiColor4D Diffuse;
+                if(AI_SUCCESS == aiGetMaterialColor(Imported_Material, AI_MATKEY_COLOR_DIFFUSE, &Diffuse))
+                {
+                    Material.Diffuse = {
+                        static_cast<Uint8>(std::max(0.0f, std::min(1.0f, Diffuse.r)) * 255.0f),
+                        static_cast<Uint8>(std::max(0.0f, std::min(1.0f, Diffuse.g)) * 255.0f),
+                        static_cast<Uint8>(std::max(0.0f, std::min(1.0f, Diffuse.b)) * 255.0f),
+                        static_cast<Uint8>(std::max(0.0f, std::min(1.0f, Diffuse.a)) * 255.0f)
+                    };
+                }
+
+                aiString Texture_Path;
+                if(Imported_Material->GetTexture(aiTextureType_DIFFUSE, 0, &Texture_Path) == AI_SUCCESS ||
+                   Imported_Material->GetTexture(aiTextureType_BASE_COLOR, 0, &Texture_Path) == AI_SUCCESS)
+                {
+                    std::string Texture_Name = Texture_Path.C_Str();
+                    if(Texture_Name.size() > 0 && Texture_Name[0] == '*')
+                    {
+                        Material.Texture_File = Texture_Name;
+                        Material.Texture_ID = Load_Assimp_Embedded_Texture(Scene, Texture_Path);
+                    }
+                    else
+                    {
+                        Material.Texture_File = Normalize_Path(Base_Directory + Texture_Name);
+                        Material.Texture_ID = Load_GL_Texture_File(Material.Texture_File);
+                    }
+                }
+
+                Mesh.Materials.push_back(Material);
+            }
+        }
+
+        if(Mesh.Materials.empty())
+        {
+            Mesh.Materials.push_back({"", 0, {120, 220, 170, 255}});
+        }
+
         for(unsigned int Mesh_Index = 0; Mesh_Index < Scene->mNumMeshes; ++Mesh_Index)
         {
             const aiMesh *Imported_Mesh = Scene->mMeshes[Mesh_Index];
             int Vertex_Offset = static_cast<int>(Mesh.Vertices.size());
+            int Material_Index = Imported_Mesh->mMaterialIndex < Mesh.Materials.size() ? static_cast<int>(Imported_Mesh->mMaterialIndex) : 0;
 
             for(unsigned int Vertex_Index = 0; Vertex_Index < Imported_Mesh->mNumVertices; ++Vertex_Index)
             {
                 const aiVector3D &Vertex = Imported_Mesh->mVertices[Vertex_Index];
                 Mesh.Vertices.push_back({Vertex.x, Vertex.y, Vertex.z});
+
+                if(Imported_Mesh->HasNormals())
+                {
+                    const aiVector3D &Normal = Imported_Mesh->mNormals[Vertex_Index];
+                    Mesh.Normals.push_back({Normal.x, Normal.y, Normal.z});
+                }
+                else
+                {
+                    Mesh.Normals.push_back({0.0f, 1.0f, 0.0f});
+                }
+
+                if(Imported_Mesh->HasTextureCoords(0))
+                {
+                    const aiVector3D &UV = Imported_Mesh->mTextureCoords[0][Vertex_Index];
+                    Mesh.UVs.push_back({UV.x, 1.0f - UV.y});
+                }
+                else
+                {
+                    Mesh.UVs.push_back({0.0f, 0.0f});
+                }
             }
 
             for(unsigned int Face_Index = 0; Face_Index < Imported_Mesh->mNumFaces; ++Face_Index)
@@ -367,11 +698,29 @@ Mesh_State Load_Mesh_File(std::string File)
                     int B = Vertex_Offset + static_cast<int>(Face.mIndices[(Index + 1) % Face.mNumIndices]);
                     Mesh.Edges.push_back({A, B});
                 }
+
+                if(Face.mNumIndices == 3)
+                {
+                    Mesh.Triangles.push_back({
+                        Vertex_Offset + static_cast<int>(Face.mIndices[0]),
+                        Vertex_Offset + static_cast<int>(Face.mIndices[1]),
+                        Vertex_Offset + static_cast<int>(Face.mIndices[2]),
+                        Material_Index
+                    });
+                }
             }
         }
 
-        if(!Mesh.Vertices.empty() && !Mesh.Edges.empty())
+        if(!Mesh.Vertices.empty() && (!Mesh.Edges.empty() || !Mesh.Triangles.empty()))
         {
+            if(DEBUG)
+            {
+                std::cout << "Assimp loaded mesh: " << File
+                          << " Vertices: " << Mesh.Vertices.size()
+                          << " Edges: " << Mesh.Edges.size()
+                          << " Triangles: " << Mesh.Triangles.size()
+                          << std::endl;
+            }
             return Mesh;
         }
     }
@@ -402,6 +751,26 @@ Mesh_State Load_Mesh_File(std::string File)
             Vec3 Vertex;
             Stream >> Vertex.X >> Vertex.Y >> Vertex.Z;
             Mesh.Vertices.push_back(Vertex);
+            Mesh.Normals.push_back({0.0f, 1.0f, 0.0f});
+            Mesh.UVs.push_back({0.0f, 0.0f});
+        }
+        else if(Type == "vn" || Type == "VN")
+        {
+            Vec3 Normal;
+            Stream >> Normal.X >> Normal.Y >> Normal.Z;
+            if(!Mesh.Normals.empty())
+            {
+                Mesh.Normals.back() = Normal;
+            }
+        }
+        else if(Type == "vt" || Type == "VT")
+        {
+            Vec2 UV;
+            Stream >> UV.X >> UV.Y;
+            if(!Mesh.UVs.empty())
+            {
+                Mesh.UVs.back() = {UV.X, 1.0f - UV.Y};
+            }
         }
         else if(Type == "e" || Type == "E")
         {
@@ -411,15 +780,42 @@ Mesh_State Load_Mesh_File(std::string File)
         }
         else if(Type == "f" || Type == "F")
         {
-            int A, B, C;
-            Stream >> A >> B >> C;
-            Mesh.Edges.push_back({A, B});
-            Mesh.Edges.push_back({B, C});
-            Mesh.Edges.push_back({C, A});
+            std::vector<int> Face;
+            std::string Token;
+            while(Stream >> Token)
+            {
+                int Index = Parse_Obj_Vertex_Index(Token, static_cast<int>(Mesh.Vertices.size()));
+                if(Index >= 0 && Index < static_cast<int>(Mesh.Vertices.size()))
+                {
+                    Face.push_back(Index);
+                }
+            }
+
+            if(Face.size() >= 2)
+            {
+                for(size_t Index = 0; Index < Face.size(); ++Index)
+                {
+                    int A = Face[Index];
+                    int B = Face[(Index + 1) % Face.size()];
+                    Mesh.Edges.push_back({A, B});
+                }
+            }
+
+            if(Face.size() >= 3)
+            {
+                if(Mesh.Materials.empty())
+                {
+                    Mesh.Materials.push_back({"", 0, {120, 220, 170, 255}});
+                }
+                for(size_t Index = 1; Index + 1 < Face.size(); ++Index)
+                {
+                    Mesh.Triangles.push_back({Face[0], Face[Index], Face[Index + 1], 0});
+                }
+            }
         }
     }
 
-    if(Mesh.Vertices.empty() || Mesh.Edges.empty())
+    if(Mesh.Vertices.empty() || (Mesh.Edges.empty() && Mesh.Triangles.empty()))
     {
         return Make_Cube_Mesh(File);
     }
@@ -429,10 +825,10 @@ Mesh_State Load_Mesh_File(std::string File)
 
 void Destroy_Texture(Texture_State &State)
 {
-    if(State.Texture != nullptr)
+    if(State.Texture != 0)
     {
-        SDL_DestroyTexture(State.Texture);
-        State.Texture = nullptr;
+        glDeleteTextures(1, &State.Texture);
+        State.Texture = 0;
     }
 }
 
@@ -458,15 +854,15 @@ bool Ensure_ImGui(Window_State &Window)
     IO.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     ImGui::StyleColorsDark();
 
-    if(!ImGui_ImplSDL2_InitForSDLRenderer(Window.Window, Window.Renderer))
+    if(!ImGui_ImplSDL2_InitForOpenGL(Window.Window, Window.GL_Context))
     {
         if(DEBUG) std::cout << "Dear ImGui SDL2 backend could not initialize" << std::endl;
         return false;
     }
 
-    if(!ImGui_ImplSDLRenderer2_Init(Window.Renderer))
+    if(!ImGui_ImplOpenGL2_Init())
     {
-        if(DEBUG) std::cout << "Dear ImGui SDL_Renderer backend could not initialize" << std::endl;
+        if(DEBUG) std::cout << "Dear ImGui OpenGL backend could not initialize" << std::endl;
         ImGui_ImplSDL2_Shutdown();
         return false;
     }
@@ -479,7 +875,7 @@ void Begin_ImGui_Frame(Window_State &Window)
 {
     if(!Ensure_ImGui(Window)) return;
 
-    ImGui_ImplSDLRenderer2_NewFrame();
+    ImGui_ImplOpenGL2_NewFrame();
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
 }
@@ -489,7 +885,7 @@ void End_ImGui_Frame(Window_State &Window)
     if(!ImGui_Ready) return;
 
     ImGui::Render();
-    ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), Window.Renderer);
+    ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
 }
 
 void Draw_Text_Command(Window_State &Window, const Text_Command &Command)
@@ -517,18 +913,38 @@ void Draw_Text_Command(Window_State &Window, const Text_Command &Command)
         return;
     }
 
-    SDL_Texture *Texture = SDL_CreateTextureFromSurface(Window.Renderer, Surface);
-    if(Texture == nullptr)
+    SDL_Surface *Converted = SDL_ConvertSurfaceFormat(Surface, SDL_PIXELFORMAT_ABGR8888, 0);
+    SDL_FreeSurface(Surface);
+    if(Converted == nullptr)
     {
-        if(DEBUG) std::cout << "Text texture could not be created: " << SDL_GetError() << std::endl;
-        SDL_FreeSurface(Surface);
+        if(DEBUG) std::cout << "Text texture conversion failed: " << SDL_GetError() << std::endl;
         return;
     }
 
-    SDL_Rect Destination = {static_cast<int>(Command.X), static_cast<int>(Command.Y), Surface->w, Surface->h};
-    SDL_FreeSurface(Surface);
-    SDL_RenderCopy(Window.Renderer, Texture, nullptr, &Destination);
-    SDL_DestroyTexture(Texture);
+    GLuint Texture = 0;
+    glGenTextures(1, &Texture);
+    glBindTexture(GL_TEXTURE_2D, Texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Converted->w, Converted->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, Converted->pixels);
+
+    float X = Command.X;
+    float Y = Command.Y;
+    float W = static_cast<float>(Converted->w);
+    float H = static_cast<float>(Converted->h);
+    SDL_FreeSurface(Converted);
+
+    glDisable(GL_LIGHTING);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, Texture);
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+    glBegin(GL_QUADS);
+        glTexCoord2f(0.0f, 0.0f); glVertex2f(X, Y);
+        glTexCoord2f(1.0f, 0.0f); glVertex2f(X + W, Y);
+        glTexCoord2f(1.0f, 1.0f); glVertex2f(X + W, Y + H);
+        glTexCoord2f(0.0f, 1.0f); glVertex2f(X, Y + H);
+    glEnd();
+    glDeleteTextures(1, &Texture);
 }
 
 void Draw_GUI(Window_State &Window)
@@ -632,32 +1048,101 @@ void Draw_Mesh_Asset(Window_State &Window, const Asset_State &Asset)
         Line_Color = {120, 220, 170, 255};
     }
 
-    SDL_SetRenderDrawColor(Window.Renderer, Line_Color.r, Line_Color.g, Line_Color.b, Line_Color.a);
-
     const Mesh_State &Mesh = Mesh_It->second;
-    std::vector<SDL_Point> Points(Mesh.Vertices.size());
-    std::vector<bool> Visible(Mesh.Vertices.size(), false);
 
-    for(size_t i = 0; i < Mesh.Vertices.size(); ++i)
+    bool Wire_Only = Asset.Shader == "Wire";
+    glPushMatrix();
+    glTranslatef(Asset.X, Asset.Y, Asset.Z);
+    glRotatef(Asset.Yaw, 0.0f, 1.0f, 0.0f);
+    glRotatef(Asset.Pitch, 1.0f, 0.0f, 0.0f);
+    glRotatef(Asset.Roll, 0.0f, 0.0f, 1.0f);
+    glScalef(Asset.Scale_X, Asset.Scale_Y, Asset.Scale_Z);
+
+    if(!Wire_Only && !Mesh.Triangles.empty())
     {
-        Vec3 Point = Mesh.Vertices[i];
-        Point.X *= Asset.Scale_X;
-        Point.Y *= Asset.Scale_Y;
-        Point.Z *= Asset.Scale_Z;
-        Point = Rotate_Point(Point, Asset.Yaw, Asset.Pitch, Asset.Roll);
-        Point.X += Asset.X;
-        Point.Y += Asset.Y;
-        Point.Z += Asset.Z;
-        Visible[i] = Project_Point(Window, Point, Points[i]);
+        glEnable(GL_LIGHTING);
+        glDisable(GL_BLEND);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        int Bound_Material = -1;
+        for(const Mesh_Triangle &Triangle : Mesh.Triangles)
+        {
+            int A = Triangle.A;
+            int B = Triangle.B;
+            int C = Triangle.C;
+            if(A < 0 || B < 0 || C < 0) continue;
+            if(static_cast<size_t>(A) >= Mesh.Vertices.size()) continue;
+            if(static_cast<size_t>(B) >= Mesh.Vertices.size()) continue;
+            if(static_cast<size_t>(C) >= Mesh.Vertices.size()) continue;
+
+            int Material_Index = Triangle.Material;
+            if(Material_Index < 0 || static_cast<size_t>(Material_Index) >= Mesh.Materials.size())
+            {
+                Material_Index = 0;
+            }
+
+            if(Bound_Material != Material_Index)
+            {
+                Bound_Material = Material_Index;
+                const Mesh_Material &Material = Mesh.Materials[Material_Index];
+                if(Material.Texture_ID != 0)
+                {
+                    glEnable(GL_TEXTURE_2D);
+                    glBindTexture(GL_TEXTURE_2D, Material.Texture_ID);
+                    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+                    glColor4ub(255, 255, 255, 255);
+                }
+                else
+                {
+                    glDisable(GL_TEXTURE_2D);
+                    SDL_Color Diffuse = Material.Diffuse;
+                    if(Diffuse.r < 8 && Diffuse.g < 8 && Diffuse.b < 8)
+                    {
+                        Diffuse = {120, 220, 170, 255};
+                    }
+                    glColor4ub(Diffuse.r, Diffuse.g, Diffuse.b, 255);
+                }
+            }
+
+            glBegin(GL_TRIANGLES);
+                int Indices[3] = {A, B, C};
+                for(int Index : Indices)
+                {
+                    if(static_cast<size_t>(Index) < Mesh.Normals.size())
+                    {
+                        const Vec3 &Normal = Mesh.Normals[Index];
+                        glNormal3f(Normal.X, Normal.Y, Normal.Z);
+                    }
+                    if(static_cast<size_t>(Index) < Mesh.UVs.size())
+                    {
+                        const Vec2 &UV = Mesh.UVs[Index];
+                        glTexCoord2f(UV.X, UV.Y);
+                    }
+                    const Vec3 &Vertex = Mesh.Vertices[Index];
+                    glVertex3f(Vertex.X, Vertex.Y, Vertex.Z);
+                }
+            glEnd();
+        }
+    }
+    else
+    {
+        glEnable(GL_BLEND);
+        glDisable(GL_LIGHTING);
+        glDisable(GL_TEXTURE_2D);
+        glColor4ub(Line_Color.r, Line_Color.g, Line_Color.b, Line_Color.a);
+        glBegin(GL_LINES);
+        for(const auto &Edge : Mesh.Edges)
+        {
+            if(Edge.first < 0 || Edge.second < 0) continue;
+            if(static_cast<size_t>(Edge.first) >= Mesh.Vertices.size() || static_cast<size_t>(Edge.second) >= Mesh.Vertices.size()) continue;
+            const Vec3 &A = Mesh.Vertices[Edge.first];
+            const Vec3 &B = Mesh.Vertices[Edge.second];
+            glVertex3f(A.X, A.Y, A.Z);
+            glVertex3f(B.X, B.Y, B.Z);
+        }
+        glEnd();
     }
 
-    for(const auto &Edge : Mesh.Edges)
-    {
-        if(Edge.first < 0 || Edge.second < 0) continue;
-        if(static_cast<size_t>(Edge.first) >= Points.size() || static_cast<size_t>(Edge.second) >= Points.size()) continue;
-        if(!Visible[Edge.first] || !Visible[Edge.second]) continue;
-        SDL_RenderDrawLine(Window.Renderer, Points[Edge.first].x, Points[Edge.first].y, Points[Edge.second].x, Points[Edge.second].y);
-    }
+    glPopMatrix();
 }
 
 extern "C" void Constructor()
@@ -669,7 +1154,7 @@ extern "C" void Destructor()
 {
     if(ImGui_Ready)
     {
-        ImGui_ImplSDLRenderer2_Shutdown();
+        ImGui_ImplOpenGL2_Shutdown();
         ImGui_ImplSDL2_Shutdown();
         ImGui::DestroyContext();
         ImGui_Ready = false;
@@ -687,6 +1172,19 @@ extern "C" void Destructor()
         Destroy_Texture(Item.second);
     }
     Textures.clear();
+
+    for(auto &Mesh_Item : Meshes)
+    {
+        for(Mesh_Material &Material : Mesh_Item.second.Materials)
+        {
+            if(Material.Texture_ID != 0)
+            {
+                glDeleteTextures(1, &Material.Texture_ID);
+                Material.Texture_ID = 0;
+            }
+        }
+    }
+    Meshes.clear();
 
     for(auto &Item : Fonts)
     {
@@ -732,6 +1230,12 @@ extern "C" void Add_Window(std::string Name, std::string Title, int Width, int H
 
     Delete_Window(Name);
 
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+    SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
+
     Window_State State;
     State.Width = Width;
     State.Height = Height;
@@ -743,7 +1247,7 @@ extern "C" void Add_Window(std::string Name, std::string Title, int Width, int H
         SDL_WINDOWPOS_CENTERED,
         Width,
         Height,
-        SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE
+        SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL
     );
 
     if(State.Window == nullptr)
@@ -752,15 +1256,22 @@ extern "C" void Add_Window(std::string Name, std::string Title, int Width, int H
         return;
     }
 
-    State.Renderer = SDL_CreateRenderer(State.Window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    if(State.Renderer == nullptr)
+    State.GL_Context = SDL_GL_CreateContext(State.Window);
+    if(State.GL_Context == nullptr)
     {
-        if(DEBUG) std::cout << "SDL renderer could not be created: " << SDL_GetError() << std::endl;
+        if(DEBUG) std::cout << "SDL OpenGL context could not be created: " << SDL_GetError() << std::endl;
         SDL_DestroyWindow(State.Window);
         return;
     }
 
-        SDL_SetRenderDrawBlendMode(State.Renderer, SDL_BLENDMODE_BLEND);
+    SDL_GL_MakeCurrent(State.Window, State.GL_Context);
+    SDL_GL_SetSwapInterval(1);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_NORMALIZE);
+    glEnable(GL_COLOR_MATERIAL);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     Windows[Name] = State;
     Focused_Window = Name;
 
@@ -795,7 +1306,7 @@ extern "C" void Delete_Window(std::string Name)
 
     if(Windows.size() == 1 && ImGui_Ready)
     {
-        ImGui_ImplSDLRenderer2_Shutdown();
+        ImGui_ImplOpenGL2_Shutdown();
         ImGui_ImplSDL2_Shutdown();
         ImGui::DestroyContext();
         ImGui_Ready = false;
@@ -868,8 +1379,6 @@ extern "C" void Set_View_Port(std::string Window, int X, int Y, int W, int H)
     Window_State *State = Find_Window(Window);
     if(State == nullptr) return;
 
-    SDL_Rect Viewport = {X, Y, W, H};
-    SDL_RenderSetViewport(State->Renderer, &Viewport);
     State->View_X = X;
     State->View_Y = Y;
     State->View_W = W;
@@ -962,28 +1471,12 @@ extern "C" void Load_Texture(std::string Name, std::string File)
     Destroy_Texture(State);
     State.File = Texture_Path + File;
 
-    State.Texture = IMG_LoadTexture(Window->Renderer, State.File.c_str());
-    if(State.Texture == nullptr)
+    SDL_GL_MakeCurrent(Window->Window, Window->GL_Context);
+    State.Texture = Load_GL_Texture_File(State.File, &State.Width, &State.Height);
+    if(State.Texture == 0)
     {
-        SDL_Surface *Surface = SDL_LoadBMP(State.File.c_str());
-        if(Surface != nullptr)
-        {
-            State.Texture = SDL_CreateTextureFromSurface(Window->Renderer, Surface);
-            State.Width = Surface->w;
-            State.Height = Surface->h;
-            SDL_FreeSurface(Surface);
-        }
-    }
-
-    if(State.Texture == nullptr)
-    {
-        if(DEBUG) std::cout << "Texture did not load: " << State.File << std::endl
-                  << "SDL_image Error: " << IMG_GetError() << std::endl
-                  << "SDL Error: " << SDL_GetError() << std::endl;
         return;
     }
-
-    SDL_QueryTexture(State.Texture, nullptr, nullptr, &State.Width, &State.Height);
 }
 
 extern "C" void Load_Font(std::string Name, std::string File, int Size)
@@ -1069,6 +1562,25 @@ extern "C" void Rotate_Asset(std::string Name, float Yaw, float Pitch, float Rol
     Assets[Name].Yaw += Yaw;
     Assets[Name].Pitch += Pitch;
     Assets[Name].Roll += Roll;
+}
+
+extern "C" void Set_Active_Asset(std::string Name)
+{
+    Active_Asset = Name;
+}
+
+extern "C" void Rotate_Active_Yaw_Input(int Value)
+{
+    if(Active_Asset == "" || Assets.find(Active_Asset) == Assets.end()) return;
+    float Amount = static_cast<float>(Value) / 32768.0f;
+    Assets[Active_Asset].Yaw += Amount * 3.0f;
+}
+
+extern "C" void Move_Active_Forward_Input(int Value)
+{
+    if(Active_Asset == "" || Assets.find(Active_Asset) == Assets.end()) return;
+    float Amount = static_cast<float>(Value) / 32768.0f;
+    Assets[Active_Asset].Z += -Amount * 0.08f;
 }
 
 extern "C" void Draw_Text(std::string Font, std::string Text, float X, float Y)
@@ -1173,28 +1685,70 @@ extern "C" void Render()
     for(auto &Item : Windows)
     {
         Window_State &State = Item.second;
-        SDL_SetRenderDrawColor(State.Renderer, State.Clear_Color.r, State.Clear_Color.g, State.Clear_Color.b, State.Clear_Color.a);
-        SDL_RenderClear(State.Renderer);
+        SDL_GL_MakeCurrent(State.Window, State.GL_Context);
+        int Current_W = 0;
+        int Current_H = 0;
+        SDL_GetWindowSize(State.Window, &Current_W, &Current_H);
+        State.Width = Current_W;
+        State.Height = Current_H;
+
+        glClearColor(State.Clear_Color.r / 255.0f, State.Clear_Color.g / 255.0f, State.Clear_Color.b / 255.0f, State.Clear_Color.a / 255.0f);
+        glClearDepth(1.0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LEQUAL);
+        glDisable(GL_CULL_FACE);
+        glEnable(GL_NORMALIZE);
+        glEnable(GL_COLOR_MATERIAL);
+        glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+
+        Set_Viewport_Projection(State);
+        Set_Model_View(State);
+
+        GLfloat Ambient[] = {0.28f, 0.28f, 0.30f, 1.0f};
+        GLfloat Diffuse[] = {0.86f, 0.86f, 0.78f, 1.0f};
+        GLfloat Position[] = {2.5f, 4.0f, 4.0f, 0.0f};
+        glLightModelfv(GL_LIGHT_MODEL_AMBIENT, Ambient);
+        glLightfv(GL_LIGHT0, GL_DIFFUSE, Diffuse);
+        glLightfv(GL_LIGHT0, GL_POSITION, Position);
+        glEnable(GL_LIGHT0);
         Begin_ImGui_Frame(State);
 
         for(auto &Asset_Item : Assets)
         {
             Asset_State &Asset = Asset_Item.second;
             auto Texture_It = Textures.find(Asset.Texture);
-            if(Texture_It == Textures.end() || Texture_It->second.Texture == nullptr)
+            if(Texture_It != Textures.end() && Texture_It->second.Texture != 0)
             {
-                Draw_Mesh_Asset(State, Asset);
-                continue;
+                Set_2D_Projection(State);
+                glDisable(GL_LIGHTING);
+                glDisable(GL_DEPTH_TEST);
+                glEnable(GL_TEXTURE_2D);
+                glBindTexture(GL_TEXTURE_2D, Texture_It->second.Texture);
+                glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+                float Width = Texture_It->second.Width * Asset.Scale_X;
+                float Height = Texture_It->second.Height * Asset.Scale_Y;
+                float X = Asset.X;
+                float Y = Asset.Y;
+                glPushMatrix();
+                glTranslatef(X + Width * 0.5f, Y + Height * 0.5f, 0.0f);
+                glRotatef(Asset.Roll, 0.0f, 0.0f, 1.0f);
+                glBegin(GL_QUADS);
+                    glTexCoord2f(0.0f, 0.0f); glVertex2f(-Width * 0.5f, -Height * 0.5f);
+                    glTexCoord2f(1.0f, 0.0f); glVertex2f(Width * 0.5f, -Height * 0.5f);
+                    glTexCoord2f(1.0f, 1.0f); glVertex2f(Width * 0.5f, Height * 0.5f);
+                    glTexCoord2f(0.0f, 1.0f); glVertex2f(-Width * 0.5f, Height * 0.5f);
+                glEnd();
+                glPopMatrix();
+                glEnable(GL_DEPTH_TEST);
+                Set_Viewport_Projection(State);
+                Set_Model_View(State);
             }
-
-            int Width = static_cast<int>(Texture_It->second.Width * Asset.Scale_X);
-            int Height = static_cast<int>(Texture_It->second.Height * Asset.Scale_Y);
-            SDL_Rect Destination = {static_cast<int>(Asset.X), static_cast<int>(Asset.Y), Width, Height};
-            SDL_Point Center = {Width / 2, Height / 2};
-            SDL_RenderCopyEx(State.Renderer, Texture_It->second.Texture, nullptr, &Destination, Asset.Roll, &Center, SDL_FLIP_NONE);
             Draw_Mesh_Asset(State, Asset);
         }
 
+        Set_2D_Projection(State);
+        glDisable(GL_DEPTH_TEST);
         for(const Text_Command &Command : Text_Commands)
         {
             Draw_Text_Command(State, Command);
@@ -1202,7 +1756,7 @@ extern "C" void Render()
 
         Draw_GUI(State);
         End_ImGui_Frame(State);
-        SDL_RenderPresent(State.Renderer);
+        SDL_GL_SwapWindow(State.Window);
     }
 }
 

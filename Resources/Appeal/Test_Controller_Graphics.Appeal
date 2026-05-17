@@ -1,0 +1,57 @@
+Debug 0
+Add_Dynamic_Module Graphics Appeal_SDL2_Graphics
+Add_Dynamic_Module Input Appeal_SDL2_Input
+Graphics Debug 1
+Input Debug 1
+Graphics Set_Paths ./Resources
+Input Set_Paths ./Resources
+
+Graphics Add_Window Main "Appeal Controller Graphics Test" 960 540
+Graphics Set_FPS 60
+Graphics Show Main
+Graphics Set_Focus Main
+Graphics Set_View_Port Main 0 0 960 540
+Graphics Set_Perspective Main 45.0 0.1 100.0
+Graphics Set_Camera_Location Main 0.0 0.7 -10.0
+Graphics Set_Camera_Orientation Main 0.0 0.0 0.0
+Graphics Update_Camera Main
+
+Graphics Load_Shader Wire Wire.Config
+Graphics Load_Shader Model_Lit_Textured Model_Lit_Textured.Config
+Graphics Load_Font MainFont Tuffy.ttf 18
+
+Graphics Load_Mesh Knight KayKit_Adventurers/Characters/gltf/Knight.glb
+Graphics Load_Asset Knight Knight
+Graphics Set_Shader Knight Model_Lit_Textured
+Graphics Set_Location Knight 0.0 -1.0 7.0
+Graphics Set_Orientation Knight 0.0 0.0 0.0
+Graphics Set_Scale Knight 1.8 1.8 1.8
+Graphics Set_Active_Asset Knight
+
+Input Add_Control_Set Default
+Input Set_Control_Set Default
+Input Open_Controller -1
+Input Set_Controller_Axis Left_Stick_X Graphics.Rotate_Active_Yaw_Input
+Input Set_Controller_Axis Left_Stick_Y Graphics.Move_Active_Forward_Input
+
+Graphics Draw_Text MainFont "Left Stick X: rotate    Left Stick Y: forward/back" 24.0 24.0
+Graphics GUI_Begin Controller
+Graphics GUI_Text Title "Controller + Graphics"
+Graphics GUI_Text Model "Active model: Knight"
+Graphics GUI_Text Hint "Move the left stick. Close Main or press Escape to exit."
+Graphics GUI_End
+
+Graphics Window_Open Main
+Set_Var_Global Main_Open Graphics.Window.Main.Open
+
+Loop While Var Main_Open == 1 {
+Input Update Default
+Graphics Render
+Graphics Update
+Graphics Window_Open Main
+Set_Var_Global Main_Open Graphics.Window.Main.Open
+}
+
+Input Close_Controller -1
+Graphics Close_All
+Done

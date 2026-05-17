@@ -610,7 +610,7 @@ extern "C" void Update(std::string Control_Set_Name)
 
             int Value = State.Axis_Now[Axis_Code];
             int Before = State.Axis_Before[Axis_Code];
-            if(Value != Before && (std::abs(Value) > Controller_Deadzone || std::abs(Before) > Controller_Deadzone))
+            if(std::abs(Value) > Controller_Deadzone || (Value != Before && std::abs(Before) > Controller_Deadzone))
             {
                 Trigger_Analog_Function(Item.second, Value);
             }
@@ -622,7 +622,7 @@ extern "C" void Update(std::string Control_Set_Name)
 
             int Value = State.Axis_Now[Axis_Code];
             int Before = State.Axis_Before[Axis_Code];
-            if(Value != Before && (std::abs(Value) > Controller_Deadzone || std::abs(Before) > Controller_Deadzone))
+            if(std::abs(Value) > Controller_Deadzone || (Value != Before && std::abs(Before) > Controller_Deadzone))
             {
                 Trigger_Analog_Function(Item.second, Value);
             }

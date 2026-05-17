@@ -1,0 +1,84 @@
+Debug 0
+Add_Dynamic_Module Graphics Appeal_SDL2_Graphics
+Graphics Debug 1
+Graphics Set_Paths ./Resources
+
+Graphics Add_Window Main "Appeal 3D Model Test" 960 540
+Graphics Set_FPS 60
+Graphics Show Main
+Graphics Set_Focus Main
+Graphics Set_View_Port Main 0 0 960 540
+Graphics Set_Perspective Main 45.0 0.1 100.0
+Graphics Set_Camera_Location Main 0.0 0.7 -10.0
+Graphics Set_Camera_Orientation Main 0.0 0.0 0.0
+Graphics Update_Camera Main
+
+Graphics Load_Shader Wire Wire.Config
+Graphics Load_Shader Model_Lit_Textured Model_Lit_Textured.Config
+Graphics Load_Font MainFont Tuffy.ttf 18
+
+// Lighting is currently provided by the Graphics plugin default OpenGL light.
+// These are the intended script-level controls once lighting commands are added.
+//Graphics Add_Directional_Light Sun 2.5 4.0 4.0 0.86 0.86 0.78
+//Graphics Set_Ambient_Light 0.28 0.28 0.30
+
+Graphics Load_Mesh Knight KayKit_Adventurers/Characters/gltf/Knight.glb
+Graphics Load_Asset Knight Knight
+Graphics Set_Shader Knight Model_Lit_Textured
+Graphics Set_Location Knight -3.2 -1.0 7.0
+Graphics Set_Orientation Knight 0.0 0.0 0.0
+Graphics Set_Scale Knight 1.5 1.5 1.5
+
+Graphics Load_Mesh Barbarian KayKit_Adventurers/Characters/gltf/Barbarian.glb
+Graphics Load_Asset Barbarian Barbarian
+Graphics Set_Shader Barbarian Model_Lit_Textured
+Graphics Set_Location Barbarian -1.6 -1.0 7.0
+Graphics Set_Orientation Barbarian 0.0 0.0 0.0
+Graphics Set_Scale Barbarian 1.5 1.5 1.5
+
+Graphics Load_Mesh Mage KayKit_Adventurers/Characters/gltf/Mage.glb
+Graphics Load_Asset Mage Mage
+Graphics Set_Shader Mage Model_Lit_Textured
+Graphics Set_Location Mage 0.0 -1.0 7.0
+Graphics Set_Orientation Mage 0.0 0.0 0.0
+Graphics Set_Scale Mage 1.5 1.5 1.5
+
+Graphics Load_Mesh Ranger KayKit_Adventurers/Characters/gltf/Ranger.glb
+Graphics Load_Asset Ranger Ranger
+Graphics Set_Shader Ranger Model_Lit_Textured
+Graphics Set_Location Ranger 1.6 -1.0 7.0
+Graphics Set_Orientation Ranger 0.0 0.0 0.0
+Graphics Set_Scale Ranger 1.5 1.5 1.5
+
+Graphics Load_Mesh Rogue KayKit_Adventurers/Characters/gltf/Rogue.glb
+Graphics Load_Asset Rogue Rogue
+Graphics Set_Shader Rogue Model_Lit_Textured
+Graphics Set_Location Rogue 3.2 -1.0 7.0
+Graphics Set_Orientation Rogue 0.0 0.0 0.0
+Graphics Set_Scale Rogue 1.5 1.5 1.5
+
+Graphics Load_Mesh Book KayKit_Adventurers/Assets/gltf/spellbook_open.gltf
+Graphics Load_Asset Book Book
+Graphics Set_Shader Book Model_Lit_Textured
+Graphics Set_Location Book 0.0 1.1 7.0
+Graphics Set_Orientation Book 0.0 20.0 0.0
+Graphics Set_Scale Book 2.0 2.0 2.0
+
+Graphics Draw_Text MainFont "KayKit GLTF Model Test" 24.0 24.0
+Graphics GUI_Begin Models
+Graphics GUI_Text Title "KayKit GLTF Model Test"
+Graphics GUI_Text Hint "Close Main window to exit"
+Graphics GUI_End
+
+Graphics Window_Open Main
+Set_Var_Global Main_Open Graphics.Window.Main.Open
+
+Loop While Var Main_Open == 1 {
+Graphics Render
+Graphics Update
+Graphics Window_Open Main
+Set_Var_Global Main_Open Graphics.Window.Main.Open
+}
+
+Graphics Close_All
+Done

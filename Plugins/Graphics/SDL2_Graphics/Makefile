@@ -16,7 +16,7 @@ IMGUI_SRCS := \
 	$(IMGUI_DIR)/imgui_tables.cpp \
 	$(IMGUI_DIR)/imgui_widgets.cpp \
 	$(IMGUI_DIR)/backends/imgui_impl_sdl2.cpp \
-	$(IMGUI_DIR)/backends/imgui_impl_sdlrenderer2.cpp
+	$(IMGUI_DIR)/backends/imgui_impl_opengl2.cpp
 SRCS := $(SRC_DIR)/main.cpp $(IMGUI_SRCS)
 OBJS := $(SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 OBJS := $(OBJS:$(IMGUI_DIR)/%.cpp=$(OBJ_DIR)/imgui/%.o)
@@ -43,6 +43,7 @@ CXX ?= g++
 	ASSIMP_ROOT ?= ../../../Third_Party/Assimp/Windows/x86_64
 	ASSIMP_INCLUDE ?= $(ASSIMP_ROOT)/include
 	ASSIMP_LIB ?= $(ASSIMP_ROOT)/lib
+	ASSIMP_BIN ?= $(ASSIMP_ROOT)/bin
 	ifeq ($(wildcard $(ASSIMP_INCLUDE)/assimp/Importer.hpp),)
 		ifneq ($(wildcard C:/3rd_Party_Libs/Include/assimp/Importer.hpp),)
 			ASSIMP_INCLUDE := C:/3rd_Party_Libs/Include
@@ -54,16 +55,17 @@ CXX ?= g++
 		endif
 	endif
 	CPPFLAGS := -I$(SDL_INCLUDE) -I$(SDL_INCLUDE)/SDL2 -I$(IMGUI_DIR) -I$(IMGUI_DIR)/backends
-	ifneq ($(wildcard $(ASSIMP_INCLUDE)/assimp/Importer.hpp),)
-	ifneq ($(wildcard $(ASSIMP_LIB)/libassimp.dll.a),)
+ifneq ($(wildcard $(ASSIMP_INCLUDE)/assimp/Importer.hpp),)
+ifneq ($(wildcard $(ASSIMP_LIB)/libassimp.dll.a),)
 		CPPFLAGS += -I$(ASSIMP_INCLUDE) -DAPPEAL_USE_ASSIMP
 		LDFLAGS_ASSIMP := -L$(ASSIMP_LIB)
 		LDLIBS_ASSIMP := -lassimp
-	endif
-	endif
+		ASSIMP_RUNTIME_DLLS := $(wildcard $(ASSIMP_BIN)/libassimp*.dll)
+endif
+endif
 	CXXFLAGS := -Wall
 	LDFLAGS := -shared -L$(SDL_LIB) $(LDFLAGS_ASSIMP)
-	LDLIBS := -lSDL2_image -lSDL2_ttf -lSDL2 $(LDLIBS_ASSIMP)
+	LDLIBS := -lSDL2_image -lSDL2_ttf -lSDL2 -lopengl32 $(LDLIBS_ASSIMP)
 	RUNTIME_DIR := ../../../Resources/Modules/Graphics/$(PLUGIN_NAME)
 else
 CXX ?= g++
@@ -77,7 +79,7 @@ CXX ?= g++
 	CPPFLAGS := $(shell $(SDL2_CONFIG) --cflags) -I$(IMGUI_DIR) -I$(IMGUI_DIR)/backends $(ASSIMP_CFLAGS) $(ASSIMP_DEFINE)
 	CXXFLAGS := -fPIC -Wall
 	LDFLAGS := -shared
-	LDLIBS := $(shell $(SDL2_CONFIG) --libs) -lSDL2_image -lSDL2_ttf $(ASSIMP_LIBS)
+	LDLIBS := $(shell $(SDL2_CONFIG) --libs) -lSDL2_image -lSDL2_ttf -lGL $(ASSIMP_LIBS)
 	RUNTIME_DIR := ../../../Resources/Modules/Graphics/$(PLUGIN_NAME)
 endif
 
@@ -110,6 +112,9 @@ ifeq ($(OS),Windows_NT)
 	cp "$(SDL_BIN)"/SDL2.dll ../../../
 	cp "$(SDL_BIN)"/SDL2_image.dll ../../../
 	cp "$(SDL_BIN)"/SDL2_ttf.dll ../../../
+ifneq ($(ASSIMP_RUNTIME_DLLS),)
+	cp "$(ASSIMP_BIN)"/libassimp*.dll ../../../
+endif
 endif
 
 clean:
