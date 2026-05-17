@@ -1,0 +1,7 @@
+Debug 1
+Add_Dynamic_Module Network Appeal_SDL2_Network
+Network Debug 1
+Network Listen Local_Test 34567
+Network Poll
+Network Stop_Listening Local_Test
+Done
