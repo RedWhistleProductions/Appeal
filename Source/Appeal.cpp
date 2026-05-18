@@ -199,8 +199,7 @@ void Appeal::Run()
                 {
                     std::string Function_Name;
                     Data_Manager >> Function_Name;
-                    Appeal_Functions.Find("Function_Name");
-                    Data_Manager.Add_Source("Function_Name", &Appeal_Functions.Current->Value);
+                    Run_Function(Function_Name);
                 }
                 else if( Command == "Return" )
                 {

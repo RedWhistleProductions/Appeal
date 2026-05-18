@@ -1,0 +1,7 @@
+Print Start_Call_Function_Test
+Define_Function Test_Function
+Print Function_Ran
+End_Function
+Call Test_Function
+Print End_Call_Function_Test
+Done
