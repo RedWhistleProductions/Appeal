@@ -1,0 +1,29 @@
+Add_Dynamic_Module Graphics Appeal_SDL2_Graphics
+Add_Dynamic_Module Pong Bananas_Pong
+Graphics Debug 0
+Pong Debug 0
+Graphics Set_Paths ./Resources
+Graphics Add_Window Main "Pong Smoke Test" 800 480
+Graphics Set_FPS 60
+Graphics Show Main
+Graphics Set_View_Port Main 0 0 800 480
+Graphics Set_Ortho Main 0.0 800.0 480.0 0.0 -1.0 1.0
+Pong Set_Field 800.0 480.0
+Pong Update
+Set_Var_Global Left_X Pong.Left.X
+Set_Var_Global Left_Y Pong.Left.Y
+Set_Var_Global Right_X Pong.Right.X
+Set_Var_Global Right_Y Pong.Right.Y
+Set_Var_Global Paddle_W Pong.Paddle.W
+Set_Var_Global Paddle_H Pong.Paddle.H
+Set_Var_Global Ball_X Pong.Ball.X
+Set_Var_Global Ball_Y Pong.Ball.Y
+Set_Var_Global Ball_Size Pong.Ball.Size
+Graphics Draw_Rect Background 0.0 0.0 800.0 480.0 10 14 20 255
+Graphics Draw_Rect Left_Paddle Var Left_X Var Left_Y Var Paddle_W Var Paddle_H 230 236 245 255
+Graphics Draw_Rect Right_Paddle Var Right_X Var Right_Y Var Paddle_W Var Paddle_H 230 236 245 255
+Graphics Draw_Rect Ball Var Ball_X Var Ball_Y Var Ball_Size Var Ball_Size 255 211 105 255
+Graphics Render
+Graphics Update
+Delay 1
+Done

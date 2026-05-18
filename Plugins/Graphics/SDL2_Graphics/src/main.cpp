@@ -142,6 +142,16 @@ struct Text_Command
     SDL_Color Color = {230, 236, 245, 255};
 };
 
+struct Rect_Command
+{
+    std::string Name;
+    float X = 0.0f;
+    float Y = 0.0f;
+    float W = 0.0f;
+    float H = 0.0f;
+    SDL_Color Color = {255, 255, 255, 255};
+};
+
 struct GUI_Command
 {
     std::string Kind;
@@ -167,6 +177,7 @@ std::map<std::string, Font_State> Fonts;
 std::map<std::string, std::string> Shaders;
 std::map<std::string, Mesh_State> Meshes;
 std::vector<Text_Command> Text_Commands;
+std::map<std::string, Rect_Command> Rect_Commands;
 std::vector<GUI_Command> GUI_Commands;
 std::map<std::string, bool> GUI_Clicked;
 std::map<std::string, int> GUI_Slider_Values;
@@ -1588,6 +1599,16 @@ extern "C" void Draw_Text(std::string Font, std::string Text, float X, float Y)
     Text_Commands.push_back({Font, Text, X, Y, {230, 236, 245, 255}});
 }
 
+extern "C" void Draw_Rect(std::string Name, float X, float Y, float W, float H, int R, int G, int B, int A)
+{
+    Rect_Commands[Name] = {Name, X, Y, W, H, {
+        static_cast<Uint8>(std::clamp(R, 0, 255)),
+        static_cast<Uint8>(std::clamp(G, 0, 255)),
+        static_cast<Uint8>(std::clamp(B, 0, 255)),
+        static_cast<Uint8>(std::clamp(A, 0, 255))
+    }};
+}
+
 extern "C" void GUI_Begin(std::string Name)
 {
     GUI_Commands.clear();
@@ -1749,6 +1770,21 @@ extern "C" void Render()
 
         Set_2D_Projection(State);
         glDisable(GL_DEPTH_TEST);
+        glDisable(GL_LIGHTING);
+        glDisable(GL_TEXTURE_2D);
+
+        for(const auto &Rect_Item : Rect_Commands)
+        {
+            const Rect_Command &Command = Rect_Item.second;
+            glColor4f(Command.Color.r / 255.0f, Command.Color.g / 255.0f, Command.Color.b / 255.0f, Command.Color.a / 255.0f);
+            glBegin(GL_QUADS);
+                glVertex2f(Command.X, Command.Y);
+                glVertex2f(Command.X + Command.W, Command.Y);
+                glVertex2f(Command.X + Command.W, Command.Y + Command.H);
+                glVertex2f(Command.X, Command.Y + Command.H);
+            glEnd();
+        }
+
         for(const Text_Command &Command : Text_Commands)
         {
             Draw_Text_Command(State, Command);
@@ -1758,6 +1794,8 @@ extern "C" void Render()
         End_ImGui_Frame(State);
         SDL_GL_SwapWindow(State.Window);
     }
+
+    Text_Commands.clear();
 }
 
 extern "C" void Update()

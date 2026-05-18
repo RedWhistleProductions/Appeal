@@ -47,6 +47,7 @@ void (*Rotate_Active_Yaw_Input)(int Value);
 void (*Move_Active_Forward_Input)(int Value);
 
 void (*Draw_Text)(std::string Font, std::string Text, float X, float Y);
+void (*Draw_Rect)(std::string Name, float X, float Y, float W, float H, int R, int G, int B, int A);
 void (*GUI_Begin)(std::string Name);
 void (*GUI_Text)(std::string Name, std::string Text);
 void (*GUI_Button)(std::string Name, std::string Text);
@@ -170,6 +171,7 @@ extern "C" void Init_Globals(std::string Name, Named_List<Module_Data> *Shared_G
     Assign("Move_Active_Forward_Input", Move_Active_Forward_Input);
 
     Assign("Draw_Text", Draw_Text);
+    Assign("Draw_Rect", Draw_Rect);
     Assign("GUI_Begin", GUI_Begin);
     Assign("GUI_Text", GUI_Text);
     Assign("GUI_Button", GUI_Button);
@@ -533,6 +535,22 @@ extern "C" void Interpreter(Data_Source *Data)
         *Data >> X;
         *Data >> Y;
         Draw_Text(Font, Text, X, Y);
+    }
+    else if(Command == "Draw_Rect")
+    {
+        std::string Name;
+        float X, Y, W, H;
+        int R, G, B, A;
+        *Data >> Name;
+        *Data >> X;
+        *Data >> Y;
+        *Data >> W;
+        *Data >> H;
+        *Data >> R;
+        *Data >> G;
+        *Data >> B;
+        *Data >> A;
+        Draw_Rect(Name, X, Y, W, H, R, G, B, A);
     }
     else if(Command == "GUI_Begin")
     {
