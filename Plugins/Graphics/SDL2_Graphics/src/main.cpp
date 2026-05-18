@@ -1796,6 +1796,7 @@ extern "C" void Render()
     }
 
     Text_Commands.clear();
+    Rect_Commands.clear();
 }
 
 extern "C" void Update()

@@ -1,0 +1,391 @@
+Add_Dynamic_Module Graphics Appeal_SDL2_Graphics
+Add_Dynamic_Module Input Appeal_SDL2_Input
+Add_Dynamic_Module Audio Appeal_SDL2_Audio
+Add_Dynamic_Module Breakout Bananas_Breakout
+
+Graphics Debug 0
+Input Debug 0
+Audio Debug 0
+Breakout Debug 0
+
+Graphics Set_Paths ./Resources
+Audio Set_Paths ./Resources
+Graphics Add_Window Main "Bananas Breakout" 800 520
+Graphics Set_FPS 60
+Graphics Show Main
+Graphics Set_Focus Main
+Graphics Set_View_Port Main 0 0 800 520
+Graphics Set_Ortho Main 0.0 800.0 520.0 0.0 -1.0 1.0
+Graphics Load_Font MainFont Tuffy.ttf 24
+Audio Load_SFX Brick mixkit-video-game-treasure-2066.wav
+Audio Load_SFX Bounce mixkit-game-ball-tap-2073.wav
+Audio Load_SFX Life mixkit-video-game-health-recharge-2837.wav
+Audio Load_SFX Bonus mixkit-extra-bonus-in-a-video-game-2045.wav
+
+Breakout Set_Field 800.0 520.0
+
+Input Set_Key_Down Key_Left Breakout.Left
+Input Set_Key_Up Key_Left Breakout.Stop
+Input Set_Key_Down Key_A Breakout.Left
+Input Set_Key_Up Key_A Breakout.Stop
+Input Set_Key_Down Key_Right Breakout.Right
+Input Set_Key_Up Key_Right Breakout.Stop
+Input Set_Key_Down Key_D Breakout.Right
+Input Set_Key_Up Key_D Breakout.Stop
+Input Set_Key_Down Key_Escape Graphics.Close_All
+
+Set_Var_Global Main_Open Graphics.Window.Main.Open
+
+Loop While Var Main_Open == 1 {
+Graphics Update
+Graphics Window_Open Main
+Set_Var_Global Main_Open Graphics.Window.Main.Open
+Input Update Default
+Breakout Update
+Set_Var_Global Breakout_Event Breakout.Event
+If Var Breakout_Event == Brick {
+Audio Play_SFX_Name Brick
+}
+If Var Breakout_Event == Paddle {
+Audio Play_SFX_Name Bounce
+}
+If Var Breakout_Event == Wall {
+Audio Play_SFX_Name Bounce
+}
+If Var Breakout_Event == Life {
+Audio Play_SFX_Name Life
+}
+If Var Breakout_Event == GameOver {
+Audio Play_SFX_Name Life
+}
+If Var Breakout_Event == Level {
+Audio Play_SFX_Name Bonus
+}
+Breakout Clear_Event
+Set_Var_Global Paddle_X Breakout.Paddle.X
+Set_Var_Global Paddle_Y Breakout.Paddle.Y
+Set_Var_Global Paddle_W Breakout.Paddle.W
+Set_Var_Global Paddle_H Breakout.Paddle.H
+Set_Var_Global Ball_X Breakout.Ball.X
+Set_Var_Global Ball_Y Breakout.Ball.Y
+Set_Var_Global Ball_Size Breakout.Ball.Size
+Set_Var_Global Score Breakout.Score
+Set_Var_Global Lives Breakout.Lives
+Set_Var_Global Brick_W Breakout.Brick.W
+Set_Var_Global Brick_H Breakout.Brick.H
+
+Graphics Draw_Rect Background 0.0 0.0 800.0 520.0 8 12 18 255
+Graphics Draw_Text MainFont "Bananas Breakout" 286.0 16.0
+Graphics Draw_Text MainFont "Score" 32.0 16.0
+Graphics Draw_Text MainFont Var Score 106.0 16.0
+Graphics Draw_Text MainFont "Lives" 650.0 16.0
+Graphics Draw_Text MainFont Var Lives 722.0 16.0
+
+Set_Var_Global Brick_0_Alive Breakout.Brick.0.Alive
+Set_Var_Global Brick_0_X Breakout.Brick.0.X
+Set_Var_Global Brick_0_Y Breakout.Brick.0.Y
+If Var Brick_0_Alive == 1 {
+Graphics Draw_Rect Brick_0 Var Brick_0_X Var Brick_0_Y Var Brick_W Var Brick_H 255 107 107 255
+}
+Set_Var_Global Brick_1_Alive Breakout.Brick.1.Alive
+Set_Var_Global Brick_1_X Breakout.Brick.1.X
+Set_Var_Global Brick_1_Y Breakout.Brick.1.Y
+If Var Brick_1_Alive == 1 {
+Graphics Draw_Rect Brick_1 Var Brick_1_X Var Brick_1_Y Var Brick_W Var Brick_H 255 107 107 255
+}
+Set_Var_Global Brick_2_Alive Breakout.Brick.2.Alive
+Set_Var_Global Brick_2_X Breakout.Brick.2.X
+Set_Var_Global Brick_2_Y Breakout.Brick.2.Y
+If Var Brick_2_Alive == 1 {
+Graphics Draw_Rect Brick_2 Var Brick_2_X Var Brick_2_Y Var Brick_W Var Brick_H 255 107 107 255
+}
+Set_Var_Global Brick_3_Alive Breakout.Brick.3.Alive
+Set_Var_Global Brick_3_X Breakout.Brick.3.X
+Set_Var_Global Brick_3_Y Breakout.Brick.3.Y
+If Var Brick_3_Alive == 1 {
+Graphics Draw_Rect Brick_3 Var Brick_3_X Var Brick_3_Y Var Brick_W Var Brick_H 255 107 107 255
+}
+Set_Var_Global Brick_4_Alive Breakout.Brick.4.Alive
+Set_Var_Global Brick_4_X Breakout.Brick.4.X
+Set_Var_Global Brick_4_Y Breakout.Brick.4.Y
+If Var Brick_4_Alive == 1 {
+Graphics Draw_Rect Brick_4 Var Brick_4_X Var Brick_4_Y Var Brick_W Var Brick_H 255 107 107 255
+}
+Set_Var_Global Brick_5_Alive Breakout.Brick.5.Alive
+Set_Var_Global Brick_5_X Breakout.Brick.5.X
+Set_Var_Global Brick_5_Y Breakout.Brick.5.Y
+If Var Brick_5_Alive == 1 {
+Graphics Draw_Rect Brick_5 Var Brick_5_X Var Brick_5_Y Var Brick_W Var Brick_H 255 107 107 255
+}
+Set_Var_Global Brick_6_Alive Breakout.Brick.6.Alive
+Set_Var_Global Brick_6_X Breakout.Brick.6.X
+Set_Var_Global Brick_6_Y Breakout.Brick.6.Y
+If Var Brick_6_Alive == 1 {
+Graphics Draw_Rect Brick_6 Var Brick_6_X Var Brick_6_Y Var Brick_W Var Brick_H 255 107 107 255
+}
+Set_Var_Global Brick_7_Alive Breakout.Brick.7.Alive
+Set_Var_Global Brick_7_X Breakout.Brick.7.X
+Set_Var_Global Brick_7_Y Breakout.Brick.7.Y
+If Var Brick_7_Alive == 1 {
+Graphics Draw_Rect Brick_7 Var Brick_7_X Var Brick_7_Y Var Brick_W Var Brick_H 255 107 107 255
+}
+Set_Var_Global Brick_8_Alive Breakout.Brick.8.Alive
+Set_Var_Global Brick_8_X Breakout.Brick.8.X
+Set_Var_Global Brick_8_Y Breakout.Brick.8.Y
+If Var Brick_8_Alive == 1 {
+Graphics Draw_Rect Brick_8 Var Brick_8_X Var Brick_8_Y Var Brick_W Var Brick_H 255 107 107 255
+}
+Set_Var_Global Brick_9_Alive Breakout.Brick.9.Alive
+Set_Var_Global Brick_9_X Breakout.Brick.9.X
+Set_Var_Global Brick_9_Y Breakout.Brick.9.Y
+If Var Brick_9_Alive == 1 {
+Graphics Draw_Rect Brick_9 Var Brick_9_X Var Brick_9_Y Var Brick_W Var Brick_H 255 107 107 255
+}
+Set_Var_Global Brick_10_Alive Breakout.Brick.10.Alive
+Set_Var_Global Brick_10_X Breakout.Brick.10.X
+Set_Var_Global Brick_10_Y Breakout.Brick.10.Y
+If Var Brick_10_Alive == 1 {
+Graphics Draw_Rect Brick_10 Var Brick_10_X Var Brick_10_Y Var Brick_W Var Brick_H 255 177 66 255
+}
+Set_Var_Global Brick_11_Alive Breakout.Brick.11.Alive
+Set_Var_Global Brick_11_X Breakout.Brick.11.X
+Set_Var_Global Brick_11_Y Breakout.Brick.11.Y
+If Var Brick_11_Alive == 1 {
+Graphics Draw_Rect Brick_11 Var Brick_11_X Var Brick_11_Y Var Brick_W Var Brick_H 255 177 66 255
+}
+Set_Var_Global Brick_12_Alive Breakout.Brick.12.Alive
+Set_Var_Global Brick_12_X Breakout.Brick.12.X
+Set_Var_Global Brick_12_Y Breakout.Brick.12.Y
+If Var Brick_12_Alive == 1 {
+Graphics Draw_Rect Brick_12 Var Brick_12_X Var Brick_12_Y Var Brick_W Var Brick_H 255 177 66 255
+}
+Set_Var_Global Brick_13_Alive Breakout.Brick.13.Alive
+Set_Var_Global Brick_13_X Breakout.Brick.13.X
+Set_Var_Global Brick_13_Y Breakout.Brick.13.Y
+If Var Brick_13_Alive == 1 {
+Graphics Draw_Rect Brick_13 Var Brick_13_X Var Brick_13_Y Var Brick_W Var Brick_H 255 177 66 255
+}
+Set_Var_Global Brick_14_Alive Breakout.Brick.14.Alive
+Set_Var_Global Brick_14_X Breakout.Brick.14.X
+Set_Var_Global Brick_14_Y Breakout.Brick.14.Y
+If Var Brick_14_Alive == 1 {
+Graphics Draw_Rect Brick_14 Var Brick_14_X Var Brick_14_Y Var Brick_W Var Brick_H 255 177 66 255
+}
+Set_Var_Global Brick_15_Alive Breakout.Brick.15.Alive
+Set_Var_Global Brick_15_X Breakout.Brick.15.X
+Set_Var_Global Brick_15_Y Breakout.Brick.15.Y
+If Var Brick_15_Alive == 1 {
+Graphics Draw_Rect Brick_15 Var Brick_15_X Var Brick_15_Y Var Brick_W Var Brick_H 255 177 66 255
+}
+Set_Var_Global Brick_16_Alive Breakout.Brick.16.Alive
+Set_Var_Global Brick_16_X Breakout.Brick.16.X
+Set_Var_Global Brick_16_Y Breakout.Brick.16.Y
+If Var Brick_16_Alive == 1 {
+Graphics Draw_Rect Brick_16 Var Brick_16_X Var Brick_16_Y Var Brick_W Var Brick_H 255 177 66 255
+}
+Set_Var_Global Brick_17_Alive Breakout.Brick.17.Alive
+Set_Var_Global Brick_17_X Breakout.Brick.17.X
+Set_Var_Global Brick_17_Y Breakout.Brick.17.Y
+If Var Brick_17_Alive == 1 {
+Graphics Draw_Rect Brick_17 Var Brick_17_X Var Brick_17_Y Var Brick_W Var Brick_H 255 177 66 255
+}
+Set_Var_Global Brick_18_Alive Breakout.Brick.18.Alive
+Set_Var_Global Brick_18_X Breakout.Brick.18.X
+Set_Var_Global Brick_18_Y Breakout.Brick.18.Y
+If Var Brick_18_Alive == 1 {
+Graphics Draw_Rect Brick_18 Var Brick_18_X Var Brick_18_Y Var Brick_W Var Brick_H 255 177 66 255
+}
+Set_Var_Global Brick_19_Alive Breakout.Brick.19.Alive
+Set_Var_Global Brick_19_X Breakout.Brick.19.X
+Set_Var_Global Brick_19_Y Breakout.Brick.19.Y
+If Var Brick_19_Alive == 1 {
+Graphics Draw_Rect Brick_19 Var Brick_19_X Var Brick_19_Y Var Brick_W Var Brick_H 255 177 66 255
+}
+Set_Var_Global Brick_20_Alive Breakout.Brick.20.Alive
+Set_Var_Global Brick_20_X Breakout.Brick.20.X
+Set_Var_Global Brick_20_Y Breakout.Brick.20.Y
+If Var Brick_20_Alive == 1 {
+Graphics Draw_Rect Brick_20 Var Brick_20_X Var Brick_20_Y Var Brick_W Var Brick_H 255 211 105 255
+}
+Set_Var_Global Brick_21_Alive Breakout.Brick.21.Alive
+Set_Var_Global Brick_21_X Breakout.Brick.21.X
+Set_Var_Global Brick_21_Y Breakout.Brick.21.Y
+If Var Brick_21_Alive == 1 {
+Graphics Draw_Rect Brick_21 Var Brick_21_X Var Brick_21_Y Var Brick_W Var Brick_H 255 211 105 255
+}
+Set_Var_Global Brick_22_Alive Breakout.Brick.22.Alive
+Set_Var_Global Brick_22_X Breakout.Brick.22.X
+Set_Var_Global Brick_22_Y Breakout.Brick.22.Y
+If Var Brick_22_Alive == 1 {
+Graphics Draw_Rect Brick_22 Var Brick_22_X Var Brick_22_Y Var Brick_W Var Brick_H 255 211 105 255
+}
+Set_Var_Global Brick_23_Alive Breakout.Brick.23.Alive
+Set_Var_Global Brick_23_X Breakout.Brick.23.X
+Set_Var_Global Brick_23_Y Breakout.Brick.23.Y
+If Var Brick_23_Alive == 1 {
+Graphics Draw_Rect Brick_23 Var Brick_23_X Var Brick_23_Y Var Brick_W Var Brick_H 255 211 105 255
+}
+Set_Var_Global Brick_24_Alive Breakout.Brick.24.Alive
+Set_Var_Global Brick_24_X Breakout.Brick.24.X
+Set_Var_Global Brick_24_Y Breakout.Brick.24.Y
+If Var Brick_24_Alive == 1 {
+Graphics Draw_Rect Brick_24 Var Brick_24_X Var Brick_24_Y Var Brick_W Var Brick_H 255 211 105 255
+}
+Set_Var_Global Brick_25_Alive Breakout.Brick.25.Alive
+Set_Var_Global Brick_25_X Breakout.Brick.25.X
+Set_Var_Global Brick_25_Y Breakout.Brick.25.Y
+If Var Brick_25_Alive == 1 {
+Graphics Draw_Rect Brick_25 Var Brick_25_X Var Brick_25_Y Var Brick_W Var Brick_H 255 211 105 255
+}
+Set_Var_Global Brick_26_Alive Breakout.Brick.26.Alive
+Set_Var_Global Brick_26_X Breakout.Brick.26.X
+Set_Var_Global Brick_26_Y Breakout.Brick.26.Y
+If Var Brick_26_Alive == 1 {
+Graphics Draw_Rect Brick_26 Var Brick_26_X Var Brick_26_Y Var Brick_W Var Brick_H 255 211 105 255
+}
+Set_Var_Global Brick_27_Alive Breakout.Brick.27.Alive
+Set_Var_Global Brick_27_X Breakout.Brick.27.X
+Set_Var_Global Brick_27_Y Breakout.Brick.27.Y
+If Var Brick_27_Alive == 1 {
+Graphics Draw_Rect Brick_27 Var Brick_27_X Var Brick_27_Y Var Brick_W Var Brick_H 255 211 105 255
+}
+Set_Var_Global Brick_28_Alive Breakout.Brick.28.Alive
+Set_Var_Global Brick_28_X Breakout.Brick.28.X
+Set_Var_Global Brick_28_Y Breakout.Brick.28.Y
+If Var Brick_28_Alive == 1 {
+Graphics Draw_Rect Brick_28 Var Brick_28_X Var Brick_28_Y Var Brick_W Var Brick_H 255 211 105 255
+}
+Set_Var_Global Brick_29_Alive Breakout.Brick.29.Alive
+Set_Var_Global Brick_29_X Breakout.Brick.29.X
+Set_Var_Global Brick_29_Y Breakout.Brick.29.Y
+If Var Brick_29_Alive == 1 {
+Graphics Draw_Rect Brick_29 Var Brick_29_X Var Brick_29_Y Var Brick_W Var Brick_H 255 211 105 255
+}
+Set_Var_Global Brick_30_Alive Breakout.Brick.30.Alive
+Set_Var_Global Brick_30_X Breakout.Brick.30.X
+Set_Var_Global Brick_30_Y Breakout.Brick.30.Y
+If Var Brick_30_Alive == 1 {
+Graphics Draw_Rect Brick_30 Var Brick_30_X Var Brick_30_Y Var Brick_W Var Brick_H 95 196 141 255
+}
+Set_Var_Global Brick_31_Alive Breakout.Brick.31.Alive
+Set_Var_Global Brick_31_X Breakout.Brick.31.X
+Set_Var_Global Brick_31_Y Breakout.Brick.31.Y
+If Var Brick_31_Alive == 1 {
+Graphics Draw_Rect Brick_31 Var Brick_31_X Var Brick_31_Y Var Brick_W Var Brick_H 95 196 141 255
+}
+Set_Var_Global Brick_32_Alive Breakout.Brick.32.Alive
+Set_Var_Global Brick_32_X Breakout.Brick.32.X
+Set_Var_Global Brick_32_Y Breakout.Brick.32.Y
+If Var Brick_32_Alive == 1 {
+Graphics Draw_Rect Brick_32 Var Brick_32_X Var Brick_32_Y Var Brick_W Var Brick_H 95 196 141 255
+}
+Set_Var_Global Brick_33_Alive Breakout.Brick.33.Alive
+Set_Var_Global Brick_33_X Breakout.Brick.33.X
+Set_Var_Global Brick_33_Y Breakout.Brick.33.Y
+If Var Brick_33_Alive == 1 {
+Graphics Draw_Rect Brick_33 Var Brick_33_X Var Brick_33_Y Var Brick_W Var Brick_H 95 196 141 255
+}
+Set_Var_Global Brick_34_Alive Breakout.Brick.34.Alive
+Set_Var_Global Brick_34_X Breakout.Brick.34.X
+Set_Var_Global Brick_34_Y Breakout.Brick.34.Y
+If Var Brick_34_Alive == 1 {
+Graphics Draw_Rect Brick_34 Var Brick_34_X Var Brick_34_Y Var Brick_W Var Brick_H 95 196 141 255
+}
+Set_Var_Global Brick_35_Alive Breakout.Brick.35.Alive
+Set_Var_Global Brick_35_X Breakout.Brick.35.X
+Set_Var_Global Brick_35_Y Breakout.Brick.35.Y
+If Var Brick_35_Alive == 1 {
+Graphics Draw_Rect Brick_35 Var Brick_35_X Var Brick_35_Y Var Brick_W Var Brick_H 95 196 141 255
+}
+Set_Var_Global Brick_36_Alive Breakout.Brick.36.Alive
+Set_Var_Global Brick_36_X Breakout.Brick.36.X
+Set_Var_Global Brick_36_Y Breakout.Brick.36.Y
+If Var Brick_36_Alive == 1 {
+Graphics Draw_Rect Brick_36 Var Brick_36_X Var Brick_36_Y Var Brick_W Var Brick_H 95 196 141 255
+}
+Set_Var_Global Brick_37_Alive Breakout.Brick.37.Alive
+Set_Var_Global Brick_37_X Breakout.Brick.37.X
+Set_Var_Global Brick_37_Y Breakout.Brick.37.Y
+If Var Brick_37_Alive == 1 {
+Graphics Draw_Rect Brick_37 Var Brick_37_X Var Brick_37_Y Var Brick_W Var Brick_H 95 196 141 255
+}
+Set_Var_Global Brick_38_Alive Breakout.Brick.38.Alive
+Set_Var_Global Brick_38_X Breakout.Brick.38.X
+Set_Var_Global Brick_38_Y Breakout.Brick.38.Y
+If Var Brick_38_Alive == 1 {
+Graphics Draw_Rect Brick_38 Var Brick_38_X Var Brick_38_Y Var Brick_W Var Brick_H 95 196 141 255
+}
+Set_Var_Global Brick_39_Alive Breakout.Brick.39.Alive
+Set_Var_Global Brick_39_X Breakout.Brick.39.X
+Set_Var_Global Brick_39_Y Breakout.Brick.39.Y
+If Var Brick_39_Alive == 1 {
+Graphics Draw_Rect Brick_39 Var Brick_39_X Var Brick_39_Y Var Brick_W Var Brick_H 95 196 141 255
+}
+Set_Var_Global Brick_40_Alive Breakout.Brick.40.Alive
+Set_Var_Global Brick_40_X Breakout.Brick.40.X
+Set_Var_Global Brick_40_Y Breakout.Brick.40.Y
+If Var Brick_40_Alive == 1 {
+Graphics Draw_Rect Brick_40 Var Brick_40_X Var Brick_40_Y Var Brick_W Var Brick_H 91 192 235 255
+}
+Set_Var_Global Brick_41_Alive Breakout.Brick.41.Alive
+Set_Var_Global Brick_41_X Breakout.Brick.41.X
+Set_Var_Global Brick_41_Y Breakout.Brick.41.Y
+If Var Brick_41_Alive == 1 {
+Graphics Draw_Rect Brick_41 Var Brick_41_X Var Brick_41_Y Var Brick_W Var Brick_H 91 192 235 255
+}
+Set_Var_Global Brick_42_Alive Breakout.Brick.42.Alive
+Set_Var_Global Brick_42_X Breakout.Brick.42.X
+Set_Var_Global Brick_42_Y Breakout.Brick.42.Y
+If Var Brick_42_Alive == 1 {
+Graphics Draw_Rect Brick_42 Var Brick_42_X Var Brick_42_Y Var Brick_W Var Brick_H 91 192 235 255
+}
+Set_Var_Global Brick_43_Alive Breakout.Brick.43.Alive
+Set_Var_Global Brick_43_X Breakout.Brick.43.X
+Set_Var_Global Brick_43_Y Breakout.Brick.43.Y
+If Var Brick_43_Alive == 1 {
+Graphics Draw_Rect Brick_43 Var Brick_43_X Var Brick_43_Y Var Brick_W Var Brick_H 91 192 235 255
+}
+Set_Var_Global Brick_44_Alive Breakout.Brick.44.Alive
+Set_Var_Global Brick_44_X Breakout.Brick.44.X
+Set_Var_Global Brick_44_Y Breakout.Brick.44.Y
+If Var Brick_44_Alive == 1 {
+Graphics Draw_Rect Brick_44 Var Brick_44_X Var Brick_44_Y Var Brick_W Var Brick_H 91 192 235 255
+}
+Set_Var_Global Brick_45_Alive Breakout.Brick.45.Alive
+Set_Var_Global Brick_45_X Breakout.Brick.45.X
+Set_Var_Global Brick_45_Y Breakout.Brick.45.Y
+If Var Brick_45_Alive == 1 {
+Graphics Draw_Rect Brick_45 Var Brick_45_X Var Brick_45_Y Var Brick_W Var Brick_H 91 192 235 255
+}
+Set_Var_Global Brick_46_Alive Breakout.Brick.46.Alive
+Set_Var_Global Brick_46_X Breakout.Brick.46.X
+Set_Var_Global Brick_46_Y Breakout.Brick.46.Y
+If Var Brick_46_Alive == 1 {
+Graphics Draw_Rect Brick_46 Var Brick_46_X Var Brick_46_Y Var Brick_W Var Brick_H 91 192 235 255
+}
+Set_Var_Global Brick_47_Alive Breakout.Brick.47.Alive
+Set_Var_Global Brick_47_X Breakout.Brick.47.X
+Set_Var_Global Brick_47_Y Breakout.Brick.47.Y
+If Var Brick_47_Alive == 1 {
+Graphics Draw_Rect Brick_47 Var Brick_47_X Var Brick_47_Y Var Brick_W Var Brick_H 91 192 235 255
+}
+Set_Var_Global Brick_48_Alive Breakout.Brick.48.Alive
+Set_Var_Global Brick_48_X Breakout.Brick.48.X
+Set_Var_Global Brick_48_Y Breakout.Brick.48.Y
+If Var Brick_48_Alive == 1 {
+Graphics Draw_Rect Brick_48 Var Brick_48_X Var Brick_48_Y Var Brick_W Var Brick_H 91 192 235 255
+}
+Set_Var_Global Brick_49_Alive Breakout.Brick.49.Alive
+Set_Var_Global Brick_49_X Breakout.Brick.49.X
+Set_Var_Global Brick_49_Y Breakout.Brick.49.Y
+If Var Brick_49_Alive == 1 {
+Graphics Draw_Rect Brick_49 Var Brick_49_X Var Brick_49_Y Var Brick_W Var Brick_H 91 192 235 255
+}
+
+Graphics Draw_Rect Paddle Var Paddle_X Var Paddle_Y Var Paddle_W Var Paddle_H 230 236 245 255
+Graphics Draw_Rect Ball Var Ball_X Var Ball_Y Var Ball_Size Var Ball_Size 255 255 255 255
+Graphics Draw_Text MainFont "Left/Right or A/D move paddle. Escape exits." 166.0 488.0
+Graphics Render
+}
+
+Done
