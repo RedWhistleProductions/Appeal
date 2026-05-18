@@ -16,6 +16,10 @@ void (*Upgrade)();
 void (*List)();
 void (*Info)(std::string Name);
 void (*Verify)(std::string Name);
+void (*Set_Format)(std::string Format);
+void (*Set_Level)(int Level);
+void (*Create)(std::string Name, std::string Source, std::string Output);
+void (*Extract)(std::string Package, std::string Target);
 void (*Load_Module)(std::string Name);
 void (*Unload_Module)(std::string Name);
 void (*Load_Plugin)(std::string Module, std::string Plugin);
@@ -42,6 +46,10 @@ extern "C" void Init(std::string Name)
     Assign("List", List);
     Assign("Info", Info);
     Assign("Verify", Verify);
+    Assign("Set_Format", Set_Format);
+    Assign("Set_Level", Set_Level);
+    Assign("Create", Create);
+    Assign("Extract", Extract);
     Assign("Load_Module", Load_Module);
     Assign("Unload_Module", Unload_Module);
     Assign("Load_Plugin", Load_Plugin);
@@ -126,6 +134,33 @@ extern "C" void Interpreter(Data_Source *Data)
         std::string Name;
         *Data >> Name;
         Verify(Name);
+    }
+    else if(Command == "Set_Format")
+    {
+        std::string Format;
+        *Data >> Format;
+        Set_Format(Format);
+    }
+    else if(Command == "Set_Level")
+    {
+        int Level;
+        *Data >> Level;
+        Set_Level(Level);
+    }
+    else if(Command == "Create")
+    {
+        std::string Name, Source, Output;
+        *Data >> Name;
+        *Data >> Source;
+        *Data >> Output;
+        Create(Name, Source, Output);
+    }
+    else if(Command == "Extract")
+    {
+        std::string Package, Target;
+        *Data >> Package;
+        *Data >> Target;
+        Extract(Package, Target);
     }
     else if(Command == "Load_Module")
     {

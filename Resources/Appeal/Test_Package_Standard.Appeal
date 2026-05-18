@@ -1,0 +1,17 @@
+Debug 0
+Add_Dynamic_Module Package Appeal_Standard_Package
+Package Debug 1
+Package Set_Paths ./Resources
+Package Set_Format directory
+Package Set_Level 0
+Package Create Package_Test ./Resources/Appeal ./Resources/Package/LocalRepo
+Package Add_Repo Local ./Resources/Package/LocalRepo
+Package Update_Repos
+Package Search Package_Test
+Package Info Package_Test
+Package Verify Package_Test
+Package Extract Package_Test ./Resources/Package/Extracted/Package_Test
+Package Install Package_Test
+Package List
+Package Remove Package_Test
+Done
