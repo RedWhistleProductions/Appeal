@@ -1,0 +1,34 @@
+Add_Dynamic_Module World Appeal_Standard_World
+World Debug 1
+World Set_Paths ./Resources
+World Open_Scene Main
+World Create_Entity Player
+World Entity_Set_Tag Player Hero
+World Entity_Set_Active Player 1
+World Set_Location Player 0.0 1.0 2.0
+World Set_Orientation Player 0.0 90.0 0.0
+World Set_Scale Player 1.0 1.0 1.0
+World Add_Component Player Transform
+World Add_Component Player Renderable
+World Set Player Stats.Health 100
+World Get Player Stats.Health
+World Move Player 1.0 0.0 0.0
+World Rotate Player 0.0 15.0 0.0
+World Clone_Entity Player Player_Copy
+World Entity_Set_Tag Player_Copy Clone
+World List_Entities
+World List_Components Player
+World Has_Component Player Transform
+World Query Hero
+World Set_Time_Scale 1.0
+World Emit_Event PlayerSpawned
+World Update Main
+World Draw Main
+World Save_Scene Main
+World Clear_Scene Main
+World List_Entities
+World Load_Scene Main
+World List_Entities
+World Clear_Events
+World Close_Scene Main
+Done

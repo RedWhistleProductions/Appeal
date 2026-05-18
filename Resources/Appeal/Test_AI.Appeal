@@ -1,0 +1,22 @@
+Add_Dynamic_Module AI Test_AI
+AI Debug 1
+AI Set_Paths ./Resources
+AI List_Plugins
+AI Set_Load_Mode Manual
+AI Use Guard Default
+AI Set Guard State Patrol
+AI Event Guard PlayerSeen
+AI Think Guard
+AI Decide Guard
+AI Update All
+AI Release Guard
+AI Set_Plugin_Wanted Default 0
+AI Apply_Load_Plan
+AI List_Plugins
+AI Set_Load_Mode On_Demand
+AI Set_Brain Guard Default
+AI Think All
+AI Decide All
+AI Clear_Brain Guard
+AI List_Plugins
+Done

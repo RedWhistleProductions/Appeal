@@ -1,0 +1,21 @@
+Add_Dynamic_Module Mechanics Test_Mechanics
+Mechanics Debug 1
+Mechanics Set_Paths ./Resources
+Mechanics List_Plugins
+Mechanics Set_Load_Mode Manual
+Mechanics Use Player Default
+Mechanics Set Player Speed Walk
+Mechanics Digital Player Jump
+Mechanics Analog Player Move_Forward 16000
+Mechanics Update Player
+Mechanics Update All
+Mechanics Release Player
+Mechanics Set_Plugin_Wanted Default 0
+Mechanics Apply_Load_Plan
+Mechanics List_Plugins
+Mechanics Set_Load_Mode On_Demand
+Mechanics Use Player Default
+Mechanics Update All
+Mechanics Release Player
+Mechanics List_Plugins
+Done

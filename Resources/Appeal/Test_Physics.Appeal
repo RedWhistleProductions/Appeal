@@ -1,0 +1,25 @@
+Add_Dynamic_Module Physics Test_Physics
+Physics Debug 1
+Physics Set_Paths ./Resources
+Physics List_Plugins
+Physics Set_Load_Mode Manual
+Physics Use Player Default
+Physics Set_Body_Type Player Character
+Physics Set Player Mass 80
+Physics Set_Position Player 0.0 1.0 2.0
+Physics Set_Velocity Player 0.0 0.0 0.0
+Physics Apply_Force Player 0.0 -9.8 0.0
+Physics Apply_Impulse Player 1.0 0.0 0.0
+Physics Set_Gravity 0.0 -9.8 0.0
+Physics Update Player
+Physics Update All
+Physics Release Player
+Physics Set_Plugin_Wanted Default 0
+Physics Apply_Load_Plan
+Physics List_Plugins
+Physics Set_Load_Mode On_Demand
+Physics Attach Player Default
+Physics Update All
+Physics Detach Player
+Physics List_Plugins
+Done
