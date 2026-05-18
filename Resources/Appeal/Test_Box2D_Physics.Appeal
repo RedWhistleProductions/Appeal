@@ -1,0 +1,9 @@
+Add_Dynamic_Module Physics Appeal_Box2D_Physics
+Physics Debug 1
+Physics Use Player Default
+Physics Set_Body_Type Player Dynamic
+Physics Set_Position Player 0.0 1.0 0.0
+Physics Apply_Impulse Player 2.0 0.0 0.0
+Physics Update Player
+Physics Release Player
+Done

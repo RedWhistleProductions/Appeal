@@ -1,0 +1,31 @@
+Add_Dynamic_Module Mechanics Bananas_Standard_Mechanics
+Add_Dynamic_Module Physics Appeal_Jolt_Physics
+Add_Dynamic_Module AI Appeal_Recast_BehaviorTree_AI
+
+Mechanics Debug 1
+Physics Debug 1
+AI Debug 1
+
+Mechanics Use Player Default
+Mechanics Set Player Mode OnFoot
+Mechanics Analog Player Move_Forward 24000
+Mechanics Digital Player Jump
+Mechanics Update Player
+
+Physics Use Player Default
+Physics Set_Body_Type Player Character
+Physics Set Player Mass 80
+Physics Set_Position Player 0.0 1.0 0.0
+Physics Apply_Impulse Player 1.0 0.0 0.0
+Physics Update Player
+
+AI Use Guard Default
+AI Set Guard Target Player
+AI Event Guard PlayerSeen
+AI Think Guard
+AI Decide Guard
+
+AI Release Guard
+Physics Release Player
+Mechanics Release Player
+Done
