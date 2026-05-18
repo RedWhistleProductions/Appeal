@@ -1,6 +1,7 @@
 Obj/
 Resources/Audio/
 Resources/Package/
+Resources/Storage/
 Resources/Fonts/
 Resources/Textures/
 Resources/Graphics/Fonts/*
@@ -29,6 +30,8 @@ Third_Party/Assimp/build/
 Third_Party/Assimp/Windows/x86_64/include/
 Third_Party/Assimp/Windows/x86_64/bin/*.dll
 Third_Party/Assimp/Windows/x86_64/lib/
+Third_Party/SQLite/*.zip
+Third_Party/SQLite/sqlite-amalgamation-*/
 /SDL2*.dll
 /assimp*.dll
 /libassimp*.dll

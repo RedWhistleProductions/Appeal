@@ -1,0 +1,22 @@
+Add_Dynamic_Module Storage Appeal_SQLite_Storage
+Storage Debug 1
+Storage Set_Paths ./Resources
+Storage Open Test
+Storage Set Audio.Volume 75
+Storage Get Audio.Volume
+Storage Insert Songs FolkSong "Billy Snyder"
+Storage Insert Songs TestTrack "Appeal Storage Test"
+Storage Find Songs FolkSong
+Storage List Songs
+Storage Begin
+Storage Update Songs FolkSong "Billy Snyder Updated"
+Storage Commit
+Storage Find Songs FolkSong
+Storage Export ./Resources/Storage/Test_Storage_Export.txt
+Storage Backup ./Resources/Storage/Test_Backup.appealdb
+Storage Remove Songs TestTrack
+Storage List Songs
+Storage Restore ./Resources/Storage/Test_Backup.appealdb
+Storage List Songs
+Storage Close Test
+Done
