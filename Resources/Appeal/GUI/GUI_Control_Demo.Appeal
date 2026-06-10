@@ -1,0 +1,116 @@
+Graphics GUI_Begin GUI_Control_Demo
+Graphics GUI_Text Title "Appeal GUI Control Demo"
+Graphics GUI_Label_Text Code_GUI_Begin "Graphics GUI_Begin GUI_Control_Demo"
+Graphics GUI_Bullet_Text Note "Each control below is followed by the Appeal code that creates it."
+
+Graphics GUI_Separator_Text Text_Controls
+Graphics GUI_Text Demo_Text "GUI_Text displays plain text."
+Graphics GUI_Label_Text Code_GUI_Text "Graphics GUI_Text Demo_Text GUI_Text_displays_plain_text"
+Graphics GUI_Label_Text Demo_Label_Text "GUI_Label_Text displays a label and value."
+Graphics GUI_Label_Text Code_GUI_Label_Text "Graphics GUI_Label_Text Demo_Label_Text GUI_Label_Text_displays_a_label_and_value"
+Graphics GUI_Bullet_Text Demo_Bullet_Text "GUI_Bullet_Text displays bullet text."
+Graphics GUI_Label_Text Code_GUI_Bullet_Text "Graphics GUI_Bullet_Text Demo_Bullet_Text GUI_Bullet_Text_displays_bullet_text"
+
+Graphics GUI_Separator_Text Layout_Controls
+Graphics GUI_Text Demo_Separator "GUI_Separator draws a separator line."
+Graphics GUI_Label_Text Code_GUI_Separator "Graphics GUI_Separator"
+Graphics GUI_Separator
+Graphics GUI_Label_Text Code_GUI_Separator_Text "Graphics GUI_Separator_Text Layout_Controls"
+Graphics GUI_Button Demo_Same_Line_A "Same Line A" None
+Graphics GUI_Same_Line
+Graphics GUI_Button Demo_Same_Line_B "Same Line B" None
+Graphics GUI_Label_Text Code_GUI_Same_Line "Graphics GUI_Same_Line"
+Graphics GUI_New_Line
+Graphics GUI_Label_Text Code_GUI_New_Line "Graphics GUI_New_Line"
+Graphics GUI_Spacing
+Graphics GUI_Label_Text Code_GUI_Spacing "Graphics GUI_Spacing"
+Graphics GUI_Indent 24
+Graphics GUI_Text Demo_Indented "This text is indented."
+Graphics GUI_Label_Text Code_GUI_Indent "Graphics GUI_Indent 24"
+Graphics GUI_Unindent 24
+Graphics GUI_Label_Text Code_GUI_Unindent "Graphics GUI_Unindent 24"
+
+Graphics GUI_Separator_Text Button_Controls
+Graphics GUI_Button Demo_Button Button None
+Graphics GUI_Label_Text Code_GUI_Button "Graphics GUI_Button Demo_Button Button None"
+Graphics GUI_Small_Button Demo_Small_Button Small None
+Graphics GUI_Label_Text Code_GUI_Small_Button "Graphics GUI_Small_Button Demo_Small_Button Small None"
+
+Graphics GUI_Separator_Text Value_Controls
+Graphics GUI_Slider_Int Demo_Slider_Int "Slider Int" 50 0 100 None
+Graphics GUI_Label_Text Code_GUI_Slider_Int "Graphics GUI_Slider_Int Demo_Slider_Int Slider_Int 50 0 100 None"
+Graphics GUI_Slider_Float Demo_Slider_Float "Slider Float" 0.5 0.0 1.0 None
+Graphics GUI_Label_Text Code_GUI_Slider_Float "Graphics GUI_Slider_Float Demo_Slider_Float Slider_Float 0.5 0.0 1.0 None"
+Graphics GUI_Drag_Int Demo_Drag_Int "Drag Int" 10 -100 100 1 None
+Graphics GUI_Label_Text Code_GUI_Drag_Int "Graphics GUI_Drag_Int Demo_Drag_Int Drag_Int 10 -100 100 1 None"
+Graphics GUI_Drag_Float Demo_Drag_Float "Drag Float" 1.5 -10.0 10.0 0.1 None
+Graphics GUI_Label_Text Code_GUI_Drag_Float "Graphics GUI_Drag_Float Demo_Drag_Float Drag_Float 1.5 -10.0 10.0 0.1 None"
+Graphics GUI_Input_Text Demo_Input_Text "Input Text" "Appeal" None
+Graphics GUI_Label_Text Code_GUI_Input_Text "Graphics GUI_Input_Text Demo_Input_Text Input_Text Appeal None"
+Graphics GUI_Input_Int Demo_Input_Int "Input Int" 42 None
+Graphics GUI_Label_Text Code_GUI_Input_Int "Graphics GUI_Input_Int Demo_Input_Int Input_Int 42 None"
+Graphics GUI_Input_Float Demo_Input_Float "Input Float" 3.14 None
+Graphics GUI_Label_Text Code_GUI_Input_Float "Graphics GUI_Input_Float Demo_Input_Float Input_Float 3.14 None"
+
+Graphics GUI_Separator_Text Choice_Controls
+Graphics GUI_Checkbox Demo_Checkbox Checkbox 1 None
+Graphics GUI_Label_Text Code_GUI_Checkbox "Graphics GUI_Checkbox Demo_Checkbox Checkbox 1 None"
+Graphics GUI_Radio_Button Demo_Radio_Button "Radio Button" 1 None
+Graphics GUI_Label_Text Code_GUI_Radio_Button "Graphics GUI_Radio_Button Demo_Radio_Button Radio_Button 1 None"
+Graphics GUI_Combo Demo_Combo Combo "Option_A|Option_B|Option_C" 0 None
+Graphics GUI_Label_Text Code_GUI_Combo "Graphics GUI_Combo Demo_Combo Combo Option_A|Option_B|Option_C 0 None"
+Graphics GUI_List_Box Demo_List_Box "List Box" "First|Second|Third" 1 None
+Graphics GUI_Label_Text Code_GUI_List_Box "Graphics GUI_List_Box Demo_List_Box List_Box First|Second|Third 1 None"
+Graphics GUI_Selectable Demo_Selectable Selectable 0 None
+Graphics GUI_Label_Text Code_GUI_Selectable "Graphics GUI_Selectable Demo_Selectable Selectable 0 None"
+
+Graphics GUI_Separator_Text Feedback_Controls
+Graphics GUI_Progress_Bar Demo_Progress 0.65 "65 percent"
+Graphics GUI_Label_Text Code_GUI_Progress_Bar "Graphics GUI_Progress_Bar Demo_Progress 0.65 65_percent"
+Graphics GUI_Button Demo_Tooltip_Button "Hover for tooltip" None
+Graphics GUI_Tooltip "Hover text"
+Graphics GUI_Label_Text Code_GUI_Tooltip "Graphics GUI_Tooltip Hover_text"
+
+Graphics GUI_Separator_Text Group_Controls
+Graphics GUI_Group_Begin Demo_Group
+Graphics GUI_Text Demo_Group_Text "This text is inside a group."
+Graphics GUI_Button Demo_Group_Button "Group Button" None
+Graphics GUI_Group_End
+Graphics GUI_Label_Text Code_GUI_Group "Graphics GUI_Group_Begin Demo_Group ... Graphics GUI_Group_End"
+
+Graphics GUI_Separator_Text Tree_Controls
+Graphics GUI_Tree_Node Demo_Tree
+Graphics GUI_Text Demo_Tree_Text "This text is inside a tree node."
+Graphics GUI_Tree_End
+Graphics GUI_Label_Text Code_GUI_Tree "Graphics GUI_Tree_Node Demo_Tree ... Graphics GUI_Tree_End"
+
+Graphics GUI_Separator_Text Tab_Controls
+Graphics GUI_Tab_Bar_Begin Demo_Tab_Bar
+Graphics GUI_Tab_Item_Begin First_Tab
+Graphics GUI_Text Demo_Tab_Text_A "First tab content."
+Graphics GUI_Tab_Item_End
+Graphics GUI_Tab_Item_Begin Second_Tab
+Graphics GUI_Text Demo_Tab_Text_B "Second tab content."
+Graphics GUI_Tab_Item_End
+Graphics GUI_Tab_Bar_End
+Graphics GUI_Label_Text Code_GUI_Tab_Bar "Graphics GUI_Tab_Bar_Begin Demo_Tab_Bar ... Graphics GUI_Tab_Bar_End"
+Graphics GUI_Label_Text Code_GUI_Tab_Item "Graphics GUI_Tab_Item_Begin First_Tab ... Graphics GUI_Tab_Item_End"
+
+Graphics GUI_Separator_Text Menu_Controls
+Graphics GUI_Menu_Bar_Begin
+Graphics GUI_Menu_Begin Demo_Menu
+Graphics GUI_Menu_Item Demo_Menu_Item "Menu Item" None
+Graphics GUI_Menu_End
+Graphics GUI_Menu_Bar_End
+Graphics GUI_Label_Text Code_GUI_Menu_Bar "Graphics GUI_Menu_Bar_Begin ... Graphics GUI_Menu_Bar_End"
+Graphics GUI_Label_Text Code_GUI_Menu "Graphics GUI_Menu_Begin Demo_Menu ... Graphics GUI_Menu_End"
+Graphics GUI_Label_Text Code_GUI_Menu_Item "Graphics GUI_Menu_Item Demo_Menu_Item Menu_Item None"
+
+Graphics GUI_Separator_Text Callback_Example
+Graphics GUI_Button Demo_Callback_Button "Button With Callback" None
+Graphics GUI_Label_Text Code_GUI_Callback "Graphics GUI_Button Demo_Callback_Button Button_With_Callback Example_Function"
+Graphics GUI_Label_Text Code_GUI_None "Use None when the control should not call a function."
+
+Graphics GUI_End
+
+Return

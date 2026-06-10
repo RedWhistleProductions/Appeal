@@ -30,7 +30,7 @@ struct Session_State
     bool Connected = false;
 };
 
-bool DEBUG = true;
+bool DEBUG = false;
 bool Network_Ready = false;
 std::string Resources = "./Resources";
 std::map<std::string, Listener_State> Listeners;

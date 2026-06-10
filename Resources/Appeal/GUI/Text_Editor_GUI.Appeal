@@ -1,0 +1,32 @@
+Graphics GUI_Begin Text_Editor
+Graphics GUI_Text Text_Editor_Title "Text Editor"
+Graphics GUI_Input_Text Text_Editor_Path File Resources/Appeal/Main.Appeal None
+Graphics GUI_Button Text_Editor_Load Load None
+Graphics GUI_Same_Line
+Graphics GUI_Button Text_Editor_Save Save None
+Graphics GUI_Separator
+Graphics GUI_Input_Text_Multiline Text_Editor_Text Text Empty 760 420 None
+Graphics GUI_End
+
+Graphics GUI_Text_Value Text_Editor_Path
+Set_Var_Global Text_Editor_Path_Value GUI.Text_Editor_Path.Value
+
+Graphics GUI_Button_Clicked Text_Editor_Load
+Set_Var_Global Text_Editor_Load_Clicked GUI.Text_Editor_Load.Clicked
+If Var Text_Editor_Load_Clicked == True
+{
+	Files Read_All Var Text_Editor_Path_Value
+	Set_Var_Global Text_Editor_Loaded_Text Files.Last_Read
+	Graphics GUI_Set_Text_Value Text_Editor_Text Var Text_Editor_Loaded_Text
+}
+
+Graphics GUI_Button_Clicked Text_Editor_Save
+Set_Var_Global Text_Editor_Save_Clicked GUI.Text_Editor_Save.Clicked
+If Var Text_Editor_Save_Clicked == True
+{
+	Graphics GUI_Text_Value Text_Editor_Text
+	Set_Var_Global Text_Editor_Save_Text GUI.Text_Editor_Text.Value
+	Files Write_All Var Text_Editor_Path_Value Var Text_Editor_Save_Text
+}
+
+Return

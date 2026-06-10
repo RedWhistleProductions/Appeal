@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="../../Resources/Graphics/Icons/Bananas_App_Icon.ico" type="image/x-icon">
   <title>Storage Module</title>
   <style>
     body { max-width: 980px; margin: 0 auto; padding: 34px 22px 56px; font: 16px/1.55 system-ui, sans-serif; }
@@ -16,19 +17,26 @@
 <body>
   <nav><a href="../Index.html">Documentation</a> / Modules / Storage</nav>
   <h1>Storage Module</h1>
-  <p>The Storage module is the persistent data scaffold for files, settings, and key/value save data.</p>
+  <p>The Storage module is the persistent data scaffold for settings, save data, and database-backed key/value data. The default direction is SQLite because it is small, local, portable, open source, and easy to copy or back up.</p>
   <h2>Loading</h2>
-  <pre><code>Add_Dynamic_Module Storage Test_Storage
-Run Test_Storage</code></pre>
+  <pre><code>Add_Dynamic_Module Storage Appeal_SQLite_Storage
+Run Test/Test_Storage_SQLite</code></pre>
+  <p>The API should stay database-neutral so a later PostgreSQL, MongoDB, or other storage plugin can use the same Appeal commands where possible.</p>
   <h2>Commands</h2>
   <table>
     <tr><th>Command</th><th>Arguments</th></tr>
+    <tr><td><code>Debug</code></td><td><code>On</code>, <code>Off</code>, <code>True</code>, <code>False</code>, <code>1</code>, or <code>0</code></td></tr>
     <tr><td><code>Set_Paths</code></td><td><code>resources</code></td></tr>
     <tr><td><code>Open</code>, <code>Close</code>, <code>Save</code>, <code>Load</code></td><td><code>name</code></td></tr>
+    <tr><td><code>Use</code></td><td><code>name</code></td></tr>
     <tr><td><code>Read</code>, <code>Exists</code>, <code>Delete</code></td><td><code>file</code></td></tr>
     <tr><td><code>Write</code></td><td><code>name file</code></td></tr>
     <tr><td><code>Set</code></td><td><code>key value</code></td></tr>
     <tr><td><code>Get</code></td><td><code>key</code></td></tr>
+    <tr><td><code>Insert</code>, <code>Update</code></td><td><code>table key value</code></td></tr>
+    <tr><td><code>Find</code>, <code>List</code>, <code>Remove</code></td><td>database query arguments</td></tr>
+    <tr><td><code>Begin</code>, <code>Commit</code>, <code>Rollback</code></td><td>none</td></tr>
+    <tr><td><code>Backup</code>, <code>Restore</code>, <code>Export</code>, <code>Import</code></td><td><code>file</code></td></tr>
   </table>
 </body>
 </html>

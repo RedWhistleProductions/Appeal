@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="../../Resources/Graphics/Icons/Bananas_App_Icon.ico" type="image/x-icon">
   <title>World Module</title>
   <style>
     body { max-width: 980px; margin: 0 auto; padding: 34px 22px 56px; font: 16px/1.55 system-ui, sans-serif; }
@@ -16,21 +17,26 @@
 <body>
   <nav><a href="../Index.html">Documentation</a> / Modules / World</nav>
   <h1>World Module</h1>
-  <p>The World module is the first scene/entity scaffold for Bananas-style apps.</p>
+  <p>The World module is the scene and entity scaffold for Bananas-style apps. It keeps world state separate from Mechanics, Physics, and AI so those systems can be swapped or scaled independently.</p>
   <h2>Loading</h2>
-  <pre><code>Add_Dynamic_Module World Test_World
-Run Test_World</code></pre>
+  <pre><code>Add_Dynamic_Module World Appeal_Standard_World
+Run Test/Test_World_Standard</code></pre>
   <h2>Commands</h2>
   <table>
     <tr><th>Command</th><th>Arguments</th></tr>
+    <tr><td><code>Debug</code></td><td><code>On</code>, <code>Off</code>, <code>True</code>, <code>False</code>, <code>1</code>, or <code>0</code></td></tr>
     <tr><td><code>Set_Paths</code></td><td><code>resources</code></td></tr>
-    <tr><td><code>Create</code>, <code>Load</code>, <code>Save</code>, <code>Switch</code>, <code>Update</code>, <code>Draw</code></td><td><code>world</code></td></tr>
-    <tr><td><code>Entity_Create</code>, <code>Entity_Destroy</code></td><td><code>entity</code></td></tr>
+    <tr><td><code>Create</code>, <code>Open_Scene</code>, <code>Load</code>, <code>Load_Scene</code>, <code>Save</code>, <code>Save_Scene</code>, <code>Switch</code>, <code>Use_Scene</code>, <code>Close_Scene</code>, <code>Clear_Scene</code>, <code>Update</code>, <code>Draw</code></td><td><code>world</code> or <code>scene</code></td></tr>
+    <tr><td><code>Entity_Create</code>, <code>Create_Entity</code>, <code>Entity_Destroy</code>, <code>Delete_Entity</code>, <code>Clone_Entity</code></td><td><code>entity</code></td></tr>
     <tr><td><code>Entity_Set_Active</code></td><td><code>entity active</code></td></tr>
     <tr><td><code>Entity_Set_Tag</code></td><td><code>entity tag</code></td></tr>
-    <tr><td><code>Set_Position</code>, <code>Set_Rotation</code>, <code>Set_Scale</code>, <code>Move</code>, <code>Rotate</code></td><td><code>entity x y z</code></td></tr>
-    <tr><td><code>Add_Component</code>, <code>Remove_Component</code></td><td><code>entity component</code></td></tr>
+    <tr><td><code>Set_Position</code>, <code>Set_Location</code>, <code>Set_Rotation</code>, <code>Set_Orientation</code>, <code>Set_Scale</code>, <code>Move</code>, <code>Rotate</code></td><td><code>entity x y z</code></td></tr>
+    <tr><td><code>Add_Component</code>, <code>Remove_Component</code>, <code>Has_Component</code>, <code>List_Components</code></td><td><code>entity component</code></td></tr>
+    <tr><td><code>Set</code>, <code>Get</code></td><td><code>entity key value</code> or <code>entity key</code></td></tr>
+    <tr><td><code>List_Entities</code></td><td>none</td></tr>
     <tr><td><code>Query</code></td><td><code>tag</code></td></tr>
+    <tr><td><code>Pause</code>, <code>Resume</code>, <code>Set_Time_Scale</code></td><td>time-control arguments</td></tr>
+    <tr><td><code>Emit_Event</code>, <code>Clear_Events</code></td><td>event arguments</td></tr>
   </table>
 </body>
 </html>

@@ -9,7 +9,7 @@
 
 namespace fs = std::filesystem;
 
-bool DEBUG = true;
+bool DEBUG = false;
 std::string Resources_Path = "./Resources";
 std::string Package_Path = "./Resources/Package";
 std::string Repo_File = "./Resources/Package/Repos.txt";

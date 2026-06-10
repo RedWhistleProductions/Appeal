@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="../Resources/Graphics/Icons/Bananas_App_Icon.ico" type="image/x-icon">
+	<title>Appeal Design Principles</title>
+	<style>
+		:root {
+			color-scheme: light dark;
+			--bg: #f7f7f4;
+			--fg: #1c1d20;
+			--muted: #5d6470;
+			--line: #cfd4d9;
+			--accent: #15616d;
+		}
+
+		@media (prefers-color-scheme: dark) {
+			:root {
+				--bg: #15171a;
+				--fg: #eceff3;
+				--muted: #aab2bd;
+				--line: #343a42;
+				--accent: #4fb3bf;
+			}
+		}
+
+		* { box-sizing: border-box; }
+
+		body {
+			margin: 0;
+			background: var(--bg);
+			color: var(--fg);
+			font: 16px/1.55 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+		}
+
+		main {
+			max-width: 980px;
+			margin: 0 auto;
+			padding: 34px 22px 56px;
+		}
+
+		nav {
+			margin-bottom: 24px;
+			color: var(--muted);
+		}
+
+		nav a { color: var(--accent); }
+
+		h1 {
+			margin: 0 0 10px;
+			font-size: clamp(2rem, 5vw, 3.4rem);
+			line-height: 1.05;
+			letter-spacing: 0;
+		}
+
+		h2 {
+			margin: 34px 0 12px;
+			border-top: 1px solid var(--line);
+			padding-top: 20px;
+			font-size: 1.35rem;
+		}
+
+		p {
+			max-width: 84ch;
+			margin: 0 0 14px;
+		}
+
+		ul { padding-left: 22px; }
+		li { margin: 7px 0; }
+
+		code {
+			padding: 2px 5px;
+			border-radius: 4px;
+			background: color-mix(in srgb, var(--line), transparent 70%);
+			font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+			font-size: 0.94em;
+		}
+	</style>
+</head>
+<body>
+	<main>
+		<nav><a href="Index.html">Documentation</a> / Design Principles</nav>
+		<h1>Appeal Design Principles</h1>
+		<p>Appeal is a general-purpose programming language and runtime. Bananas is the first major Appeal-based app, focused on game development. The same language and module API should later support other apps, including a browser that uses Appeal scripts instead of HTML and JavaScript.</p>
+
+		<h2>Universal Scripts, Platform-Specific Plugins</h2>
+		<p>Appeal scripts and modules should stay platform independent. Plugins are compiled for each platform and provide optimized native behavior behind the same Appeal command API. A game should be able to use the same script on a desktop, handheld, phone, or server while each system loads plugins and assets appropriate for its hardware.</p>
+
+		<h2>Small Module Set, Broad Modules</h2>
+		<p>Appeal should avoid a large number of narrow modules. Each module should cover a useful area of responsibility. For example, Graphics is a 3D system that also handles 2D rendering, text, and GUI controls, so Bananas and future apps can share the same rendering API.</p>
+
+		<h2>Scripts First</h2>
+		<p>Appeal app developers should build with Appeal scripts and assets. They should not need to edit C or C++ source code. Native source changes belong to Appeal runtime development, module development, or plugin development.</p>
+
+		<h2>Resource-Conscious by Default</h2>
+		<p>The design assumes limited resources first. Apps should work out of the box on modest systems and scale upward on stronger systems. Stronger platforms can use heavier plugins and richer assets; lower-resource systems can use lighter plugins and smaller assets while running the same game logic.</p>
+
+		<h2>Repository-Based Distribution</h2>
+		<p>Modules, plugins, and assets should come from dedicated repositories. Different devices or operating systems can select different repositories. Systems with handheld and docked modes can switch between configurations, including different <code>Config.Appeal</code> choices and asset sets.</p>
+
+		<h2>Security in Plugins</h2>
+		<p>Remote scripts should not be able to replace native plugins. Plugin installation and updates should come from trusted repositories and user-approved package operations. Browser-style Appeal apps should keep security in distro-managed plugins, so unknown script authors provide content while the user's trusted plugin set enforces permissions and safety.</p>
+
+		<h2>Permission-Oriented Apps</h2>
+		<p>Apps should eventually use permissions similar to mobile operating systems. Users should be able to grant and revoke access to capabilities such as network, storage, input devices, and plugin installation.</p>
+
+		<h2>Validated Strings at the Boundary</h2>
+		<p>Appeal script values are strings at the language boundary. Plugins cast those strings to the native types they need, validate them, and either clamp or reject values based on the function. Clamping is useful for harmless ranges such as volume. Rejection is better when an invalid value indicates bad data or unsafe behavior.</p>
+
+		<h2>Network Direction</h2>
+		<p>The Network module should be able to read commands from a server and run them like a script from a file. It should also download assets and update modules or plugins through trusted package flows. Early networking can be plain for debugging, then move toward encrypted, key-based authentication once the command path is proven.</p>
+	</main>
+</body>
+</html>

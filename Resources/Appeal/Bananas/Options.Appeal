@@ -1,0 +1,17 @@
+Graphics Draw_Rect Options_Background 0.0 0.0 960.0 540.0 18 18 28 255
+Graphics GUI_Begin Options_Menu
+Graphics GUI_Text Options_Title "Options"
+Graphics GUI_Button Graphics_Options Graphics None
+Graphics GUI_Button Audio_Options Audio None
+Graphics GUI_Button Controls_Options Controls None
+Graphics GUI_Button Back_From_Options Back None
+Graphics GUI_End
+
+Graphics GUI_Button_Clicked Back_From_Options
+Set_Var_Global Back_From_Options_Clicked GUI.Back_From_Options.Clicked
+If Var Back_From_Options_Clicked == 1
+{
+	Set_Var Game_State Bananas/Game_Over
+}
+
+Return

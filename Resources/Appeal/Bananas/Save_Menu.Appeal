@@ -1,0 +1,15 @@
+Graphics Draw_Rect Save_Background 0.0 0.0 960.0 540.0 14 18 28 255
+Graphics GUI_Begin Save_Menu
+Graphics GUI_Text Save_Title "Save Menu"
+Graphics GUI_Button Save_Slot_1 "Save Slot 1" None
+Graphics GUI_Button Back_From_Save Back None
+Graphics GUI_End
+
+Graphics GUI_Button_Clicked Back_From_Save
+Set_Var_Global Back_From_Save_Clicked GUI.Back_From_Save.Clicked
+If Var Back_From_Save_Clicked == 1
+{
+	Set_Var Game_State Bananas/Game_Over
+}
+
+Return

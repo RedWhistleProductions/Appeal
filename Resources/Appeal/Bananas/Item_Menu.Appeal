@@ -1,0 +1,15 @@
+Graphics Draw_Rect Item_Background 0.0 0.0 960.0 540.0 16 20 24 255
+Graphics GUI_Begin Item_Menu
+Graphics GUI_Text Item_Title "Item Menu"
+Graphics GUI_List_Box Item_List Items "Potion|Key|Map" 0 None
+Graphics GUI_Button Back_From_Items Back None
+Graphics GUI_End
+
+Graphics GUI_Button_Clicked Back_From_Items
+Set_Var_Global Back_From_Items_Clicked GUI.Back_From_Items.Clicked
+If Var Back_From_Items_Clicked == 1
+{
+	Set_Var Game_State Bananas/Playing
+}
+
+Return

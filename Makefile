@@ -1,5 +1,6 @@
 # Compiler
 CXX ?= g++
+WINDRES ?= windres
 
 # Compiler flags
 CXXFLAGS = -g -Wall -pthread
@@ -29,10 +30,13 @@ SRC_FILES = $(wildcard $(SRC_DIR)/*.cpp)
 
 # Object files
 OBJ_FILES = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRC_FILES))
+RES_FILES =
 
 # Executable
 ifeq ($(OS),Windows_NT)
     EXE_EXT = .exe
+    RC_FILES = $(wildcard $(SRC_DIR)/*.rc)
+    RES_FILES = $(patsubst $(SRC_DIR)/%.rc, $(OBJ_DIR)/%.res, $(RC_FILES))
 else
     EXE_EXT =
 endif
@@ -61,13 +65,18 @@ install-plugins: $(PLUGIN_INSTALL_TARGETS)
 install: $(TARGET) install-modules install-plugins
 
 # Link object files to create the executable
-$(TARGET): $(OBJ_FILES)
+$(TARGET): $(OBJ_FILES) $(RES_FILES)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 # Compile source files to object files
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p $(OBJ_DIR)
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+# Compile Windows resource files
+$(OBJ_DIR)/%.res: $(SRC_DIR)/%.rc
+	@mkdir -p $(OBJ_DIR)
+	$(WINDRES) $< -O coff -o $@
 
 # Clean up
 clean: $(MODULE_CLEAN_TARGETS) $(PLUGIN_CLEAN_TARGETS)

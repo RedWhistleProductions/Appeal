@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="../../Resources/Graphics/Icons/Bananas_App_Icon.ico" type="image/x-icon">
   <title>Graphics Module</title>
   <style>
     :root {
@@ -26,9 +27,7 @@
       }
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -48,9 +47,7 @@
       color: var(--muted);
     }
 
-    nav a {
-      color: var(--accent);
-    }
+    nav a { color: var(--accent); }
 
     h1 {
       margin: 0 0 10px;
@@ -67,7 +64,7 @@
     }
 
     p {
-      max-width: 78ch;
+      max-width: 80ch;
       margin: 0 0 14px;
     }
 
@@ -105,28 +102,27 @@
       vertical-align: top;
     }
 
-    th {
-      color: var(--accent);
-    }
+    th { color: var(--accent); }
   </style>
 </head>
 <body>
   <main>
     <nav><a href="../Index.html">Documentation</a> / Modules / Graphics</nav>
     <h1>Graphics Module</h1>
-    <p>The Graphics module is the visual system scaffold for Appeal and Bananas. It is intended to cover windows, cameras, 2D and 3D resources, text, GUI commands, render, and update behavior through a stable Appeal-facing API.</p>
+    <p>The Graphics module is the visual system for Appeal and Bananas. It covers windows, cameras, 2D and 3D resources, text, Dear ImGui GUI commands, rendering, and frame updates through a stable Appeal-facing API.</p>
 
     <h2>Loading</h2>
-    <pre><code>Add_Dynamic_Module Graphics Test_Graphics
-Run Test_Graphics</code></pre>
+    <pre><code>Add_Dynamic_Module Graphics Appeal_SDL2_Graphics
+Run Setup/Graphics_Setup</code></pre>
 
     <h2>Runtime Layout</h2>
     <pre><code>Resources/Modules/Graphics/Graphics.dll
-Resources/Modules/Graphics/Test_Graphics/Test_Graphics.dll</code></pre>
+Resources/Modules/Graphics/Test_Graphics/Test_Graphics.dll
+Resources/Modules/Graphics/Appeal_SDL2_Graphics/Appeal_SDL2_Graphics.dll</code></pre>
 
     <h2>SDL2 Backend</h2>
-    <p><code>Appeal_SDL2_Graphics</code> uses SDL2 for windows and rendering, Dear ImGui for GUI commands, SDL2_ttf for text, SDL2_image for image loading, and Assimp for model loading when a built Assimp library is available.</p>
-    <pre><code>Resources/Modules/Graphics/Appeal_SDL2_Graphics/Appeal_SDL2_Graphics.dll</code></pre>
+    <p><code>Appeal_SDL2_Graphics</code> uses SDL2 for windows, OpenGL for rendering, Dear ImGui for GUI commands, SDL2_ttf for text, SDL2_image for image loading, and Assimp for model loading when the built library is available.</p>
+    <p>GUI support remains part of the Graphics module and plugin for now. This keeps windowing, rendering, input event processing for ImGui, and GUI drawing in one backend.</p>
 
     <h2>Resource Layout</h2>
     <p>Graphics resources live under <code>Resources/Graphics</code>, with subfolders for each resource type.</p>
@@ -148,11 +144,11 @@ Resources/Graphics/GUI/</code></pre>
       <tbody>
         <tr>
           <td>Setup</td>
-          <td><code>Set_Paths</code>, <code>Set_FPS</code></td>
+          <td><code>Debug</code>, <code>Set_Paths</code>, <code>Set_FPS</code></td>
         </tr>
         <tr>
           <td>Windows</td>
-          <td><code>Add_Window</code>, <code>Add_Full_Screen_Window</code>, <code>Delete_Window</code>, <code>Show</code>, <code>Hide</code>, <code>Set_Focus</code>, <code>Set_Monitor</code></td>
+          <td><code>Add_Window</code>, <code>Add_Full_Screen_Window</code>, <code>Delete_Window</code>, <code>Close_All</code>, <code>Show</code>, <code>Hide</code>, <code>Set_Focus</code>, <code>Set_Monitor</code>, <code>Window_Open</code>, <code>Wait_Until_Close</code></td>
         </tr>
         <tr>
           <td>Viewport</td>
@@ -168,21 +164,59 @@ Resources/Graphics/GUI/</code></pre>
         </tr>
         <tr>
           <td>Assets</td>
-          <td><code>Set_Texture</code>, <code>Set_Shader</code>, <code>Set_Location</code>, <code>Set_Orientation</code>, <code>Set_Scale</code>, <code>Move_Asset</code>, <code>Rotate_Asset</code></td>
+          <td><code>Set_Texture</code>, <code>Set_Shader</code>, <code>Set_Location</code>, <code>Set_Orientation</code>, <code>Set_Scale</code>, <code>Move_Asset</code>, <code>Rotate_Asset</code>, <code>Set_Active_Asset</code>, <code>Rotate_Active_Yaw_Input</code>, <code>Move_Active_Forward_Input</code></td>
         </tr>
         <tr>
-          <td>Text And GUI</td>
-          <td><code>Draw_Text</code>, <code>GUI_Begin</code>, <code>GUI_Text</code>, <code>GUI_Button</code>, <code>GUI_End</code></td>
+          <td>Drawing</td>
+          <td><code>Draw_Text</code>, <code>Draw_Rect</code>, <code>Render</code>, <code>Update</code></td>
         </tr>
         <tr>
-          <td>Frame</td>
-          <td><code>Render</code>, <code>Update</code></td>
+          <td>GUI Layout</td>
+          <td><code>GUI_Begin</code>, <code>GUI_End</code>, <code>GUI_End_Window</code>, <code>GUI_Separator</code>, <code>GUI_Separator_Text</code>, <code>GUI_Same_Line</code>, <code>GUI_New_Line</code>, <code>GUI_Spacing</code>, <code>GUI_Indent</code>, <code>GUI_Unindent</code>, <code>GUI_Group_Begin</code>, <code>GUI_Group_End</code></td>
+        </tr>
+        <tr>
+          <td>GUI Text</td>
+          <td><code>GUI_Text</code>, <code>GUI_Label_Text</code>, <code>GUI_Bullet_Text</code>, <code>GUI_Tooltip</code></td>
+        </tr>
+        <tr>
+          <td>GUI Controls</td>
+          <td><code>GUI_Button</code>, <code>GUI_Small_Button</code>, <code>GUI_Slider_Int</code>, <code>GUI_Slider_Float</code>, <code>GUI_Drag_Int</code>, <code>GUI_Drag_Float</code>, <code>GUI_Input_Text</code>, <code>GUI_Input_Int</code>, <code>GUI_Input_Float</code>, <code>GUI_Checkbox</code>, <code>GUI_Radio_Button</code>, <code>GUI_Combo</code>, <code>GUI_List_Box</code>, <code>GUI_Selectable</code>, <code>GUI_Progress_Bar</code></td>
+        </tr>
+        <tr>
+          <td>GUI Containers</td>
+          <td><code>GUI_Tree_Node</code>, <code>GUI_Tree_End</code>, <code>GUI_Tab_Bar_Begin</code>, <code>GUI_Tab_Bar_End</code>, <code>GUI_Tab_Item_Begin</code>, <code>GUI_Tab_Item_End</code>, <code>GUI_Menu_Bar_Begin</code>, <code>GUI_Menu_Bar_End</code>, <code>GUI_Menu_Begin</code>, <code>GUI_Menu_End</code>, <code>GUI_Menu_Item</code></td>
+        </tr>
+        <tr>
+          <td>GUI State</td>
+          <td><code>GUI_Button_Clicked</code>, <code>GUI_Slider_Int_Value</code>, <code>GUI_Slider_Int_Changed</code>, <code>GUI_Float_Value</code>, <code>GUI_Float_Changed</code>, <code>GUI_Text_Value</code>, <code>GUI_Text_Changed</code>, <code>GUI_Int_Value</code>, <code>GUI_Int_Changed</code>, <code>GUI_Checkbox_Value</code>, <code>GUI_Checkbox_Changed</code>, <code>GUI_Selection_Value</code>, <code>GUI_Selection_Changed</code></td>
+        </tr>
+        <tr>
+          <td>GUI Callbacks</td>
+          <td><code>Set_GUI_Function</code>, <code>Set_GUI_Button_Function</code>, <code>Set_GUI_Slider_Int_Function</code>, <code>Set_GUI_Checkbox_Function</code></td>
         </tr>
       </tbody>
     </table>
 
-    <h2>Test Script</h2>
-    <p>The current test script is <code>Resources/Appeal/Test_Graphics.Appeal</code>. It exercises the SDL2 backend, including texture loading, text, Dear ImGui GUI commands, camera state, mesh loading, and wireframe rendering.</p>
+    <h2>GUI Callback Convention</h2>
+    <p>Interactive GUI controls now take a final function argument. The target can be an Appeal function, a module function such as <code>Audio.Play</code>, or <code>None</code>.</p>
+    <pre><code>Graphics GUI_Button Play Play Audio.Play
+Graphics GUI_Small_Button Reset Reset_Camera None
+Graphics GUI_Slider_Int Volume Volume Var Volume 0 100 Audio.Set_Volume_Percent
+Graphics GUI_Slider_Float Perspective_FOV "Field Of View" 45.0 10.0 120.0 None
+Graphics GUI_Drag_Float Camera_X "Camera X" 0.0 -100.0 100.0 0.1 Update_Camera_X
+Graphics GUI_Input_Text Player_Name "Player Name" Billy None
+Graphics GUI_Checkbox Loop_Current Loop Var Looping Audio.Set_Current_Loop
+Graphics GUI_Menu_Item Open_Settings Settings Open_Settings_Menu</code></pre>
+    <p>Buttons and menu items call digital functions with no arguments. Sliders, drags, numeric inputs, text inputs, checkboxes, selections, and radio buttons call value-changing callbacks. Float controls currently send scaled integer values to module callbacks.</p>
+
+    <h2>Reusable Scripts</h2>
+    <p><code>Resources/Appeal/Setup/Graphics_Setup.Appeal</code> sets up basic graphics state. <code>Resources/Appeal/GUI/Graphics_GUI.Appeal</code> builds a reusable Graphics settings window with controls for window position, viewport, perspective, and camera settings.</p>
+
+    <h2>Test Scripts</h2>
+    <p>Current Graphics test scripts live in <code>Resources/Appeal/Test</code>.</p>
+    <pre><code>Test/Test_Graphics
+Test/Test_Graphics_3D_Models
+Test/Test_Controller_Graphics</code></pre>
   </main>
 </body>
 </html>

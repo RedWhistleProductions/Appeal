@@ -28,7 +28,7 @@ int Frequency, Chanels, Chunksize;
 bool Music_On, SFX_On;
 bool Auto_Play = false;
 bool Track_Was_Playing = false;
-bool DEBUG = true;
+bool DEBUG = false;
 bool Audio_Ready = false;
 int Music_Volume = MIX_MAX_VOLUME;
 

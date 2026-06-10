@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="../../Resources/Graphics/Icons/Bananas_App_Icon.ico" type="image/x-icon">
   <title>Audio Module</title>
   <style>
     :root {
@@ -114,7 +115,7 @@
   <main>
     <nav><a href="../Index.html">Documentation</a> / Modules / Audio</nav>
     <h1>Audio Module</h1>
-    <p>The Audio module provides Appeal commands for music, sound effects, playlists, and mute/playback control. The module itself is platform-independent; the loaded plugin provides the actual audio backend.</p>
+    <p>The Audio module provides Appeal commands for music, sound effects, playlists, mute/playback control, looping, autoplay, and volume. The module itself is platform-independent; the loaded plugin provides the actual audio backend.</p>
 
     <h2>Runtime Layout</h2>
     <pre><code>Resources/Modules/Audio/Audio.dll
@@ -123,7 +124,7 @@ Resources/Modules/Audio/Appeal_SDL2_Audio/Appeal_SDL2_Audio.dll</code></pre>
 
     <h2>Loading</h2>
     <p>The module is usually loaded from <code>Config.Appeal</code> with <code>Add_Dynamic_Module</code>.</p>
-    <pre><code>Add_Dynamic_Module Audio Test_Audio</code></pre>
+    <pre><code>Add_Dynamic_Module Audio Appeal_SDL2_Audio</code></pre>
     <p>The second argument is the plugin name. For example, <code>Test_Audio</code> loads the test plugin, while <code>Appeal_SDL2_Audio</code> loads the SDL2 backend after it has been built and installed.</p>
 
     <h2>Plugin Naming</h2>
@@ -141,6 +142,11 @@ Appeal_SDL2_Audio.so</code></pre>
         </tr>
       </thead>
       <tbody>
+        <tr>
+          <td><code>Audio Debug</code></td>
+          <td><code>On</code>, <code>Off</code>, <code>True</code>, <code>False</code>, <code>1</code>, or <code>0</code></td>
+          <td>Turns Audio module and plugin console output on or off.</td>
+        </tr>
         <tr>
           <td><code>Audio Init</code></td>
           <td><code>pluginPath</code></td>
@@ -207,6 +213,11 @@ Appeal_SDL2_Audio.so</code></pre>
           <td>Moves to the previous track and plays it.</td>
         </tr>
         <tr>
+          <td><code>Audio Update</code></td>
+          <td>none</td>
+          <td>Updates playback state, including autoplaying the next song when enabled.</td>
+        </tr>
+        <tr>
           <td><code>Audio Mute</code></td>
           <td>none</td>
           <td>Mutes sound effects and stops music.</td>
@@ -215,6 +226,41 @@ Appeal_SDL2_Audio.so</code></pre>
           <td><code>Audio UnMute</code></td>
           <td>none</td>
           <td>Enables audio and resumes music.</td>
+        </tr>
+        <tr>
+          <td><code>Audio Toggle_Mute</code></td>
+          <td>none</td>
+          <td>Toggles between muted and unmuted states.</td>
+        </tr>
+        <tr>
+          <td><code>Audio Set_Volume</code></td>
+          <td><code>volume</code></td>
+          <td>Sets backend volume using the plugin's native range.</td>
+        </tr>
+        <tr>
+          <td><code>Audio Set_Volume_Percent</code></td>
+          <td><code>0-100</code></td>
+          <td>Sets volume as a percentage. This is useful for GUI sliders.</td>
+        </tr>
+        <tr>
+          <td><code>Audio Set_Current_Loop</code></td>
+          <td><code>0</code> or <code>1</code></td>
+          <td>Controls whether the current song loops.</td>
+        </tr>
+        <tr>
+          <td><code>Audio Set_Auto_Play</code></td>
+          <td><code>0</code> or <code>1</code></td>
+          <td>Controls whether the next song starts when the current song ends.</td>
+        </tr>
+        <tr>
+          <td><code>Audio Get_Volume</code>, <code>Audio Get_Volume_Percent</code></td>
+          <td>none</td>
+          <td>Returns the current volume value.</td>
+        </tr>
+        <tr>
+          <td><code>Audio Current_Looping</code>, <code>Audio Auto_Playing</code>, <code>Audio Current_Song</code>, <code>Audio Is_Muted</code></td>
+          <td>none</td>
+          <td>Returns current playback state for scripts and GUI updates.</td>
         </tr>
       </tbody>
     </table>
@@ -239,7 +285,7 @@ Stop()
 UnMute()</code></pre>
 
     <h2>Test Script</h2>
-    <p>The current test script is <code>Resources/Appeal/Test_Audio.Appeal</code>.</p>
+    <p>The current test script is <code>Resources/Appeal/Test/Test_Audio.Appeal</code>. The media player demo in <code>Resources/Appeal/Media_Player.Appeal</code> combines Audio, Graphics GUI controls, and Input-driven exit handling.</p>
     <pre><code>Audio Load_Play_List PlayAll.txt
 Audio Play_Song "Folk Song"
 Return</code></pre>

@@ -3,6 +3,8 @@
     #include "SDL2/SDL_image.h"
     #include "SDL2/SDL_ttf.h"
     #include "SDL2/SDL_opengl.h"
+    #include "SDL2/SDL_syswm.h"
+    #include <windows.h>
 #endif
 
 #ifdef __linux__
@@ -25,12 +27,16 @@
 #include <cmath>
 #include <algorithm>
 #include <array>
+#include <cstdio>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <map>
 #include <sstream>
 #include <string>
 #include <vector>
+
+namespace fs = std::filesystem;
 
 const float Pi = 3.1415926535f;
 
@@ -63,6 +69,7 @@ struct Window_State
     int View_Y = 0;
     int View_W = 0;
     int View_H = 0;
+    bool Custom_Viewport = false;
     bool Perspective = true;
     float Fovy = 45.0f;
     float Near = 0.1f;
@@ -73,6 +80,10 @@ struct Window_State
     float Ortho_Top = 0.0f;
     Vec3 Camera_Location = {0.0f, 0.0f, -6.0f};
     Vec3 Camera_Orientation = {0.0f, 0.0f, 0.0f};
+#ifdef __MINGW32__
+    HICON Big_Icon = nullptr;
+    HICON Small_Icon = nullptr;
+#endif
 };
 
 struct Mesh_Triangle
@@ -157,12 +168,35 @@ struct GUI_Command
     std::string Kind;
     std::string Name;
     std::string Text;
+    std::string Value_Text;
+    std::string Extra_Text;
+    std::string Tooltip_Text;
     int Min = 0;
     int Max = 0;
+    int Value = 0;
+    float Float_Min = 0.0f;
+    float Float_Max = 0.0f;
+    float Float_Value = 0.0f;
+    float Float_Step = 0.0f;
+};
+
+struct GUI_File_Picker_State
+{
+    std::string Root;
+    std::string Start;
+    std::string Current;
+    std::string Selected;
+    std::string Selected_Path;
+    std::string Selected_Relative;
+    bool Selected_Is_Directory = false;
+    bool Changed = false;
+    bool Initialized = false;
+    int Selected_Index = -1;
 };
 
 std::string Resources = "./Resources";
 std::string Graphics_Path = "./Resources/Graphics/";
+std::string Icon_Path = "./Resources/Graphics/Icons/";
 std::string Texture_Path = "./Resources/Graphics/Textures/";
 std::string Font_Path = "./Resources/Graphics/Fonts/";
 std::string Shader_Path = "./Resources/Graphics/Shaders/";
@@ -182,11 +216,22 @@ std::vector<GUI_Command> GUI_Commands;
 std::map<std::string, bool> GUI_Clicked;
 std::map<std::string, int> GUI_Slider_Values;
 std::map<std::string, bool> GUI_Slider_Changed;
+std::map<std::string, float> GUI_Float_Values;
+std::map<std::string, bool> GUI_Float_Changed_Values;
+std::map<std::string, std::string> GUI_Text_Values;
+std::map<std::string, bool> GUI_Text_Changed_Values;
+std::map<std::string, int> GUI_Int_Values;
+std::map<std::string, bool> GUI_Int_Changed_Values;
+std::map<std::string, int> GUI_Selection_Values;
+std::map<std::string, std::string> GUI_Selection_Text_Values;
+std::map<std::string, bool> GUI_Selection_Changed_Values;
 std::map<std::string, bool> GUI_Checkbox_Values;
 std::map<std::string, bool> GUI_Checkbox_Changed_Values;
+std::map<std::string, GUI_File_Picker_State> GUI_File_Pickers;
 std::map<std::string, std::string> GUI_Button_Functions;
 std::map<std::string, std::string> GUI_Slider_Functions;
 std::map<std::string, std::string> GUI_Checkbox_Functions;
+std::map<std::string, std::string> GUI_Functions;
 void (*Run_Function_Callback)(std::string Function) = nullptr;
 void (*Run_Analog_Function_Callback)(std::string Function, int Value) = nullptr;
 std::string Active_Asset;
@@ -197,9 +242,14 @@ bool SDL_Ready = false;
 bool IMG_Ready = false;
 bool TTF_Ready = false;
 bool ImGui_Ready = false;
-bool DEBUG = true;
+bool GUI_Visible = false;
+bool GUI_Docking_Enabled = true;
+bool DEBUG = false;
 
 extern "C" void Delete_Window(std::string Name);
+
+void Run_GUI_Function(const std::string &Name, int Value);
+void Run_GUI_Digital_Function(const std::string &Name);
 
 std::string Directory_Name(std::string File)
 {
@@ -440,6 +490,19 @@ extern "C" bool Window_Open(std::string Name)
 
 void Destroy_Window(Window_State &State)
 {
+#ifdef __MINGW32__
+    if(State.Big_Icon != nullptr)
+    {
+        DestroyIcon(State.Big_Icon);
+        State.Big_Icon = nullptr;
+    }
+    if(State.Small_Icon != nullptr)
+    {
+        DestroyIcon(State.Small_Icon);
+        State.Small_Icon = nullptr;
+    }
+#endif
+
     if(State.GL_Context != nullptr)
     {
         SDL_GL_DeleteContext(State.GL_Context);
@@ -852,6 +915,48 @@ void Destroy_Font(Font_State &State)
     }
 }
 
+bool Make_Current_GL_Context()
+{
+    for(auto &Item : Windows)
+    {
+        Window_State &State = Item.second;
+        if(State.Window != nullptr && State.GL_Context != nullptr)
+        {
+            SDL_GL_MakeCurrent(State.Window, State.GL_Context);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void Destroy_GL_Resources()
+{
+    if(!Make_Current_GL_Context())
+    {
+        return;
+    }
+
+    for(auto &Item : Textures)
+    {
+        Destroy_Texture(Item.second);
+    }
+    Textures.clear();
+
+    for(auto &Mesh_Item : Meshes)
+    {
+        for(Mesh_Material &Material : Mesh_Item.second.Materials)
+        {
+            if(Material.Texture_ID != 0)
+            {
+                glDeleteTextures(1, &Material.Texture_ID);
+                Material.Texture_ID = 0;
+            }
+        }
+    }
+    Meshes.clear();
+}
+
 bool Ensure_ImGui(Window_State &Window)
 {
     if(ImGui_Ready)
@@ -863,6 +968,7 @@ bool Ensure_ImGui(Window_State &Window)
     ImGui::CreateContext();
     ImGuiIO &IO = ImGui::GetIO();
     IO.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    IO.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     ImGui::StyleColorsDark();
 
     if(!ImGui_ImplSDL2_InitForOpenGL(Window.Window, Window.GL_Context))
@@ -889,6 +995,10 @@ void Begin_ImGui_Frame(Window_State &Window)
     ImGui_ImplOpenGL2_NewFrame();
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
+    if(GUI_Visible && GUI_Docking_Enabled)
+    {
+        ImGui::DockSpaceOverViewport();
+    }
 }
 
 void End_ImGui_Frame(Window_State &Window)
@@ -958,11 +1068,460 @@ void Draw_Text_Command(Window_State &Window, const Text_Command &Command)
     glDeleteTextures(1, &Texture);
 }
 
+void Ensure_GUI_Window(bool &In_Window)
+{
+    if(!In_Window)
+    {
+        ImGui::Begin("Appeal");
+        In_Window = true;
+    }
+}
+
+std::vector<std::string> Split_GUI_Items(const std::string &Items)
+{
+    std::vector<std::string> Result;
+    std::stringstream Stream(Items);
+    std::string Item;
+    while(std::getline(Stream, Item, '|'))
+    {
+        if(!Item.empty())
+        {
+            Result.push_back(Item);
+        }
+    }
+    return Result;
+}
+
+std::string Normalize_GUI_Path(std::string Path)
+{
+    std::replace(Path.begin(), Path.end(), '\\', '/');
+    while(Path.find("//") != std::string::npos)
+    {
+        Path.replace(Path.find("//"), 2, "/");
+    }
+    if(Path.size() > 2 && Path.substr(0, 2) == "./")
+    {
+        Path = Path.substr(2);
+    }
+    if(Path.size() > 1 && Path.back() == '/')
+    {
+        Path.pop_back();
+    }
+    return Path;
+}
+
+fs::path Canonical_Or_Absolute(fs::path Path)
+{
+    try
+    {
+        return fs::weakly_canonical(Path);
+    }
+    catch(const std::exception &)
+    {
+        return fs::absolute(Path);
+    }
+}
+
+fs::path Resolve_Resource_Path(const std::string &Path)
+{
+    fs::path Candidate(Path);
+    if(Candidate.is_absolute())
+    {
+        return Canonical_Or_Absolute(Candidate);
+    }
+
+    if(Path == "Resources")
+    {
+        return Canonical_Or_Absolute(fs::path(Resources));
+    }
+
+    fs::path Resource_Root = Canonical_Or_Absolute(fs::path(Resources));
+    fs::path Resource_Name = Resource_Root.filename();
+    if(!Resource_Name.empty() && Path.rfind(Resource_Name.string() + "/", 0) == 0)
+    {
+        return Canonical_Or_Absolute(Resource_Root.parent_path() / Candidate);
+    }
+
+    return Canonical_Or_Absolute(Resource_Root / Candidate);
+}
+
+bool Path_Is_Inside(const fs::path &Root, const fs::path &Path)
+{
+    fs::path Root_Path = Canonical_Or_Absolute(Root);
+    fs::path Target_Path = Canonical_Or_Absolute(Path);
+    auto Root_It = Root_Path.begin();
+    auto Target_It = Target_Path.begin();
+    for(; Root_It != Root_Path.end(); ++Root_It, ++Target_It)
+    {
+        if(Target_It == Target_Path.end() || *Root_It != *Target_It)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+std::string Relative_Path_Text(const fs::path &Base, const fs::path &Path)
+{
+    try
+    {
+        return Normalize_GUI_Path(fs::relative(Canonical_Or_Absolute(Path), Canonical_Or_Absolute(Base)).generic_string());
+    }
+    catch(const std::exception &)
+    {
+        return Normalize_GUI_Path(Path.generic_string());
+    }
+}
+
+fs::path Picker_Root_Path(const GUI_File_Picker_State &State)
+{
+    return Resolve_Resource_Path(State.Root.empty() ? "Resources" : State.Root);
+}
+
+fs::path Picker_Start_Path(const GUI_File_Picker_State &State)
+{
+    fs::path Root_Path = Picker_Root_Path(State);
+    if(State.Start.empty() || State.Start == ".")
+    {
+        return Root_Path;
+    }
+
+    fs::path Start = Resolve_Resource_Path(State.Start);
+    if(Path_Is_Inside(Root_Path, Start))
+    {
+        return Start;
+    }
+    return Root_Path;
+}
+
+fs::path Picker_Current_Path(const GUI_File_Picker_State &State)
+{
+    if(State.Current.empty() || State.Current == ".")
+    {
+        return Picker_Root_Path(State);
+    }
+    return Resolve_Resource_Path(State.Current);
+}
+
+void Set_File_Picker_Current(GUI_File_Picker_State &State, const fs::path &Path)
+{
+    fs::path Root_Path = Picker_Root_Path(State);
+    fs::path Candidate = Canonical_Or_Absolute(Path);
+    if(!fs::exists(Candidate) || !fs::is_directory(Candidate) || !Path_Is_Inside(Root_Path, Candidate))
+    {
+        Candidate = Root_Path;
+    }
+
+    State.Current = Relative_Path_Text(Root_Path.parent_path(), Candidate);
+    if(State.Current == ".")
+    {
+        State.Current = Normalize_GUI_Path(State.Root.empty() ? "Resources" : State.Root);
+    }
+    State.Selected.clear();
+    State.Selected_Path.clear();
+    State.Selected_Relative.clear();
+    State.Selected_Is_Directory = false;
+    State.Selected_Index = -1;
+    State.Changed = true;
+}
+
+void Ensure_File_Picker_State(GUI_File_Picker_State &State, const std::string &Root, const std::string &Start)
+{
+    if(!State.Initialized || State.Root != Root || State.Start != Start)
+    {
+        State.Root = Root.empty() ? "Resources" : Root;
+        State.Start = Start.empty() ? "." : Start;
+        State.Initialized = true;
+        State.Selected.clear();
+        State.Selected_Path.clear();
+        State.Selected_Relative.clear();
+        State.Selected_Is_Directory = false;
+        Set_File_Picker_Current(State, Picker_Start_Path(State));
+    }
+}
+
+void Select_File_Picker_Item(GUI_File_Picker_State &State, const fs::path &Item_Path, const std::string &Display_Name, int Index)
+{
+    fs::path Root_Path = Picker_Root_Path(State);
+    fs::path Start_Path = Picker_Start_Path(State);
+    State.Selected = Display_Name;
+    State.Selected_Index = Index;
+    State.Selected_Is_Directory = fs::is_directory(Item_Path);
+    State.Selected_Path = Relative_Path_Text(Root_Path.parent_path(), Item_Path);
+    State.Selected_Relative = Relative_Path_Text(Start_Path, Item_Path);
+    State.Changed = true;
+}
+
+void Select_File_Picker_Path(const std::string &Name, const std::string &Path)
+{
+    GUI_File_Picker_State &State = GUI_File_Pickers[Name];
+    fs::path Root_Path = Picker_Root_Path(State);
+    fs::path Item_Path = Resolve_Resource_Path(Path);
+    if(!Path_Is_Inside(Root_Path, Item_Path) || !fs::exists(Item_Path))
+    {
+        return;
+    }
+
+    fs::path Parent_Path = Item_Path.parent_path();
+    Set_File_Picker_Current(State, Parent_Path);
+    State.Selected = fs::is_directory(Item_Path) ? Item_Path.filename().generic_string() + "/" : Item_Path.filename().generic_string();
+    State.Selected_Is_Directory = fs::is_directory(Item_Path);
+    State.Selected_Path = Relative_Path_Text(Root_Path.parent_path(), Item_Path);
+    State.Selected_Relative = Relative_Path_Text(Picker_Start_Path(State), Item_Path);
+    State.Selected_Index = -1;
+    State.Changed = true;
+}
+
+bool Create_Game_Project_From_GUI(const std::string &Project_Name, const std::string &Picker_Name)
+{
+    std::string Name = Normalize_GUI_Path(Project_Name);
+    if(Name.empty() || Name == "." || Name == ".." || Name.find('/') != std::string::npos)
+    {
+        return false;
+    }
+
+    try
+    {
+        fs::path Game_Folder = Resolve_Resource_Path("Appeal/Games/" + Name);
+        fs::path Levels_Folder = Game_Folder / "Levels";
+        fs::path Game_Script = Game_Folder / (Name + ".Appeal");
+
+        if(fs::exists(Game_Folder) && !fs::is_directory(Game_Folder))
+        {
+            return false;
+        }
+
+        fs::create_directories(Levels_Folder);
+
+        if(!fs::exists(Game_Script))
+        {
+            std::ofstream Output(Game_Script, std::ios::binary | std::ios::trunc);
+            if(!Output)
+            {
+                return false;
+            }
+            Output << "Return\n";
+        }
+
+        GUI_Text_Values["Level_Game_Name"] = Name;
+        GUI_Text_Changed_Values["Level_Game_Name"] = true;
+        Select_File_Picker_Path(Picker_Name, "Appeal/Games/" + Name);
+        Run_GUI_Digital_Function(Picker_Name);
+        return true;
+    }
+    catch(const std::exception &)
+    {
+        return false;
+    }
+}
+
+bool Create_Level_Project_From_GUI(const std::string &Game_Name, const std::string &Level_Name, const std::string &Picker_Name)
+{
+    std::string Game = Normalize_GUI_Path(Game_Name);
+    std::string Level = Normalize_GUI_Path(Level_Name);
+    if(Game.empty())
+    {
+        Game = Normalize_GUI_Path(GUI_File_Pickers["Game_File_Picker"].Selected_Relative);
+    }
+    if(Game.size() > 7 && Game.substr(Game.size() - 7) == ".Appeal")
+    {
+        Game = Game.substr(0, Game.size() - 7);
+    }
+    if(Game.empty() || Game == "." || Game == ".." || Game.find('/') != std::string::npos)
+    {
+        return false;
+    }
+    if(Level.empty() || Level == "." || Level == ".." || Level.find('/') != std::string::npos)
+    {
+        return false;
+    }
+
+    try
+    {
+        fs::path Level_Folder = Resolve_Resource_Path("Appeal/Games/" + Game + "/Levels/" + Level);
+        fs::path Level_Script = Level_Folder / (Level + ".Appeal");
+
+        if(fs::exists(Level_Folder) && !fs::is_directory(Level_Folder))
+        {
+            return false;
+        }
+
+        fs::create_directories(Level_Folder);
+
+        if(!fs::exists(Level_Script))
+        {
+            std::ofstream Output(Level_Script, std::ios::binary | std::ios::trunc);
+            if(!Output)
+            {
+                return false;
+            }
+            Output << "Return\n";
+        }
+
+        GUI_File_Picker_State &State = GUI_File_Pickers[Picker_Name];
+        Ensure_File_Picker_State(State, "Resources", "Appeal/Games/" + Game + "/Levels");
+        Select_File_Picker_Path(Picker_Name, "Appeal/Games/" + Game + "/Levels/" + Level);
+        return true;
+    }
+    catch(const std::exception &)
+    {
+        return false;
+    }
+}
+
+void Draw_File_Picker(const GUI_Command &Command)
+{
+    GUI_File_Picker_State &State = GUI_File_Pickers[Command.Name];
+    Ensure_File_Picker_State(State, Command.Value_Text, Command.Extra_Text);
+
+    fs::path Root_Path = Picker_Root_Path(State);
+    fs::path Start_Path = Picker_Start_Path(State);
+    fs::path Current_Path = Picker_Current_Path(State);
+    if(!Path_Is_Inside(Root_Path, Current_Path))
+    {
+        Set_File_Picker_Current(State, Root_Path);
+        Current_Path = Picker_Current_Path(State);
+    }
+
+    ImGui::TextUnformatted(Command.Text.c_str());
+    ImGui::Text("Current: %s", State.Current.c_str());
+
+    if(ImGui::SmallButton("Root"))
+    {
+        Set_File_Picker_Current(State, Root_Path);
+        Current_Path = Picker_Current_Path(State);
+        Run_GUI_Digital_Function(Command.Name);
+    }
+    ImGui::SameLine();
+    if(ImGui::SmallButton("Start"))
+    {
+        Set_File_Picker_Current(State, Start_Path);
+        Current_Path = Picker_Current_Path(State);
+        Run_GUI_Digital_Function(Command.Name);
+    }
+    ImGui::SameLine();
+    bool Can_Go_Back = Canonical_Or_Absolute(Current_Path) != Canonical_Or_Absolute(Root_Path);
+    ImGui::BeginDisabled(!Can_Go_Back);
+    if(ImGui::SmallButton("Back"))
+    {
+        Set_File_Picker_Current(State, Current_Path.parent_path());
+        Current_Path = Picker_Current_Path(State);
+        Run_GUI_Digital_Function(Command.Name);
+    }
+    ImGui::EndDisabled();
+    ImGui::SameLine();
+    ImGui::Text("Selected: %s", State.Selected.empty() ? "(none)" : State.Selected.c_str());
+
+    struct Entry
+    {
+        std::string Display;
+        fs::path Path;
+        bool Directory = false;
+    };
+
+    std::vector<Entry> Entries;
+    try
+    {
+        for(const fs::directory_entry &Item : fs::directory_iterator(Current_Path))
+        {
+            Entry New_Entry;
+            New_Entry.Directory = Item.is_directory();
+            New_Entry.Display = Item.path().filename().generic_string();
+            if(New_Entry.Directory)
+            {
+                New_Entry.Display += "/";
+            }
+            New_Entry.Path = Item.path();
+            Entries.push_back(New_Entry);
+        }
+    }
+    catch(const std::exception &)
+    {
+        ImGui::TextUnformatted("Unable to read this folder.");
+    }
+
+    std::sort(Entries.begin(), Entries.end(), [](const Entry &Left, const Entry &Right)
+    {
+        if(Left.Directory != Right.Directory)
+        {
+            return Left.Directory && !Right.Directory;
+        }
+        return Left.Display < Right.Display;
+    });
+
+    ImVec2 List_Size(-1.0f, std::max(180.0f, ImGui::GetContentRegionAvail().y - 40.0f));
+    if(ImGui::BeginListBox(("##" + Command.Name + "_Files").c_str(), List_Size))
+    {
+        if(Can_Go_Back)
+        {
+            if(ImGui::Selectable("..", false))
+            {
+                Set_File_Picker_Current(State, Current_Path.parent_path());
+                Run_GUI_Digital_Function(Command.Name);
+            }
+        }
+
+        for(size_t Index = 0; Index < Entries.size(); ++Index)
+        {
+            const Entry &Item = Entries[Index];
+            bool Selected = State.Selected_Index == static_cast<int>(Index);
+            if(ImGui::Selectable(Item.Display.c_str(), Selected))
+            {
+                Select_File_Picker_Item(State, Item.Path, Item.Display, static_cast<int>(Index));
+                Run_GUI_Digital_Function(Command.Name);
+            }
+            if(Selected)
+            {
+                ImGui::SetItemDefaultFocus();
+            }
+            if(Item.Directory && ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
+            {
+                Set_File_Picker_Current(State, Item.Path);
+                Run_GUI_Digital_Function(Command.Name);
+            }
+        }
+        ImGui::EndListBox();
+    }
+}
+
+void Run_GUI_Function(const std::string &Name, int Value)
+{
+    if(Run_Analog_Function_Callback != nullptr && GUI_Functions[Name] != "")
+    {
+        Run_Analog_Function_Callback(GUI_Functions[Name], Value);
+    }
+}
+
+void Run_GUI_Digital_Function(const std::string &Name)
+{
+    if(Run_Function_Callback != nullptr && GUI_Functions[Name] != "")
+    {
+        Run_Function_Callback(GUI_Functions[Name]);
+    }
+}
+
 void Draw_GUI(Window_State &Window)
 {
     if(!Ensure_ImGui(Window)) return;
 
     bool In_Window = false;
+    std::vector<bool> Tree_Stack;
+    std::vector<bool> Tab_Bar_Stack;
+    std::vector<bool> Tab_Item_Stack;
+    std::vector<bool> Menu_Bar_Stack;
+    std::vector<bool> Menu_Stack;
+    auto Context_Open = [&]()
+    {
+        for(bool Open : Tab_Item_Stack)
+        {
+            if(!Open)
+            {
+                return false;
+            }
+        }
+        return true;
+    };
+
     for(const GUI_Command &Command : GUI_Commands)
     {
         if(Command.Kind == "Begin")
@@ -976,22 +1535,137 @@ void Draw_GUI(Window_State &Window)
             ImGui::Begin(Command.Name.c_str());
             In_Window = true;
         }
+        else if(Command.Kind == "Begin_Fullscreen")
+        {
+            if(In_Window)
+            {
+                ImGui::End();
+            }
+            ImGuiViewport *Viewport = ImGui::GetMainViewport();
+            ImGui::SetNextWindowPos(Viewport->WorkPos, ImGuiCond_Always);
+            ImGui::SetNextWindowSize(Viewport->WorkSize, ImGuiCond_Always);
+            ImGui::SetNextWindowViewport(Viewport->ID);
+            ImGuiWindowFlags Flags = ImGuiWindowFlags_NoCollapse
+                                   | ImGuiWindowFlags_NoMove
+                                   | ImGuiWindowFlags_NoResize
+                                   | ImGuiWindowFlags_NoBringToFrontOnFocus;
+            ImGui::Begin(Command.Name.c_str(), nullptr, Flags);
+            In_Window = true;
+        }
+        else if(Command.Kind == "End_Window")
+        {
+            if(In_Window)
+            {
+                ImGui::End();
+                In_Window = false;
+            }
+        }
+        else if(Command.Kind == "Tab_Bar_Begin")
+        {
+            Ensure_GUI_Window(In_Window);
+            Tab_Bar_Stack.push_back(ImGui::BeginTabBar(Command.Name.c_str()));
+        }
+        else if(Command.Kind == "Tab_Bar_End")
+        {
+            Ensure_GUI_Window(In_Window);
+            if(!Tab_Bar_Stack.empty())
+            {
+                if(Tab_Bar_Stack.back())
+                {
+                    ImGui::EndTabBar();
+                }
+                Tab_Bar_Stack.pop_back();
+            }
+        }
+        else if(Command.Kind == "Tab_Item_Begin")
+        {
+            Ensure_GUI_Window(In_Window);
+            bool Parent_Open = Tab_Bar_Stack.empty() ? true : Tab_Bar_Stack.back();
+            Tab_Item_Stack.push_back(Parent_Open && ImGui::BeginTabItem(Command.Text.c_str()));
+        }
+        else if(Command.Kind == "Tab_Item_End")
+        {
+            Ensure_GUI_Window(In_Window);
+            if(!Tab_Item_Stack.empty())
+            {
+                if(Tab_Item_Stack.back())
+                {
+                    ImGui::EndTabItem();
+                }
+                Tab_Item_Stack.pop_back();
+            }
+        }
+        else if(!Context_Open())
+        {
+            continue;
+        }
         else if(Command.Kind == "Text")
         {
-            if(!In_Window)
-            {
-                ImGui::Begin("Appeal");
-                In_Window = true;
-            }
+            Ensure_GUI_Window(In_Window);
             ImGui::TextUnformatted(Command.Text.c_str());
+        }
+        else if(Command.Kind == "Bullet_Text")
+        {
+            Ensure_GUI_Window(In_Window);
+            ImGui::BulletText("%s", Command.Text.c_str());
+        }
+        else if(Command.Kind == "Label_Text")
+        {
+            Ensure_GUI_Window(In_Window);
+            ImGui::LabelText(Command.Name.c_str(), "%s", Command.Text.c_str());
+        }
+        else if(Command.Kind == "Separator")
+        {
+            Ensure_GUI_Window(In_Window);
+            ImGui::Separator();
+        }
+        else if(Command.Kind == "Separator_Text")
+        {
+            Ensure_GUI_Window(In_Window);
+            ImGui::SeparatorText(Command.Text.c_str());
+        }
+        else if(Command.Kind == "Same_Line")
+        {
+            Ensure_GUI_Window(In_Window);
+            ImGui::SameLine();
+        }
+        else if(Command.Kind == "New_Line")
+        {
+            Ensure_GUI_Window(In_Window);
+            ImGui::NewLine();
+        }
+        else if(Command.Kind == "Spacing")
+        {
+            Ensure_GUI_Window(In_Window);
+            ImGui::Spacing();
+        }
+        else if(Command.Kind == "Indent")
+        {
+            Ensure_GUI_Window(In_Window);
+            ImGui::Indent(static_cast<float>(Command.Value));
+        }
+        else if(Command.Kind == "Unindent")
+        {
+            Ensure_GUI_Window(In_Window);
+            ImGui::Unindent(static_cast<float>(Command.Value));
+        }
+        else if(Command.Kind == "Group_Begin")
+        {
+            Ensure_GUI_Window(In_Window);
+            if(Command.Text != "")
+            {
+                ImGui::SeparatorText(Command.Text.c_str());
+            }
+            ImGui::BeginGroup();
+        }
+        else if(Command.Kind == "Group_End")
+        {
+            Ensure_GUI_Window(In_Window);
+            ImGui::EndGroup();
         }
         else if(Command.Kind == "Button")
         {
-            if(!In_Window)
-            {
-                ImGui::Begin("Appeal");
-                In_Window = true;
-            }
+            Ensure_GUI_Window(In_Window);
             if(ImGui::Button(Command.Text.c_str(), ImVec2(180.0f, 0.0f)))
             {
                 GUI_Clicked[Command.Name] = true;
@@ -999,15 +1673,39 @@ void Draw_GUI(Window_State &Window)
                 {
                     Run_Function_Callback(GUI_Button_Functions[Command.Name]);
                 }
+                Run_GUI_Digital_Function(Command.Name);
+            }
+        }
+        else if(Command.Kind == "New_Game_Project_Button")
+        {
+            Ensure_GUI_Window(In_Window);
+            if(ImGui::Button(Command.Text.c_str(), ImVec2(180.0f, 0.0f)))
+            {
+                GUI_Clicked[Command.Name] = true;
+                Create_Game_Project_From_GUI(GUI_Text_Values[Command.Value_Text], Command.Extra_Text);
+            }
+        }
+        else if(Command.Kind == "New_Level_Project_Button")
+        {
+            Ensure_GUI_Window(In_Window);
+            if(ImGui::Button(Command.Text.c_str(), ImVec2(180.0f, 0.0f)))
+            {
+                GUI_Clicked[Command.Name] = true;
+                Create_Level_Project_From_GUI(GUI_Text_Values[Command.Value_Text], GUI_Text_Values[Command.Extra_Text], Command.Tooltip_Text);
+            }
+        }
+        else if(Command.Kind == "Small_Button")
+        {
+            Ensure_GUI_Window(In_Window);
+            if(ImGui::SmallButton(Command.Text.c_str()))
+            {
+                GUI_Clicked[Command.Name] = true;
+                Run_GUI_Digital_Function(Command.Name);
             }
         }
         else if(Command.Kind == "Slider_Int")
         {
-            if(!In_Window)
-            {
-                ImGui::Begin("Appeal");
-                In_Window = true;
-            }
+            Ensure_GUI_Window(In_Window);
             int Value = GUI_Slider_Values[Command.Name];
             if(ImGui::SliderInt(Command.Text.c_str(), &Value, Command.Min, Command.Max))
             {
@@ -1017,15 +1715,95 @@ void Draw_GUI(Window_State &Window)
                 {
                     Run_Analog_Function_Callback(GUI_Slider_Functions[Command.Name], Value);
                 }
+                Run_GUI_Function(Command.Name, Value);
+            }
+        }
+        else if(Command.Kind == "Slider_Float")
+        {
+            Ensure_GUI_Window(In_Window);
+            float Value = GUI_Float_Values[Command.Name];
+            if(ImGui::SliderFloat(Command.Text.c_str(), &Value, Command.Float_Min, Command.Float_Max))
+            {
+                GUI_Float_Values[Command.Name] = Value;
+                GUI_Float_Changed_Values[Command.Name] = true;
+                Run_GUI_Function(Command.Name, static_cast<int>(Value * 1000.0f));
+            }
+        }
+        else if(Command.Kind == "Drag_Int")
+        {
+            Ensure_GUI_Window(In_Window);
+            int Value = GUI_Int_Values[Command.Name];
+            if(ImGui::DragInt(Command.Text.c_str(), &Value, static_cast<float>(Command.Value), Command.Min, Command.Max))
+            {
+                GUI_Int_Values[Command.Name] = Value;
+                GUI_Int_Changed_Values[Command.Name] = true;
+                Run_GUI_Function(Command.Name, Value);
+            }
+        }
+        else if(Command.Kind == "Drag_Float")
+        {
+            Ensure_GUI_Window(In_Window);
+            float Value = GUI_Float_Values[Command.Name];
+            if(ImGui::DragFloat(Command.Text.c_str(), &Value, Command.Float_Step, Command.Float_Min, Command.Float_Max))
+            {
+                GUI_Float_Values[Command.Name] = Value;
+                GUI_Float_Changed_Values[Command.Name] = true;
+                Run_GUI_Function(Command.Name, static_cast<int>(Value * 1000.0f));
+            }
+        }
+        else if(Command.Kind == "Input_Text")
+        {
+            Ensure_GUI_Window(In_Window);
+            char Buffer[256] = {};
+            std::string Existing = GUI_Text_Values[Command.Name];
+            std::snprintf(Buffer, sizeof(Buffer), "%s", Existing.c_str());
+            if(ImGui::InputText(Command.Text.c_str(), Buffer, sizeof(Buffer)))
+            {
+                GUI_Text_Values[Command.Name] = Buffer;
+                GUI_Text_Changed_Values[Command.Name] = true;
+                Run_GUI_Digital_Function(Command.Name);
+            }
+        }
+        else if(Command.Kind == "Input_Text_Multiline")
+        {
+            Ensure_GUI_Window(In_Window);
+            std::string Existing = GUI_Text_Values[Command.Name];
+            size_t Buffer_Size = std::max<size_t>(65536, Existing.size() + 4096);
+            std::vector<char> Buffer(Buffer_Size, '\0');
+            std::snprintf(Buffer.data(), Buffer.size(), "%s", Existing.c_str());
+            ImVec2 Size(static_cast<float>(Command.Min), static_cast<float>(Command.Max));
+            if(ImGui::InputTextMultiline(Command.Text.c_str(), Buffer.data(), Buffer.size(), Size))
+            {
+                GUI_Text_Values[Command.Name] = Buffer.data();
+                GUI_Text_Changed_Values[Command.Name] = true;
+                Run_GUI_Digital_Function(Command.Name);
+            }
+        }
+        else if(Command.Kind == "Input_Int")
+        {
+            Ensure_GUI_Window(In_Window);
+            int Value = GUI_Int_Values[Command.Name];
+            if(ImGui::InputInt(Command.Text.c_str(), &Value))
+            {
+                GUI_Int_Values[Command.Name] = Value;
+                GUI_Int_Changed_Values[Command.Name] = true;
+                Run_GUI_Function(Command.Name, Value);
+            }
+        }
+        else if(Command.Kind == "Input_Float")
+        {
+            Ensure_GUI_Window(In_Window);
+            float Value = GUI_Float_Values[Command.Name];
+            if(ImGui::InputFloat(Command.Text.c_str(), &Value))
+            {
+                GUI_Float_Values[Command.Name] = Value;
+                GUI_Float_Changed_Values[Command.Name] = true;
+                Run_GUI_Function(Command.Name, static_cast<int>(Value * 1000.0f));
             }
         }
         else if(Command.Kind == "Checkbox")
         {
-            if(!In_Window)
-            {
-                ImGui::Begin("Appeal");
-                In_Window = true;
-            }
+            Ensure_GUI_Window(In_Window);
             bool Value = GUI_Checkbox_Values[Command.Name];
             if(ImGui::Checkbox(Command.Text.c_str(), &Value))
             {
@@ -1035,8 +1813,231 @@ void Draw_GUI(Window_State &Window)
                 {
                     Run_Analog_Function_Callback(GUI_Checkbox_Functions[Command.Name], Value ? 1 : 0);
                 }
+                Run_GUI_Function(Command.Name, Value ? 1 : 0);
             }
         }
+        else if(Command.Kind == "Radio_Button")
+        {
+            Ensure_GUI_Window(In_Window);
+            int Value = GUI_Selection_Values[Command.Name];
+            if(ImGui::RadioButton(Command.Text.c_str(), &Value, Command.Value))
+            {
+                GUI_Selection_Values[Command.Name] = Value;
+                GUI_Selection_Changed_Values[Command.Name] = true;
+                Run_GUI_Function(Command.Name, Value);
+            }
+        }
+        else if(Command.Kind == "Combo")
+        {
+            Ensure_GUI_Window(In_Window);
+            std::vector<std::string> Items = Split_GUI_Items(Command.Value_Text);
+            int Value = GUI_Selection_Values[Command.Name];
+            if(Value >= 0 && static_cast<size_t>(Value) < Items.size())
+            {
+                GUI_Selection_Text_Values[Command.Name] = Items[Value];
+            }
+            const char *Preview = (Value >= 0 && static_cast<size_t>(Value) < Items.size()) ? Items[Value].c_str() : "";
+            if(ImGui::BeginCombo(Command.Text.c_str(), Preview))
+            {
+                for(size_t Index = 0; Index < Items.size(); ++Index)
+                {
+                    bool Selected = Value == static_cast<int>(Index);
+                    if(ImGui::Selectable(Items[Index].c_str(), Selected))
+                    {
+                        Value = static_cast<int>(Index);
+                        GUI_Selection_Values[Command.Name] = Value;
+                        GUI_Selection_Text_Values[Command.Name] = Items[Index];
+                        GUI_Selection_Changed_Values[Command.Name] = true;
+                        Run_GUI_Function(Command.Name, Value);
+                    }
+                    if(Selected)
+                    {
+                        ImGui::SetItemDefaultFocus();
+                    }
+                }
+                ImGui::EndCombo();
+            }
+        }
+        else if(Command.Kind == "List_Box")
+        {
+            Ensure_GUI_Window(In_Window);
+            std::vector<std::string> Items = Split_GUI_Items(Command.Value_Text);
+            int Value = GUI_Selection_Values[Command.Name];
+            if(Value >= 0 && static_cast<size_t>(Value) < Items.size())
+            {
+                GUI_Selection_Text_Values[Command.Name] = Items[Value];
+            }
+            if(ImGui::BeginListBox(Command.Text.c_str()))
+            {
+                for(size_t Index = 0; Index < Items.size(); ++Index)
+                {
+                    bool Selected = Value == static_cast<int>(Index);
+                    if(ImGui::Selectable(Items[Index].c_str(), Selected))
+                    {
+                        Value = static_cast<int>(Index);
+                        GUI_Selection_Values[Command.Name] = Value;
+                        GUI_Selection_Text_Values[Command.Name] = Items[Index];
+                        GUI_Selection_Changed_Values[Command.Name] = true;
+                        Run_GUI_Function(Command.Name, Value);
+                    }
+                }
+                ImGui::EndListBox();
+            }
+        }
+        else if(Command.Kind == "File_Picker")
+        {
+            Ensure_GUI_Window(In_Window);
+            Draw_File_Picker(Command);
+        }
+        else if(Command.Kind == "Selectable")
+        {
+            Ensure_GUI_Window(In_Window);
+            bool Selected = GUI_Checkbox_Values[Command.Name];
+            if(ImGui::Selectable(Command.Text.c_str(), Selected))
+            {
+                GUI_Checkbox_Values[Command.Name] = !Selected;
+                GUI_Checkbox_Changed_Values[Command.Name] = true;
+                Run_GUI_Function(Command.Name, GUI_Checkbox_Values[Command.Name] ? 1 : 0);
+            }
+        }
+        else if(Command.Kind == "Progress_Bar")
+        {
+            Ensure_GUI_Window(In_Window);
+            float Fraction = std::clamp(Command.Float_Value, 0.0f, 1.0f);
+            ImGui::ProgressBar(Fraction, ImVec2(-1.0f, 0.0f), Command.Text.empty() ? nullptr : Command.Text.c_str());
+        }
+        else if(Command.Kind == "Tooltip")
+        {
+            Ensure_GUI_Window(In_Window);
+            if(ImGui::IsItemHovered())
+            {
+                ImGui::SetTooltip("%s", Command.Text.c_str());
+            }
+        }
+        else if(Command.Kind == "Tree_Node")
+        {
+            Ensure_GUI_Window(In_Window);
+            bool Open = ImGui::TreeNode(Command.Text.c_str());
+            Tree_Stack.push_back(Open);
+        }
+        else if(Command.Kind == "Tree_End")
+        {
+            Ensure_GUI_Window(In_Window);
+            if(!Tree_Stack.empty())
+            {
+                if(Tree_Stack.back())
+                {
+                    ImGui::TreePop();
+                }
+                Tree_Stack.pop_back();
+            }
+        }
+        else if(Command.Kind == "Tab_Bar_Begin")
+        {
+            Ensure_GUI_Window(In_Window);
+            Tab_Bar_Stack.push_back(ImGui::BeginTabBar(Command.Name.c_str()));
+        }
+        else if(Command.Kind == "Tab_Bar_End")
+        {
+            Ensure_GUI_Window(In_Window);
+            if(!Tab_Bar_Stack.empty())
+            {
+                if(Tab_Bar_Stack.back())
+                {
+                    ImGui::EndTabBar();
+                }
+                Tab_Bar_Stack.pop_back();
+            }
+        }
+        else if(Command.Kind == "Tab_Item_Begin")
+        {
+            Ensure_GUI_Window(In_Window);
+            bool Parent_Open = Tab_Bar_Stack.empty() ? true : Tab_Bar_Stack.back();
+            Tab_Item_Stack.push_back(Parent_Open && ImGui::BeginTabItem(Command.Text.c_str()));
+        }
+        else if(Command.Kind == "Tab_Item_End")
+        {
+            Ensure_GUI_Window(In_Window);
+            if(!Tab_Item_Stack.empty())
+            {
+                if(Tab_Item_Stack.back())
+                {
+                    ImGui::EndTabItem();
+                }
+                Tab_Item_Stack.pop_back();
+            }
+        }
+        else if(Command.Kind == "Menu_Bar_Begin")
+        {
+            Ensure_GUI_Window(In_Window);
+            Menu_Bar_Stack.push_back(ImGui::BeginMenuBar());
+        }
+        else if(Command.Kind == "Menu_Bar_End")
+        {
+            Ensure_GUI_Window(In_Window);
+            if(!Menu_Bar_Stack.empty())
+            {
+                if(Menu_Bar_Stack.back())
+                {
+                    ImGui::EndMenuBar();
+                }
+                Menu_Bar_Stack.pop_back();
+            }
+        }
+        else if(Command.Kind == "Menu_Begin")
+        {
+            Ensure_GUI_Window(In_Window);
+            bool Parent_Open = Menu_Bar_Stack.empty() ? true : Menu_Bar_Stack.back();
+            Menu_Stack.push_back(Parent_Open && ImGui::BeginMenu(Command.Text.c_str()));
+        }
+        else if(Command.Kind == "Menu_End")
+        {
+            Ensure_GUI_Window(In_Window);
+            if(!Menu_Stack.empty())
+            {
+                if(Menu_Stack.back())
+                {
+                    ImGui::EndMenu();
+                }
+                Menu_Stack.pop_back();
+            }
+        }
+        else if(Command.Kind == "Menu_Item")
+        {
+            Ensure_GUI_Window(In_Window);
+            bool Parent_Open = Menu_Stack.empty() ? true : Menu_Stack.back();
+            if(Parent_Open && ImGui::MenuItem(Command.Text.c_str()))
+            {
+                GUI_Clicked[Command.Name] = true;
+                Run_GUI_Digital_Function(Command.Name);
+            }
+        }
+    }
+
+    while(!Tab_Item_Stack.empty())
+    {
+        if(Tab_Item_Stack.back()) ImGui::EndTabItem();
+        Tab_Item_Stack.pop_back();
+    }
+    while(!Tab_Bar_Stack.empty())
+    {
+        if(Tab_Bar_Stack.back()) ImGui::EndTabBar();
+        Tab_Bar_Stack.pop_back();
+    }
+    while(!Menu_Stack.empty())
+    {
+        if(Menu_Stack.back()) ImGui::EndMenu();
+        Menu_Stack.pop_back();
+    }
+    while(!Menu_Bar_Stack.empty())
+    {
+        if(Menu_Bar_Stack.back()) ImGui::EndMenuBar();
+        Menu_Bar_Stack.pop_back();
+    }
+    while(!Tree_Stack.empty())
+    {
+        if(Tree_Stack.back()) ImGui::TreePop();
+        Tree_Stack.pop_back();
     }
 
     if(In_Window)
@@ -1163,6 +2164,8 @@ extern "C" void Constructor()
 
 extern "C" void Destructor()
 {
+    Make_Current_GL_Context();
+
     if(ImGui_Ready)
     {
         ImGui_ImplOpenGL2_Shutdown();
@@ -1171,31 +2174,7 @@ extern "C" void Destructor()
         ImGui_Ready = false;
     }
 
-    for(auto &Item : Windows)
-    {
-        Destroy_Window(Item.second);
-    }
-
-    Windows.clear();
-
-    for(auto &Item : Textures)
-    {
-        Destroy_Texture(Item.second);
-    }
-    Textures.clear();
-
-    for(auto &Mesh_Item : Meshes)
-    {
-        for(Mesh_Material &Material : Mesh_Item.second.Materials)
-        {
-            if(Material.Texture_ID != 0)
-            {
-                glDeleteTextures(1, &Material.Texture_ID);
-                Material.Texture_ID = 0;
-            }
-        }
-    }
-    Meshes.clear();
+    Destroy_GL_Resources();
 
     for(auto &Item : Fonts)
     {
@@ -1205,6 +2184,13 @@ extern "C" void Destructor()
 
     Text_Commands.clear();
     GUI_Commands.clear();
+
+    for(auto &Item : Windows)
+    {
+        Destroy_Window(Item.second);
+    }
+
+    Windows.clear();
 
     if(SDL_Ready)
     {
@@ -1227,6 +2213,7 @@ extern "C" void Set_Paths(std::string Path_of_Resources)
 {
     Resources = Path_of_Resources;
     Graphics_Path = Resources + "/Graphics/";
+    Icon_Path = Graphics_Path + "Icons/";
     Texture_Path = Graphics_Path + "Textures/";
     Font_Path = Graphics_Path + "Fonts/";
     Shader_Path = Graphics_Path + "Shaders/";
@@ -1307,6 +2294,19 @@ extern "C" void Add_Full_Screen_Window(std::string Name, int Monitor)
     if(State != nullptr)
     {
         SDL_SetWindowFullscreen(State->Window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+        int Drawable_W = 0;
+        int Drawable_H = 0;
+        SDL_GL_GetDrawableSize(State->Window, &Drawable_W, &Drawable_H);
+        if(Drawable_W > 0 && Drawable_H > 0)
+        {
+            State->Width = Drawable_W;
+            State->Height = Drawable_H;
+            State->View_X = 0;
+            State->View_Y = 0;
+            State->View_W = Drawable_W;
+            State->View_H = Drawable_H;
+            State->Custom_Viewport = false;
+        }
     }
 }
 
@@ -1317,10 +2317,23 @@ extern "C" void Delete_Window(std::string Name)
 
     if(Windows.size() == 1 && ImGui_Ready)
     {
+        if(It->second.Window != nullptr && It->second.GL_Context != nullptr)
+        {
+            SDL_GL_MakeCurrent(It->second.Window, It->second.GL_Context);
+        }
         ImGui_ImplOpenGL2_Shutdown();
         ImGui_ImplSDL2_Shutdown();
         ImGui::DestroyContext();
         ImGui_Ready = false;
+    }
+
+    if(Windows.size() == 1)
+    {
+        if(It->second.Window != nullptr && It->second.GL_Context != nullptr)
+        {
+            SDL_GL_MakeCurrent(It->second.Window, It->second.GL_Context);
+        }
+        Destroy_GL_Resources();
     }
 
     Destroy_Window(It->second);
@@ -1385,6 +2398,66 @@ extern "C" void Set_FPS(int Frames)
     if(Frames > 0) Target_FPS = Frames;
 }
 
+extern "C" void Set_Window_Icon(std::string Name, std::string File)
+{
+    if(!Ensure_SDL()) return;
+
+    Window_State *State = Find_Window(Name);
+    if(State == nullptr || State->Window == nullptr)
+    {
+        if(DEBUG) std::cout << "Window not found for icon: " << Name << std::endl;
+        return;
+    }
+
+    std::string Full_File = Icon_Path + File;
+
+#ifdef __MINGW32__
+    SDL_SysWMinfo Window_Info;
+    SDL_VERSION(&Window_Info.version);
+    if(SDL_GetWindowWMInfo(State->Window, &Window_Info) == SDL_TRUE)
+    {
+        HICON Big_Icon = static_cast<HICON>(LoadImageA(nullptr, Full_File.c_str(), IMAGE_ICON, 32, 32, LR_LOADFROMFILE));
+        HICON Small_Icon = static_cast<HICON>(LoadImageA(nullptr, Full_File.c_str(), IMAGE_ICON, 16, 16, LR_LOADFROMFILE));
+        if(Big_Icon != nullptr || Small_Icon != nullptr)
+        {
+            if(State->Big_Icon != nullptr) DestroyIcon(State->Big_Icon);
+            if(State->Small_Icon != nullptr) DestroyIcon(State->Small_Icon);
+
+            State->Big_Icon = Big_Icon;
+            State->Small_Icon = Small_Icon;
+
+            HWND Window_Handle = Window_Info.info.win.window;
+            if(State->Big_Icon != nullptr)
+            {
+                SendMessageA(Window_Handle, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(State->Big_Icon));
+            }
+            if(State->Small_Icon != nullptr)
+            {
+                SendMessageA(Window_Handle, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(State->Small_Icon));
+            }
+            return;
+        }
+    }
+#endif
+
+    SDL_Surface *Icon = IMG_Load(Full_File.c_str());
+    if(Icon == nullptr)
+    {
+        Icon = SDL_LoadBMP(Full_File.c_str());
+    }
+
+    if(Icon == nullptr)
+    {
+        if(DEBUG) std::cout << "Window icon did not load: " << Full_File << std::endl
+                  << "SDL_image Error: " << IMG_GetError() << std::endl
+                  << "SDL Error: " << SDL_GetError() << std::endl;
+        return;
+    }
+
+    SDL_SetWindowIcon(State->Window, Icon);
+    SDL_FreeSurface(Icon);
+}
+
 extern "C" void Set_View_Port(std::string Window, int X, int Y, int W, int H)
 {
     Window_State *State = Find_Window(Window);
@@ -1394,6 +2467,7 @@ extern "C" void Set_View_Port(std::string Window, int X, int Y, int W, int H)
     State->View_Y = Y;
     State->View_W = W;
     State->View_H = H;
+    State->Custom_Viewport = true;
 }
 
 extern "C" void Set_Perspective(std::string Window, float Fovy, float Near, float Far)
@@ -1530,6 +2604,30 @@ extern "C" void Load_Asset(std::string Name, std::string File)
     }
 }
 
+extern "C" void Free_Texture(std::string Name)
+{
+    auto It = Textures.find(Name);
+    if(It == Textures.end())
+    {
+        return;
+    }
+
+    if(Make_Current_GL_Context())
+    {
+        Destroy_Texture(It->second);
+    }
+    Textures.erase(It);
+}
+
+extern "C" void Free_Asset(std::string Name)
+{
+    Assets.erase(Name);
+    if(Active_Asset == Name)
+    {
+        Active_Asset = "";
+    }
+}
+
 extern "C" void Set_Texture(std::string Name, std::string Texture)
 {
     Assets[Name].Texture = Texture;
@@ -1615,14 +2713,114 @@ extern "C" void GUI_Begin(std::string Name)
     GUI_Commands.push_back({"Begin", Name, Name});
 }
 
+extern "C" void GUI_Begin_Fullscreen(std::string Name)
+{
+    GUI_Commands.clear();
+    GUI_Commands.push_back({"Begin_Fullscreen", Name, Name});
+}
+
+extern "C" void GUI_End_Window()
+{
+    GUI_Commands.push_back({"End_Window"});
+}
+
 extern "C" void GUI_Text(std::string Name, std::string Text)
 {
     GUI_Commands.push_back({"Text", Name, Text});
 }
 
+extern "C" void GUI_Label_Text(std::string Name, std::string Text)
+{
+    GUI_Commands.push_back({"Label_Text", Name, Text});
+}
+
+extern "C" void GUI_Bullet_Text(std::string Name, std::string Text)
+{
+    GUI_Commands.push_back({"Bullet_Text", Name, Text});
+}
+
+extern "C" void GUI_Separator()
+{
+    GUI_Commands.push_back({"Separator"});
+}
+
+extern "C" void GUI_Separator_Text(std::string Text)
+{
+    GUI_Commands.push_back({"Separator_Text", "", Text});
+}
+
+extern "C" void GUI_Same_Line()
+{
+    GUI_Commands.push_back({"Same_Line"});
+}
+
+extern "C" void GUI_New_Line()
+{
+    GUI_Commands.push_back({"New_Line"});
+}
+
+extern "C" void GUI_Spacing()
+{
+    GUI_Commands.push_back({"Spacing"});
+}
+
+extern "C" void GUI_Indent(int Pixels)
+{
+    GUI_Command Command;
+    Command.Kind = "Indent";
+    Command.Value = Pixels;
+    GUI_Commands.push_back(Command);
+}
+
+extern "C" void GUI_Unindent(int Pixels)
+{
+    GUI_Command Command;
+    Command.Kind = "Unindent";
+    Command.Value = Pixels;
+    GUI_Commands.push_back(Command);
+}
+
+extern "C" void GUI_Group_Begin(std::string Name)
+{
+    GUI_Commands.push_back({"Group_Begin", Name, Name});
+}
+
+extern "C" void GUI_Group_End()
+{
+    GUI_Commands.push_back({"Group_End"});
+}
+
 extern "C" void GUI_Button(std::string Name, std::string Text)
 {
     GUI_Commands.push_back({"Button", Name, Text});
+}
+
+extern "C" void GUI_New_Game_Project_Button(std::string Name, std::string Text, std::string Name_Input, std::string Picker)
+{
+    GUI_Command Command;
+    Command.Kind = "New_Game_Project_Button";
+    Command.Name = Name;
+    Command.Text = Text;
+    Command.Value_Text = Name_Input;
+    Command.Extra_Text = Picker;
+    GUI_Commands.push_back(Command);
+}
+
+extern "C" void GUI_New_Level_Project_Button(std::string Name, std::string Text, std::string Game_Input, std::string Level_Input, std::string Picker)
+{
+    GUI_Command Command;
+    Command.Kind = "New_Level_Project_Button";
+    Command.Name = Name;
+    Command.Text = Text;
+    Command.Value_Text = Game_Input;
+    Command.Extra_Text = Level_Input;
+    Command.Tooltip_Text = Picker;
+    GUI_Commands.push_back(Command);
+}
+
+extern "C" void GUI_Small_Button(std::string Name, std::string Text)
+{
+    GUI_Commands.push_back({"Small_Button", Name, Text});
 }
 
 extern "C" void Set_GUI_Button_Function(std::string Name, std::string Function)
@@ -1636,7 +2834,148 @@ extern "C" void GUI_Slider_Int(std::string Name, std::string Text, int Value, in
     {
         GUI_Slider_Values[Name] = Value;
     }
-    GUI_Commands.push_back({"Slider_Int", Name, Text, Min, Max});
+    GUI_Command Command;
+    Command.Kind = "Slider_Int";
+    Command.Name = Name;
+    Command.Text = Text;
+    Command.Min = Min;
+    Command.Max = Max;
+    GUI_Commands.push_back(Command);
+}
+
+extern "C" void GUI_Slider_Float(std::string Name, std::string Text, float Value, float Min, float Max)
+{
+    if(GUI_Float_Values.find(Name) == GUI_Float_Values.end())
+    {
+        GUI_Float_Values[Name] = std::clamp(Value, Min, Max);
+    }
+
+    GUI_Command Command;
+    Command.Kind = "Slider_Float";
+    Command.Name = Name;
+    Command.Text = Text;
+    Command.Float_Min = Min;
+    Command.Float_Max = Max;
+    GUI_Commands.push_back(Command);
+}
+
+extern "C" float GUI_Float_Value(std::string Name)
+{
+    return GUI_Float_Values[Name];
+}
+
+extern "C" bool GUI_Float_Changed(std::string Name)
+{
+    bool Changed = GUI_Float_Changed_Values[Name];
+    GUI_Float_Changed_Values[Name] = false;
+    return Changed;
+}
+
+extern "C" void GUI_Drag_Int(std::string Name, std::string Text, int Value, int Min, int Max, int Speed)
+{
+    if(GUI_Int_Values.find(Name) == GUI_Int_Values.end())
+    {
+        GUI_Int_Values[Name] = std::clamp(Value, Min, Max);
+    }
+
+    GUI_Command Command;
+    Command.Kind = "Drag_Int";
+    Command.Name = Name;
+    Command.Text = Text;
+    Command.Value = Speed;
+    Command.Min = Min;
+    Command.Max = Max;
+    GUI_Commands.push_back(Command);
+}
+
+extern "C" void GUI_Drag_Float(std::string Name, std::string Text, float Value, float Min, float Max, float Speed)
+{
+    if(GUI_Float_Values.find(Name) == GUI_Float_Values.end())
+    {
+        GUI_Float_Values[Name] = std::clamp(Value, Min, Max);
+    }
+
+    GUI_Command Command;
+    Command.Kind = "Drag_Float";
+    Command.Name = Name;
+    Command.Text = Text;
+    Command.Float_Min = Min;
+    Command.Float_Max = Max;
+    Command.Float_Step = Speed;
+    GUI_Commands.push_back(Command);
+}
+
+extern "C" void GUI_Input_Text(std::string Name, std::string Text, std::string Value)
+{
+    if(GUI_Text_Values.find(Name) == GUI_Text_Values.end())
+    {
+        GUI_Text_Values[Name] = Value;
+    }
+    GUI_Commands.push_back({"Input_Text", Name, Text});
+}
+
+extern "C" void GUI_Input_Text_Multiline(std::string Name, std::string Text, std::string Value, int Width, int Height)
+{
+    if(GUI_Text_Values.find(Name) == GUI_Text_Values.end())
+    {
+        GUI_Text_Values[Name] = Value;
+    }
+
+    GUI_Command Command;
+    Command.Kind = "Input_Text_Multiline";
+    Command.Name = Name;
+    Command.Text = Text;
+    Command.Min = Width;
+    Command.Max = Height;
+    GUI_Commands.push_back(Command);
+}
+
+extern "C" void GUI_Set_Text_Value(std::string Name, std::string Value)
+{
+    GUI_Text_Values[Name] = Value;
+    GUI_Text_Changed_Values[Name] = true;
+}
+
+extern "C" std::string GUI_Text_Value(std::string Name)
+{
+    return GUI_Text_Values[Name];
+}
+
+extern "C" bool GUI_Text_Changed(std::string Name)
+{
+    bool Changed = GUI_Text_Changed_Values[Name];
+    GUI_Text_Changed_Values[Name] = false;
+    return Changed;
+}
+
+extern "C" void GUI_Input_Int(std::string Name, std::string Text, int Value)
+{
+    if(GUI_Int_Values.find(Name) == GUI_Int_Values.end())
+    {
+        GUI_Int_Values[Name] = Value;
+    }
+    GUI_Commands.push_back({"Input_Int", Name, Text});
+}
+
+extern "C" void GUI_Input_Float(std::string Name, std::string Text, float Value)
+{
+    if(GUI_Float_Values.find(Name) == GUI_Float_Values.end())
+    {
+        GUI_Float_Values[Name] = Value;
+    }
+    GUI_Commands.push_back({"Input_Float", Name, Text});
+}
+
+extern "C" int GUI_Int_Value(std::string Name)
+{
+    return GUI_Int_Values[Name];
+}
+
+extern "C" bool GUI_Int_Changed(std::string Name)
+{
+    bool Changed = GUI_Int_Changed_Values[Name];
+    GUI_Int_Changed_Values[Name] = false;
+    return Changed;
 }
 
 extern "C" void Set_GUI_Slider_Int_Function(std::string Name, std::string Function)
@@ -1665,6 +3004,218 @@ extern "C" bool GUI_Checkbox_Changed(std::string Name)
 extern "C" void Set_GUI_Checkbox_Function(std::string Name, std::string Function)
 {
     GUI_Checkbox_Functions[Name] = Function;
+}
+
+extern "C" void GUI_Radio_Button(std::string Name, std::string Text, int Option)
+{
+    GUI_Command Command;
+    Command.Kind = "Radio_Button";
+    Command.Name = Name;
+    Command.Text = Text;
+    Command.Value = Option;
+    GUI_Commands.push_back(Command);
+}
+
+extern "C" void GUI_Combo(std::string Name, std::string Text, std::string Items, int Value)
+{
+    if(GUI_Selection_Values.find(Name) == GUI_Selection_Values.end())
+    {
+        GUI_Selection_Values[Name] = Value;
+    }
+    GUI_Command Command;
+    Command.Kind = "Combo";
+    Command.Name = Name;
+    Command.Text = Text;
+    Command.Value_Text = Items;
+    GUI_Commands.push_back(Command);
+}
+
+extern "C" void GUI_List_Box(std::string Name, std::string Text, std::string Items, int Value)
+{
+    if(GUI_Selection_Values.find(Name) == GUI_Selection_Values.end())
+    {
+        GUI_Selection_Values[Name] = Value;
+    }
+    GUI_Command Command;
+    Command.Kind = "List_Box";
+    Command.Name = Name;
+    Command.Text = Text;
+    Command.Value_Text = Items;
+    GUI_Commands.push_back(Command);
+}
+
+extern "C" void GUI_File_Picker(std::string Name, std::string Text, std::string Root, std::string Start)
+{
+    GUI_File_Picker_State &State = GUI_File_Pickers[Name];
+    Ensure_File_Picker_State(State, Root, Start);
+
+    GUI_Command Command;
+    Command.Kind = "File_Picker";
+    Command.Name = Name;
+    Command.Text = Text;
+    Command.Value_Text = Root;
+    Command.Extra_Text = Start;
+    GUI_Commands.push_back(Command);
+}
+
+extern "C" void GUI_File_Picker_Select(std::string Name, std::string Path)
+{
+    Select_File_Picker_Path(Name, Path);
+}
+
+extern "C" void GUI_File_Picker_Set_Start(std::string Name, std::string Start)
+{
+    GUI_File_Picker_State &State = GUI_File_Pickers[Name];
+    std::string Root = State.Initialized ? State.Root : "Resources";
+    Ensure_File_Picker_State(State, Root, Start);
+}
+
+extern "C" void GUI_Selectable(std::string Name, std::string Text, int Selected)
+{
+    if(GUI_Checkbox_Values.find(Name) == GUI_Checkbox_Values.end())
+    {
+        GUI_Checkbox_Values[Name] = Selected != 0;
+    }
+    GUI_Commands.push_back({"Selectable", Name, Text});
+}
+
+extern "C" int GUI_Selection_Value(std::string Name)
+{
+    return GUI_Selection_Values[Name];
+}
+
+extern "C" std::string GUI_Selection_Text(std::string Name)
+{
+    return GUI_Selection_Text_Values[Name];
+}
+
+extern "C" bool GUI_Selection_Changed(std::string Name)
+{
+    bool Changed = GUI_Selection_Changed_Values[Name];
+    GUI_Selection_Changed_Values[Name] = false;
+    return Changed;
+}
+
+extern "C" std::string GUI_File_Picker_Current(std::string Name)
+{
+    return GUI_File_Pickers[Name].Current;
+}
+
+extern "C" std::string GUI_File_Picker_Selected(std::string Name)
+{
+    return GUI_File_Pickers[Name].Selected;
+}
+
+extern "C" std::string GUI_File_Picker_Selected_Path(std::string Name)
+{
+    return GUI_File_Pickers[Name].Selected_Path;
+}
+
+extern "C" std::string GUI_File_Picker_Selected_Relative(std::string Name)
+{
+    return GUI_File_Pickers[Name].Selected_Relative;
+}
+
+extern "C" bool GUI_File_Picker_Selected_Is_Directory(std::string Name)
+{
+    return GUI_File_Pickers[Name].Selected_Is_Directory;
+}
+
+extern "C" bool GUI_File_Picker_Changed(std::string Name)
+{
+    bool Changed = GUI_File_Pickers[Name].Changed;
+    GUI_File_Pickers[Name].Changed = false;
+    return Changed;
+}
+
+extern "C" void GUI_Progress_Bar(std::string Name, float Fraction, std::string Text)
+{
+    GUI_Command Command;
+    Command.Kind = "Progress_Bar";
+    Command.Name = Name;
+    Command.Text = Text;
+    Command.Float_Value = Fraction;
+    GUI_Commands.push_back(Command);
+}
+
+extern "C" void GUI_Tooltip(std::string Text)
+{
+    GUI_Commands.push_back({"Tooltip", "", Text});
+}
+
+extern "C" void GUI_Tree_Node(std::string Name)
+{
+    GUI_Commands.push_back({"Tree_Node", Name, Name});
+}
+
+extern "C" void GUI_Tree_End()
+{
+    GUI_Commands.push_back({"Tree_End"});
+}
+
+extern "C" void GUI_Tab_Bar_Begin(std::string Name)
+{
+    GUI_Commands.push_back({"Tab_Bar_Begin", Name, Name});
+}
+
+extern "C" void GUI_Tab_Bar_End()
+{
+    GUI_Commands.push_back({"Tab_Bar_End"});
+}
+
+extern "C" void GUI_Tab_Item_Begin(std::string Name)
+{
+    GUI_Commands.push_back({"Tab_Item_Begin", Name, Name});
+}
+
+extern "C" void GUI_Tab_Item_End()
+{
+    GUI_Commands.push_back({"Tab_Item_End"});
+}
+
+extern "C" void GUI_Menu_Bar_Begin()
+{
+    GUI_Commands.push_back({"Menu_Bar_Begin"});
+}
+
+extern "C" void GUI_Menu_Bar_End()
+{
+    GUI_Commands.push_back({"Menu_Bar_End"});
+}
+
+extern "C" void GUI_Menu_Begin(std::string Name)
+{
+    GUI_Commands.push_back({"Menu_Begin", Name, Name});
+}
+
+extern "C" void GUI_Menu_End()
+{
+    GUI_Commands.push_back({"Menu_End"});
+}
+
+extern "C" void GUI_Menu_Item(std::string Name, std::string Text)
+{
+    GUI_Commands.push_back({"Menu_Item", Name, Text});
+}
+
+extern "C" void Set_GUI_Function(std::string Name, std::string Function)
+{
+    GUI_Functions[Name] = Function;
+}
+
+extern "C" void Set_GUI_Visible(bool Visible)
+{
+    GUI_Visible = Visible;
+}
+
+extern "C" void Set_GUI_Docking(bool Enable)
+{
+    GUI_Docking_Enabled = Enable;
+}
+
+extern "C" void Toggle_GUI()
+{
+    GUI_Visible = !GUI_Visible;
 }
 
 extern "C" int GUI_Slider_Int_Value(std::string Name)
@@ -1709,9 +3260,23 @@ extern "C" void Render()
         SDL_GL_MakeCurrent(State.Window, State.GL_Context);
         int Current_W = 0;
         int Current_H = 0;
-        SDL_GetWindowSize(State.Window, &Current_W, &Current_H);
-        State.Width = Current_W;
-        State.Height = Current_H;
+        SDL_GL_GetDrawableSize(State.Window, &Current_W, &Current_H);
+        if(Current_W <= 0 || Current_H <= 0)
+        {
+            SDL_GetWindowSize(State.Window, &Current_W, &Current_H);
+        }
+        if(Current_W > 0 && Current_H > 0)
+        {
+            State.Width = Current_W;
+            State.Height = Current_H;
+            if(!State.Custom_Viewport)
+            {
+                State.View_X = 0;
+                State.View_Y = 0;
+                State.View_W = Current_W;
+                State.View_H = Current_H;
+            }
+        }
 
         glClearColor(State.Clear_Color.r / 255.0f, State.Clear_Color.g / 255.0f, State.Clear_Color.b / 255.0f, State.Clear_Color.a / 255.0f);
         glClearDepth(1.0);
@@ -1790,7 +3355,10 @@ extern "C" void Render()
             Draw_Text_Command(State, Command);
         }
 
-        Draw_GUI(State);
+        if(GUI_Visible)
+        {
+            Draw_GUI(State);
+        }
         End_ImGui_Frame(State);
         SDL_GL_SwapWindow(State.Window);
     }

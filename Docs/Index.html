@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="../Resources/Graphics/Icons/Bananas_App_Icon.ico" type="image/x-icon">
   <title>Appeal Documentation</title>
   <style>
     :root {
@@ -28,9 +29,7 @@
       }
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -65,7 +64,7 @@
 
     p {
       margin: 0 0 14px;
-      max-width: 78ch;
+      max-width: 80ch;
     }
 
     .lede {
@@ -104,9 +103,7 @@
       font-size: 1.1rem;
     }
 
-    .card span {
-      color: var(--muted);
-    }
+    .card span { color: var(--muted); }
 
     code {
       padding: 2px 5px;
@@ -116,13 +113,8 @@
       font-size: 0.94em;
     }
 
-    ul {
-      padding-left: 22px;
-    }
-
-    li {
-      margin: 7px 0;
-    }
+    ul { padding-left: 22px; }
+    li { margin: 7px 0; }
 
     footer {
       margin-top: 40px;
@@ -145,35 +137,59 @@
       <div class="grid">
         <a class="card" href="Appeal.html">
           <strong>Appeal Runtime</strong>
-          <span>Core concepts, startup flow, scripts, modules, plugins, and data sources.</span>
+          <span>Core concepts, startup flow, scripts, modules, plugins, command callbacks, and data sources.</span>
+        </a>
+        <a class="card" href="Module_Commands.html">
+          <strong>Command Reference</strong>
+          <span>Current script-facing commands for the Appeal runtime and each module.</span>
+        </a>
+        <a class="card" href="Design_Principles.html">
+          <strong>Design Principles</strong>
+          <span>Universal scripts, platform-specific plugins, repository-based distribution, security, and resource-aware design.</span>
+        </a>
+        <a class="card" href="Coding_Format.html">
+          <strong>Coding Format</strong>
+          <span>Official Appeal and C/C++ formatting conventions for braces, indentation, script layout, and debug usage.</span>
         </a>
         <a class="card" href="Modules/Audio.html">
           <strong>Audio Module</strong>
-          <span>Music, sound effects, playlists, and the Audio plugin contract.</span>
+          <span>Music, sound effects, playlists, mute, looping, autoplay, and volume control.</span>
         </a>
         <a class="card" href="Modules/Input.html">
           <strong>Input Module</strong>
-          <span>Current placeholder status and the intended role for input backends.</span>
+          <span>Keyboard, mouse, game controllers, reconnect behavior, and function bindings.</span>
         </a>
         <a class="card" href="Modules/Graphics.html">
           <strong>Graphics Module</strong>
-          <span>Window, camera, asset, text, GUI, render, and update command scaffold.</span>
+          <span>Windows, OpenGL rendering, assets, shaders, text, Dear ImGui GUI commands, and callbacks.</span>
         </a>
         <a class="card" href="Modules/Network.html">
           <strong>Network Module</strong>
-          <span>Connection, command-stream, send, receive, run, and download command scaffold.</span>
+          <span>Client/server roles, command streams, transfers, and the SDL2_net backend.</span>
         </a>
         <a class="card" href="Modules/Package.html">
           <strong>Package Module</strong>
-          <span>Repository, install, verify, upgrade, and runtime load command scaffold.</span>
+          <span>Repository, package, compression, install, verify, upgrade, and runtime load commands.</span>
         </a>
         <a class="card" href="Modules/Storage.html">
           <strong>Storage Module</strong>
-          <span>Persistent settings, files, key/value data, and save/load command scaffold.</span>
+          <span>SQLite-backed persistent storage with a database-neutral Appeal API.</span>
         </a>
         <a class="card" href="Modules/World.html">
           <strong>World Module</strong>
-          <span>Scene, entity, transform, component, update, and draw command scaffold.</span>
+          <span>Scene, entity, transform, component, update, draw, and plugin load-plan commands.</span>
+        </a>
+        <a class="card" href="Modules/Mechanics.html">
+          <strong>Mechanics Module</strong>
+          <span>Hot-swappable gameplay mechanics such as walking, swimming, driving, and flying.</span>
+        </a>
+        <a class="card" href="Modules/Physics.html">
+          <strong>Physics Module</strong>
+          <span>Physics backend slots, bodies, forces, impulses, gravity, and scene attachment.</span>
+        </a>
+        <a class="card" href="Modules/AI.html">
+          <strong>AI Module</strong>
+          <span>NPC brains, behavior updates, decisions, events, and swappable AI plugins.</span>
         </a>
       </div>
     </section>
@@ -185,15 +201,33 @@
         <li><code>Source/</code> contains the Appeal app and core runtime.</li>
         <li><code>Modules/</code> contains platform-independent module source code.</li>
         <li><code>Plugins/</code> contains platform-specific plugin source code.</li>
-        <li><code>Resources/Appeal/</code> contains Appeal scripts such as <code>Main.Appeal</code> and <code>Config.Appeal</code>.</li>
+        <li><code>Resources/Appeal/</code> contains Appeal scripts.</li>
+        <li><code>Resources/Appeal/Setup/</code> contains reusable setup scripts such as <code>Config.Appeal</code> and <code>Graphics_Setup.Appeal</code>.</li>
+        <li><code>Resources/Appeal/GUI/</code> contains reusable GUI scripts such as <code>Graphics_GUI.Appeal</code>.</li>
+        <li><code>Resources/Appeal/Test/</code> contains module, plugin, language, and demo test scripts.</li>
         <li><code>Resources/Modules/</code> contains built module and plugin binaries used at runtime.</li>
+        <li><code>Resources/&lt;Module&gt;/</code> contains module resources, such as <code>Resources/Audio/Music</code>, <code>Resources/Audio/SFX</code>, and <code>Resources/Graphics/Textures</code>.</li>
       </ul>
     </section>
 
     <section>
-      <h2>Conventions</h2>
-      <p>Each module should eventually have a <code>Test_&lt;Module&gt;.Appeal</code> script and a <code>Test_&lt;Module&gt;</code> plugin. The test plugin exports every function expected by the module and prints function calls to the terminal, making it both a test backend and a template for real plugins.</p>
-      <p>Every module should include a standard <code>Debug 0</code> / <code>Debug 1</code> command. Module wrappers should keep their own debug flag and forward it to a plugin export named <code>Debug(bool Enable)</code> when the plugin provides one.</p>
+      <h2>Current Conventions</h2>
+      <p>Appeal app developers should build with Appeal scripts and assets. They should not need to edit C++ source code. Developers of Appeal itself can add modules or update plugins when the language and runtime need new native capabilities.</p>
+      <ul>
+        <li><code>Main.Appeal</code> is the default startup script. The app can also start from a named script argument for testing or launching directly into a game or tool.</li>
+        <li><code>Setup/Config.Appeal</code> loads the default modules and plugins. Other setup scripts can configure specific systems.</li>
+        <li>Default module configuration scripts should use <code>Default_&lt;Module&gt;_Config.Appeal</code> when they are added.</li>
+        <li>Each module should have a <code>Test_&lt;Module&gt;.Appeal</code> script and a <code>Test_&lt;Module&gt;</code> plugin.</li>
+        <li>SDL plugins are the cross-platform default until more specialized plugins are available.</li>
+        <li>Backend plugin names should use <code>Appeal_&lt;BackendLibrary&gt;_&lt;Module&gt;</code>, such as <code>Appeal_SDL2_Audio</code>.</li>
+        <li><code>Debug</code> is a standard command. It accepts <code>On</code>, <code>True</code>, or <code>1</code> to enable output and <code>Off</code>, <code>False</code>, or <code>0</code> to disable output.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Packaging Direction</h2>
+      <p>Plugins should eventually list their third-party dependencies in a plugin manifest, so the package system can install build and runtime dependencies for each supported platform. Remote scripts should not be able to install or replace native plugins; plugin installation belongs to trusted repositories and user-approved package operations.</p>
+      <p>The planned repository model lets different systems use different plugin and asset repositories. A low-resource device can use lighter plugins and assets while still running the same Appeal script API as a higher-end system.</p>
     </section>
 
     <footer>

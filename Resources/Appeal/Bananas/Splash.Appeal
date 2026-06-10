@@ -1,0 +1,25 @@
+//This Script Will Show the Bananas Splash Screen
+// Splash screen
+Graphics Load_Texture Red_Whistle_Logo_Texture ../Images/Red_Whistle_Logo.png
+Graphics Load_Asset Red_Whistle_Logo_Asset Red_Whistle_Logo
+Graphics Set_Texture Red_Whistle_Logo_Asset Red_Whistle_Logo_Texture
+Graphics Set_Location Red_Whistle_Logo_Asset 0.0 0.0 0.0
+Graphics Set_Scale Red_Whistle_Logo_Asset 2.308 1.525 1.0
+Graphics Render
+Delay 1
+
+Graphics Free_Asset Red_Whistle_Logo_Asset
+Graphics Free_Texture Red_Whistle_Logo_Texture
+
+Graphics Load_Texture Bananas_Splash_Texture ../Images/Bananas.png
+Graphics Load_Asset Bananas_Splash Bananas_Splash
+Graphics Set_Texture Bananas_Splash Bananas_Splash_Texture
+Graphics Set_Location Bananas_Splash 0.0 0.0 0.0
+Graphics Set_Scale Bananas_Splash 1.446 0.906 1.0
+Graphics Render
+Delay 1
+
+Graphics Free_Asset Bananas_Splash
+Graphics Free_Texture Bananas_Splash_Texture
+
+Return

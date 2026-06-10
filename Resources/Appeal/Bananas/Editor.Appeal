@@ -1,0 +1,16 @@
+Graphics Set_GUI_Visible On
+Graphics Set_GUI_Docking Off
+
+Graphics GUI_Begin_Fullscreen Bananas_Editor
+Graphics GUI_Tab_Bar_Begin Editor_Tabs
+
+Run Bananas/Editor_Tabs/Game
+Run Bananas/Editor_Tabs/Level
+Run Bananas/Editor_Tabs/Characters
+Run Bananas/Editor_Tabs/Objects
+Run Bananas/Editor_Tabs/Music
+
+Graphics GUI_Tab_Bar_End
+Graphics GUI_End_Window
+
+Return

@@ -63,7 +63,7 @@ ifneq ($(wildcard $(ASSIMP_LIB)/libassimp.dll.a),)
 		ASSIMP_RUNTIME_DLLS := $(wildcard $(ASSIMP_BIN)/libassimp*.dll)
 endif
 endif
-	CXXFLAGS := -Wall
+	CXXFLAGS := -std=c++17 -Wall
 	LDFLAGS := -shared -L$(SDL_LIB) $(LDFLAGS_ASSIMP)
 	LDLIBS := -lSDL2_image -lSDL2_ttf -lSDL2 -lopengl32 $(LDLIBS_ASSIMP)
 	RUNTIME_DIR := ../../../Resources/Modules/Graphics/$(PLUGIN_NAME)
@@ -77,7 +77,7 @@ CXX ?= g++
 		ASSIMP_DEFINE := -DAPPEAL_USE_ASSIMP
 	endif
 	CPPFLAGS := $(shell $(SDL2_CONFIG) --cflags) -I$(IMGUI_DIR) -I$(IMGUI_DIR)/backends $(ASSIMP_CFLAGS) $(ASSIMP_DEFINE)
-	CXXFLAGS := -fPIC -Wall
+	CXXFLAGS := -std=c++17 -fPIC -Wall
 	LDFLAGS := -shared
 	LDLIBS := $(shell $(SDL2_CONFIG) --libs) -lSDL2_image -lSDL2_ttf -lGL $(ASSIMP_LIBS)
 	RUNTIME_DIR := ../../../Resources/Modules/Graphics/$(PLUGIN_NAME)

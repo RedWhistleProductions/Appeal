@@ -1,0 +1,16 @@
+Graphics GUI_Tab_Item_Begin Objects
+Graphics GUI_Text Objects_Title "Objects"
+Graphics GUI_Button New_Object_Button New None
+Graphics GUI_Button Load_Object_Button Load None
+Graphics GUI_Button Save_Object_Button Save None
+Graphics GUI_Separator
+Graphics GUI_Text Asset_Browser_Title "Assets"
+Graphics GUI_List_Box Asset_List Assets "Tree|Rock|Player_Start|Light" 0 None
+Graphics GUI_Separator
+Graphics GUI_Text Transform_Title "Transform"
+Graphics GUI_Input_Float Object_X X 0.0 None
+Graphics GUI_Input_Float Object_Y Y 0.0 None
+Graphics GUI_Input_Float Object_Z Z 0.0 None
+Graphics GUI_Tab_Item_End
+
+Return

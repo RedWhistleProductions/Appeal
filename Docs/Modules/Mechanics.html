@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="../../Resources/Graphics/Icons/Bananas_App_Icon.ico" type="image/x-icon">
+  <title>Mechanics Module</title>
+  <style>
+    body { max-width: 980px; margin: 0 auto; padding: 34px 22px 56px; font: 16px/1.55 system-ui, sans-serif; }
+    nav { margin-bottom: 24px; }
+    code, pre { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+    code { padding: 2px 5px; border-radius: 4px; background: #e9edf0; }
+    pre { overflow: auto; padding: 14px; border: 1px solid #ccd2d8; border-radius: 8px; }
+    table { width: 100%; border-collapse: collapse; margin: 12px 0 22px; }
+    th, td { border: 1px solid #ccd2d8; padding: 10px; text-align: left; vertical-align: top; }
+  </style>
+</head>
+<body>
+  <nav><a href="../Index.html">Documentation</a> / Modules / Mechanics</nav>
+  <h1>Mechanics Module</h1>
+  <p>The Mechanics module controls gameplay movement and interaction rules. It is designed to hot-swap mechanic plugins as the player changes context, such as walking, swimming, driving, flying, or using a menu.</p>
+
+  <h2>Loading</h2>
+  <pre><code>Add_Dynamic_Module Mechanics Test_Mechanics
+Run Test/Test_Mechanics</code></pre>
+
+  <h2>Plugin Load Plan</h2>
+  <p>The module stores plugin slots by name. Each slot has a plugin file name, an optional loaded plugin pointer, and a wanted flag. This allows the script or setup layer to keep all plugins loaded on strong systems, load only scene plugins on medium systems, or load one at a time on limited systems.</p>
+
+  <h2>Commands</h2>
+  <table>
+    <tr><th>Command</th><th>Arguments</th><th>Purpose</th></tr>
+    <tr><td><code>Debug</code></td><td><code>On</code>, <code>Off</code>, <code>True</code>, <code>False</code>, <code>1</code>, or <code>0</code></td><td>Turns module and plugin console output on or off.</td></tr>
+    <tr><td><code>Set_Paths</code></td><td><code>resources</code></td><td>Sets resource paths for mechanics plugins.</td></tr>
+    <tr><td><code>Add_Plugin</code></td><td><code>name file</code></td><td>Adds a plugin slot without necessarily loading it.</td></tr>
+    <tr><td><code>Remove_Plugin</code></td><td><code>name</code></td><td>Removes a plugin slot.</td></tr>
+    <tr><td><code>Load_Plugin</code>, <code>Unload_Plugin</code></td><td><code>name</code></td><td>Loads or unloads a named slot.</td></tr>
+    <tr><td><code>Set_Plugin_Wanted</code></td><td><code>name wanted</code></td><td>Marks whether a plugin should be loaded by the current load plan.</td></tr>
+    <tr><td><code>Apply_Load_Plan</code></td><td>none</td><td>Loads wanted plugins and unloads unwanted plugins.</td></tr>
+    <tr><td><code>Set_Load_Mode</code></td><td><code>mode</code></td><td>Sets the resource strategy for plugin loading.</td></tr>
+    <tr><td><code>List_Plugins</code></td><td>none</td><td>Prints known plugin slots when debug is enabled.</td></tr>
+    <tr><td><code>Use</code></td><td><code>plugin entity</code></td><td>Assigns an entity to a mechanics backend.</td></tr>
+    <tr><td><code>Release</code></td><td><code>plugin entity</code></td><td>Releases an entity from a mechanics backend.</td></tr>
+    <tr><td><code>Update</code></td><td><code>plugin entity dt</code></td><td>Updates a mechanic for an entity.</td></tr>
+    <tr><td><code>Digital</code></td><td><code>plugin entity action</code></td><td>Sends a no-argument action, such as jump or interact.</td></tr>
+    <tr><td><code>Analog</code></td><td><code>plugin entity action value</code></td><td>Sends a value-based action, such as steering or throttle.</td></tr>
+    <tr><td><code>Set</code></td><td><code>plugin entity key value</code></td><td>Sets a mechanic-specific option.</td></tr>
+  </table>
+</body>
+</html>

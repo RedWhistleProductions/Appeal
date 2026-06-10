@@ -1,0 +1,25 @@
+Set_Var Door_Open True
+If Var Door_Open == 1
+{
+	Print "True equals 1"
+}
+
+Set_Var Door_Open on
+If Var Door_Open == On
+{
+	Print "on equals On"
+}
+
+Set_Var Door_Open false
+If Var Door_Open == 0
+{
+	Print "false equals 0"
+}
+
+Set_Var Door_Open Off
+If Var Door_Open != True
+{
+	Print "Off is not True"
+}
+
+Done

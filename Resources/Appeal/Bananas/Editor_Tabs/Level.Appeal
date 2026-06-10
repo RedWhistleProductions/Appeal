@@ -1,0 +1,46 @@
+Graphics GUI_Tab_Item_Begin Level
+Graphics GUI_Text Level_Title "Level"
+Graphics GUI_Text Level_Game_Label Var Active_Game
+Graphics GUI_Set_Text_Value Level_Game_Name Var Active_Game
+Graphics GUI_Text_Value Level_Game_Name
+Set_Var_Global Level_Game_Name_Value GUI.Level_Game_Name.Value
+Files Join Appeal/Games Var Level_Game_Name_Value
+Set_Var_Global Game_Folder_Path Files.Last_Path
+Files Join Var Game_Folder_Path Levels
+Set_Var_Global Game_Levels_Folder_Path Files.Last_Path
+Graphics GUI_Separator
+Graphics GUI_Input_Text Level_New_Name Name Test_Level None
+Graphics GUI_New_Level_Project_Button New_Level_Button New Level_Game_Name Level_New_Name Level_File_Picker
+Graphics GUI_Text_Value Level_New_Name
+Set_Var_Global Level_New_Name_Value GUI.Level_New_Name.Value
+Files Join Var Game_Levels_Folder_Path Var Level_New_Name_Value
+Set_Var_Global New_Level_Folder_Path Files.Last_Path
+Files Add_Extension Var Level_New_Name_Value Appeal
+Set_Var_Global New_Level_File_Name Files.Last_Path
+Files Join Var New_Level_Folder_Path Var New_Level_File_Name
+Set_Var_Global New_Level_File_Path Files.Last_Path
+Graphics GUI_Text New_Level_Path_Label Var New_Level_File_Path
+Graphics GUI_Separator
+Graphics GUI_Text Existing_Levels_Title "Existing Levels"
+Graphics GUI_File_Picker Level_File_Picker Levels Resources Var Game_Levels_Folder_Path None
+Set_Var_Global Level_Selected_Path Graphics.GUI.Level_File_Picker.Selected_Path
+Set_Var_Global Level_Selected_Is_Directory Graphics.GUI.Level_File_Picker.Selected_Is_Directory
+Set_Var_Global Level_Selected_Relative Graphics.GUI.Level_File_Picker.Selected_Relative
+Set_Var_Global Active_Level Graphics.GUI.Level_File_Picker.Selected_Relative
+Graphics GUI_Text Level_Selected_Label Var Level_Selected_Relative
+Graphics GUI_Tab_Item_End
+
+If Var Level_Selected_Is_Directory == True
+{
+	Files Join Games Var Active_Game
+	Set_Var_Global Active_Level_Game_Path Files.Last_Path
+	Files Join Var Active_Level_Game_Path Levels
+	Set_Var_Global Active_Level_Levels_Path Files.Last_Path
+	Files Join Var Active_Level_Levels_Path Var Active_Level
+	Set_Var_Global Active_Level_Folder_Path Files.Last_Path
+	Files Join Var Active_Level_Folder_Path Var Active_Level
+	Set_Var_Global Active_Level_Script Files.Last_Path
+	Run Var Active_Level_Script
+}
+
+Return

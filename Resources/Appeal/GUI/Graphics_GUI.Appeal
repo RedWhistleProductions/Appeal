@@ -1,0 +1,51 @@
+Graphics GUI_Begin Models
+Graphics GUI_Text Title "Graphics Configuration"
+
+// Window X and Y
+Graphics GUI_Separator_Text Window_Position
+Graphics GUI_Drag_Int Window_X "Window X" 64 -4096 4096 1 None
+Graphics GUI_Drag_Int Window_Y "Window Y" 64 -4096 4096 1 None
+
+// Window Width and Height
+Graphics GUI_Separator_Text Window_Size
+Graphics GUI_Slider_Int Window_Width "Window Width" 960 320 3840 None
+Graphics GUI_Slider_Int Window_Height "Window Height" 540 240 2160 None
+
+//Viewport X and Y
+Graphics GUI_Separator_Text Viewport_Position
+Graphics GUI_Drag_Int Viewport_X "Viewport X" 0 0 3840 1 None
+Graphics GUI_Drag_Int Viewport_Y "Viewport Y" 0 0 2160 1 None
+
+//Viewport Width and Height
+Graphics GUI_Separator_Text Viewport_Size
+Graphics GUI_Slider_Int Viewport_Width "Viewport Width" 960 320 3840 None
+Graphics GUI_Slider_Int Viewport_Height "Viewport Height" 540 240 2160 None
+
+// Perspective
+Graphics GUI_Separator_Text Perspective
+Graphics GUI_Checkbox Perspective_Enabled "Perspective Enabled" 1 None
+Graphics GUI_Slider_Float Perspective_FOV "Field Of View" 45.0 10.0 120.0 None
+Graphics GUI_Slider_Float Perspective_Near "Near Clip" 0.1 0.01 10.0 None
+Graphics GUI_Slider_Float Perspective_Far "Far Clip" 100.0 10.0 1000.0 None
+
+//Camera Controls
+Graphics GUI_Separator_Text Camera_Controls
+Graphics GUI_Button Camera_Reset "Reset Camera" None
+Graphics GUI_Same_Line
+Graphics GUI_Button Camera_Apply "Apply Camera" None
+
+//Camera Location
+Graphics GUI_Separator_Text Camera_Location
+Graphics GUI_Drag_Float Camera_Location_X "Camera X" 0.0 -100.0 100.0 0.1 None
+Graphics GUI_Drag_Float Camera_Location_Y "Camera Y" 0.7 -100.0 100.0 0.1 None
+Graphics GUI_Drag_Float Camera_Location_Z "Camera Z" -10.0 -100.0 100.0 0.1 None
+
+//Camera Orientation	
+Graphics GUI_Separator_Text Camera_Orientation
+Graphics GUI_Slider_Float Camera_Yaw "Camera Yaw" 0.0 -180.0 180.0 None
+Graphics GUI_Slider_Float Camera_Pitch "Camera Pitch" 0.0 -90.0 90.0 None
+Graphics GUI_Slider_Float Camera_Roll "Camera Roll" 0.0 -180.0 180.0 None
+
+Graphics GUI_End
+
+Return

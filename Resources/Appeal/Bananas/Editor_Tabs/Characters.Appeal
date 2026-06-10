@@ -1,0 +1,15 @@
+Graphics GUI_Tab_Item_Begin Characters
+Graphics GUI_Text Characters_Title "Characters"
+Graphics GUI_Button New_Character_Button New None
+Graphics GUI_Button Load_Character_Button Load None
+Graphics GUI_Button Save_Character_Button Save None
+Graphics GUI_Separator
+Graphics GUI_List_Box Character_List Characters "Player|Guard|Merchant|Creature" 0 None
+Graphics GUI_Separator
+Graphics GUI_Text Character_Stats_Title "Stats"
+Graphics GUI_Input_Int Character_HP HP 100 None
+Graphics GUI_Input_Int Character_MP MP 25 None
+Graphics GUI_Input_Int Character_Speed Speed 10 None
+Graphics GUI_Tab_Item_End
+
+Return

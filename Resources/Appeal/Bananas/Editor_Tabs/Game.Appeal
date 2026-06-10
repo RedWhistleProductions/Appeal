@@ -1,0 +1,24 @@
+Graphics GUI_Tab_Item_Begin Game
+Graphics GUI_Text Game_Title "Game"
+Graphics GUI_Input_Text Game_New_Name Name Test None
+Graphics GUI_New_Game_Project_Button New_Game_Button New Game_New_Name Game_File_Picker
+Graphics GUI_Text_Value Game_New_Name
+Set_Var_Global Game_New_Name_Value GUI.Game_New_Name.Value
+Files Join Appeal/Games Var Game_New_Name_Value
+Set_Var_Global New_Game_Folder_Path Files.Last_Path
+Files Add_Extension Var Game_New_Name_Value Appeal
+Set_Var_Global New_Game_File_Name Files.Last_Path
+Files Join Var New_Game_Folder_Path Var New_Game_File_Name
+Set_Var_Global New_Game_File_Path Files.Last_Path
+Graphics GUI_Text New_Game_Path_Label Var New_Game_File_Path
+Graphics GUI_Separator
+Graphics GUI_Text Existing_Games_Title "Existing Games"
+Graphics GUI_File_Picker Game_File_Picker Games Resources Appeal/Games Select_Game
+Set_Var_Global Game_Selected_Path Graphics.GUI.Game_File_Picker.Selected_Path
+Set_Var_Global Game_Selected_Is_Directory Graphics.GUI.Game_File_Picker.Selected_Is_Directory
+Set_Var_Global Game_Selected_Relative Graphics.GUI.Game_File_Picker.Selected_Relative
+Graphics GUI_Set_Text_Value Level_Game_Name Var Active_Game
+Graphics GUI_Text Game_Selected_Label Var Game_Selected_Relative
+Graphics GUI_Tab_Item_End
+
+Return

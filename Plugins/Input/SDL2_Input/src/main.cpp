@@ -85,7 +85,7 @@ int Mouse_Delta_Y_Value = 0;
 int Mouse_Wheel_Value = 0;
 bool SDL_Ready = false;
 bool Windows_Controller_Shutdown_Safe = true;
-bool DEBUG = true;
+bool DEBUG = false;
 bool Auto_Open_Controllers = false;
 
 extern "C" void Open_Controller(int Controller);
@@ -475,6 +475,7 @@ extern "C" void Update(std::string Control_Set_Name)
     Triggered_Functions.clear();
 
     SDL_Event Event;
+    std::vector<SDL_Event> Unhandled_Events;
     while(SDL_PollEvent(&Event))
     {
         if(Event.type == SDL_MOUSEWHEEL)
@@ -508,6 +509,16 @@ extern "C" void Update(std::string Control_Set_Name)
                 }
             }
         }
+        else
+        {
+            Unhandled_Events.push_back(Event);
+        }
+    }
+
+    for(const SDL_Event &Unhandled_Event : Unhandled_Events)
+    {
+        SDL_Event Event_Copy = Unhandled_Event;
+        SDL_PushEvent(&Event_Copy);
     }
 
     int New_Mouse_X = 0;

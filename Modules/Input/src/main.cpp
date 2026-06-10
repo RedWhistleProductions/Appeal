@@ -2,7 +2,7 @@
 #include "Data_Source.h"
 
 Plugin Module;
-bool Module_Debug = true;
+bool Module_Debug = false;
 
 void (*Debug)(bool Enable);
 void (*Set_Paths)(std::string Resources);
@@ -131,9 +131,16 @@ extern "C" void Interpreter(Data_Source *Data)
     }
     else if(Command == "Debug")
     {
-        int Enable;
-        *Data >> Enable;
-        Module_Debug = Enable != 0;
+        std::string Value;
+        *Data >> Value;
+        if(Value == "1" || Value == "On" || Value == "True")
+        {
+            Module_Debug = true;
+        }
+        else if(Value == "0" || Value == "Off" || Value == "False")
+        {
+            Module_Debug = false;
+        }
         if(Debug != nullptr) Debug(Module_Debug);
     }
     else if(Command == "Set_Paths")

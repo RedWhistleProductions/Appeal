@@ -4,6 +4,21 @@ static Appeal *Active_Appeal = nullptr;
 
 namespace
 {
+    bool Normalize_Boolean(std::string Value, std::string &Result)
+    {
+        if(Value == "True" || Value == "true" || Value == "On" || Value == "on" || Value == "1")
+        {
+            Result = "1";
+            return true;
+        }
+        if(Value == "False" || Value == "false" || Value == "Off" || Value == "off" || Value == "0")
+        {
+            Result = "0";
+            return true;
+        }
+        return false;
+    }
+
     bool Try_Float(const std::string &Value, float &Result)
     {
         try
@@ -155,9 +170,16 @@ void Appeal::Run()
                 }
                 else if(Command == "Debug")
                 {
-                    int Enable;
-                    Data_Manager >> Enable;
-                    Debug_Mode = Enable != 0;
+                    std::string Value;
+                    Data_Manager >> Value;
+                    if(Value == "1" || Value == "On" || Value == "True")
+                    {
+                        Debug_Mode = true;
+                    }
+                    else if(Value == "0" || Value == "Off" || Value == "False")
+                    {
+                        Debug_Mode = false;
+                    }
                 }
                 else if(Command == "Add_Dynamic_Module")
                 {
@@ -177,6 +199,21 @@ void Appeal::Run()
                 {
                     std::string Name;
                     Data_Manager >> Name;
+                    if(Name == "Var")
+                    {
+                        std::string Variable;
+                        Data_Manager >> Variable;
+                        auto Variable_It = Data_Manager.Variables.find(Variable);
+                        if(Variable_It != Data_Manager.Variables.end())
+                        {
+                            Name = Variable_It->second;
+                        }
+                        else
+                        {
+                            if(Debug_Mode) std::cout << "Run variable not found: " << Variable << std::endl;
+                            continue;
+                        }
+                    }
                     Add_Script(Name);
                     if(Debug_Mode) std::cout << "Running: " << Name << std::endl;
                 }
@@ -187,7 +224,7 @@ void Appeal::Run()
                     Appeal_Functions.Add_Node(Function_Name);
                     while( Command != "End_Function" and Command != "Done")
                     {
-                        Data_Manager >> Command;
+                        Command = Data_Manager.Data_Sources.Current->Value->Get_Data();
                         if( Command == "End_Function" or Command == "Done")
                         {
                             break;
@@ -365,8 +402,18 @@ bool Appeal::Evaluate(std::string V1, std::string Op, std::string V2)
     V1 = Resolve_Value(V1);
     V2 = Resolve_Value(V2);
 
-    if(Op == "==") return V1 == V2;
-    else if(Op == "!=") return V1 != V2;
+    if(Op == "==" || Op == "!=")
+    {
+        std::string B1, B2;
+        if(Normalize_Boolean(V1, B1) && Normalize_Boolean(V2, B2))
+        {
+            if(Op == "==") return B1 == B2;
+            return B1 != B2;
+        }
+
+        if(Op == "==") return V1 == V2;
+        return V1 != V2;
+    }
     else if(Op == "<=" || Op == "<" || Op == ">=" || Op == ">")
     {
         float N1 = 0.0f;

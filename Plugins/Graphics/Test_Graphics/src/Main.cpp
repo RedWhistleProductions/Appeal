@@ -63,6 +63,11 @@ extern "C" void Set_FPS(int Frames)
     std::cout << "Set_FPS(" << Frames << ")" << std::endl;
 }
 
+extern "C" void Set_Window_Icon(std::string Name, std::string File)
+{
+    std::cout << "Set_Window_Icon(" << Name << ", " << File << ")" << std::endl;
+}
+
 extern "C" void Set_View_Port(std::string Window, int X, int Y, int W, int H)
 {
     std::cout << "Set_View_Port(" << Window << ", " << X << ", " << Y << ", " << W << ", " << H << ")" << std::endl;
@@ -128,6 +133,16 @@ extern "C" void Load_Asset(std::string Name, std::string File)
     std::cout << "Load_Asset(" << Name << ", " << File << ")" << std::endl;
 }
 
+extern "C" void Free_Texture(std::string Name)
+{
+    std::cout << "Free_Texture(" << Name << ")" << std::endl;
+}
+
+extern "C" void Free_Asset(std::string Name)
+{
+    std::cout << "Free_Asset(" << Name << ")" << std::endl;
+}
+
 extern "C" void Set_Texture(std::string Name, std::string Texture)
 {
     std::cout << "Set_Texture(" << Name << ", " << Texture << ")" << std::endl;
@@ -173,6 +188,11 @@ extern "C" void GUI_Begin(std::string Name)
     std::cout << "GUI_Begin(" << Name << ")" << std::endl;
 }
 
+extern "C" void GUI_Begin_Fullscreen(std::string Name)
+{
+    std::cout << "GUI_Begin_Fullscreen(" << Name << ")" << std::endl;
+}
+
 extern "C" void GUI_Text(std::string Name, std::string Text)
 {
     std::cout << "GUI_Text(" << Name << ", " << Text << ")" << std::endl;
@@ -181,6 +201,16 @@ extern "C" void GUI_Text(std::string Name, std::string Text)
 extern "C" void GUI_Button(std::string Name, std::string Text)
 {
     std::cout << "GUI_Button(" << Name << ", " << Text << ")" << std::endl;
+}
+
+extern "C" void GUI_New_Game_Project_Button(std::string Name, std::string Text, std::string Name_Input, std::string Picker)
+{
+    std::cout << "GUI_New_Game_Project_Button(" << Name << ", " << Text << ", " << Name_Input << ", " << Picker << ")" << std::endl;
+}
+
+extern "C" void GUI_New_Level_Project_Button(std::string Name, std::string Text, std::string Game_Input, std::string Level_Input, std::string Picker)
+{
+    std::cout << "GUI_New_Level_Project_Button(" << Name << ", " << Text << ", " << Game_Input << ", " << Level_Input << ", " << Picker << ")" << std::endl;
 }
 
 extern "C" bool GUI_Button_Clicked(std::string Name)
@@ -204,6 +234,78 @@ extern "C" bool GUI_Slider_Int_Changed(std::string Name)
 {
     std::cout << "GUI_Slider_Int_Changed(" << Name << ")" << std::endl;
     return false;
+}
+
+extern "C" std::string GUI_Selection_Text(std::string Name)
+{
+    std::cout << "GUI_Selection_Text(" << Name << ")" << std::endl;
+    return "";
+}
+
+extern "C" void GUI_File_Picker(std::string Name, std::string Text, std::string Root, std::string Start)
+{
+    std::cout << "GUI_File_Picker(" << Name << ", " << Text << ", " << Root << ", " << Start << ")" << std::endl;
+}
+
+extern "C" void GUI_File_Picker_Select(std::string Name, std::string Path)
+{
+    std::cout << "GUI_File_Picker_Select(" << Name << ", " << Path << ")" << std::endl;
+}
+
+extern "C" void GUI_File_Picker_Set_Start(std::string Name, std::string Start)
+{
+    std::cout << "GUI_File_Picker_Set_Start(" << Name << ", " << Start << ")" << std::endl;
+}
+
+extern "C" std::string GUI_File_Picker_Current(std::string Name)
+{
+    std::cout << "GUI_File_Picker_Current(" << Name << ")" << std::endl;
+    return "";
+}
+
+extern "C" std::string GUI_File_Picker_Selected(std::string Name)
+{
+    std::cout << "GUI_File_Picker_Selected(" << Name << ")" << std::endl;
+    return "";
+}
+
+extern "C" std::string GUI_File_Picker_Selected_Path(std::string Name)
+{
+    std::cout << "GUI_File_Picker_Selected_Path(" << Name << ")" << std::endl;
+    return "";
+}
+
+extern "C" std::string GUI_File_Picker_Selected_Relative(std::string Name)
+{
+    std::cout << "GUI_File_Picker_Selected_Relative(" << Name << ")" << std::endl;
+    return "";
+}
+
+extern "C" bool GUI_File_Picker_Selected_Is_Directory(std::string Name)
+{
+    std::cout << "GUI_File_Picker_Selected_Is_Directory(" << Name << ")" << std::endl;
+    return false;
+}
+
+extern "C" bool GUI_File_Picker_Changed(std::string Name)
+{
+    std::cout << "GUI_File_Picker_Changed(" << Name << ")" << std::endl;
+    return false;
+}
+
+extern "C" void GUI_Input_Text_Multiline(std::string Name, std::string Text, std::string Value, int Width, int Height)
+{
+    std::cout << "GUI_Input_Text_Multiline(" << Name << ", " << Text << ", " << Value << ", " << Width << ", " << Height << ")" << std::endl;
+}
+
+extern "C" void GUI_Set_Text_Value(std::string Name, std::string Value)
+{
+    std::cout << "GUI_Set_Text_Value(" << Name << ", " << Value << ")" << std::endl;
+}
+
+extern "C" void Set_GUI_Docking(bool Enable)
+{
+    std::cout << "Set_GUI_Docking(" << Enable << ")" << std::endl;
 }
 
 extern "C" void GUI_End()

@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="../../Resources/Graphics/Icons/Bananas_App_Icon.ico" type="image/x-icon">
   <title>Network Module</title>
   <style>
     body { max-width: 980px; margin: 0 auto; padding: 34px 22px 56px; font: 16px/1.55 system-ui, sans-serif; }
@@ -16,20 +17,26 @@
 <body>
   <nav><a href="../Index.html">Documentation</a> / Modules / Network</nav>
   <h1>Network Module</h1>
-  <p>The Network module is the first command-stream and download scaffold. The test plugin prints every function call.</p>
+  <p>The Network module is the command-stream, transfer, and multiplayer network scaffold. It is designed to let Appeal read commands from a server and run them like a script, download assets, and later update modules and plugins through trusted package flows.</p>
+  <p>The Network module can play client and server roles at the same time. For example, a LAN host can listen for other players while also acting as a local player client.</p>
   <h2>Loading</h2>
-  <pre><code>Add_Dynamic_Module Network Test_Network
-Run Test_Network</code></pre>
+  <pre><code>Add_Dynamic_Module Network Appeal_SDL2_Network
+Run Test/Test_Network_SDL2</code></pre>
+  <p>The current network direction starts with a simple unencrypted debug-friendly connection model. The later security direction is key-based authentication and encryption, similar in spirit to SSH but not necessarily a literal SSH connection.</p>
   <h2>Commands</h2>
   <table>
     <tr><th>Command</th><th>Arguments</th></tr>
+    <tr><td><code>Debug</code></td><td><code>On</code>, <code>Off</code>, <code>True</code>, <code>False</code>, <code>1</code>, or <code>0</code></td></tr>
     <tr><td><code>Set_Paths</code></td><td><code>resources</code></td></tr>
     <tr><td><code>Connect</code></td><td><code>host port</code></td></tr>
     <tr><td><code>Listen</code></td><td><code>port</code></td></tr>
+    <tr><td><code>Stop_Listening</code></td><td>none</td></tr>
+    <tr><td><code>Accept</code></td><td>none</td></tr>
     <tr><td><code>Disconnect</code></td><td>none</td></tr>
     <tr><td><code>Send</code></td><td><code>message</code></td></tr>
     <tr><td><code>Receive</code></td><td>none</td></tr>
     <tr><td><code>Poll</code></td><td>none</td></tr>
+    <tr><td><code>Has_Data</code></td><td>none</td></tr>
     <tr><td><code>Has_Command</code></td><td>none</td></tr>
     <tr><td><code>Read_Command</code></td><td>none</td></tr>
     <tr><td><code>Run</code></td><td><code>script</code></td></tr>

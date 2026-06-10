@@ -13,7 +13,7 @@ std::string Resources, Music_Path, SFX_Path;
 
 int Frequency, Chanels, Chunksize;
 bool Music_On, SFX_On;
-bool DEBUG = true;
+bool DEBUG = false;
 
 extern "C" void Set_Paths(std::string Path_of_Resources)
 {

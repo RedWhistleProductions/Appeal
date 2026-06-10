@@ -31,7 +31,7 @@ namespace
         int Users = 0;
     };
 
-    bool Module_Debug = true;
+    bool Module_Debug = false;
     std::string Resources_Path = "./Resources";
     std::string Load_Mode = "Manual";
     std::map<std::string, Plugin_Slot> Plugins;
@@ -146,9 +146,16 @@ extern "C" void Interpreter(Data_Source *Data)
     }
     else if(Command == "Debug")
     {
-        int Enable;
-        *Data >> Enable;
-        Module_Debug = Enable != 0;
+        std::string Value;
+        *Data >> Value;
+        if(Value == "1" || Value == "On" || Value == "True")
+        {
+            Module_Debug = true;
+        }
+        else if(Value == "0" || Value == "Off" || Value == "False")
+        {
+            Module_Debug = false;
+        }
         for(auto &Pair : Plugins)
             if(Pair.second.Functions.Debug != nullptr) Pair.second.Functions.Debug(Module_Debug);
     }
