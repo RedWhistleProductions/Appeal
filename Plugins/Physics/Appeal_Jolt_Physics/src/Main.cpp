@@ -14,7 +14,7 @@ namespace
         Vec3 Force;
     };
 
-    bool Debug_Output = true;
+    bool Debug_Output = false;
     std::map<std::string, Body> Bodies;
     Vec3 Gravity = {0.0f, -9.8f, 0.0f};
 

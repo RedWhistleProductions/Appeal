@@ -30,17 +30,6 @@ Set_Var_Global Active_Level Graphics.GUI.Level_File_Picker.Selected_Relative
 Graphics GUI_Text Level_Selected_Label Var Level_Selected_Relative
 Graphics GUI_Tab_Item_End
 
-If Var Level_Selected_Is_Directory == True
-{
-	Files Join Games Var Active_Game
-	Set_Var_Global Active_Level_Game_Path Files.Last_Path
-	Files Join Var Active_Level_Game_Path Levels
-	Set_Var_Global Active_Level_Levels_Path Files.Last_Path
-	Files Join Var Active_Level_Levels_Path Var Active_Level
-	Set_Var_Global Active_Level_Folder_Path Files.Last_Path
-	Files Join Var Active_Level_Folder_Path Var Active_Level
-	Set_Var_Global Active_Level_Script Files.Last_Path
-	Run Var Active_Level_Script
-}
+
 
 Return

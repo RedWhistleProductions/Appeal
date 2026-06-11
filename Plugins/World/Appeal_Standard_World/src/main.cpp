@@ -37,7 +37,7 @@ namespace
         std::vector<std::string> Events;
     };
 
-    bool Debug_Output = true;
+    bool Debug_Output = false;
     std::filesystem::path Resources_Path = "./Resources";
     std::filesystem::path World_Path = Resources_Path / "World";
     std::map<std::string, Scene> Scenes;

@@ -11,7 +11,7 @@ namespace
         std::map<std::string, std::string> Values;
     };
 
-    bool Debug_Output = true;
+    bool Debug_Output = false;
     std::string Resources_Path = "./Resources";
     std::map<std::string, Agent> Agents;
 

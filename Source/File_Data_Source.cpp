@@ -13,6 +13,11 @@ File_Data_Source::File_Data_Source(std::string File_Name)
 
 void File_Data_Source::Load(std::string File_Name)
 {
+    if(Valid)
+    {
+        File.Close();
+    }
+    File.Mode = "Input";
     Valid = File.Open(File_Name);
 }
 

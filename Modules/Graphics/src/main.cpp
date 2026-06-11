@@ -605,11 +605,11 @@ extern "C" void Interpreter(Data_Source *Data)
     {
         std::string Value;
         *Data >> Value;
-        if(Value == "1" || Value == "On" || Value == "True")
+        if(Value == "1" || Value == "On" || Value == "on" || Value == "True" || Value == "true")
         {
             Module_Debug = true;
         }
-        else if(Value == "0" || Value == "Off" || Value == "False")
+        else if(Value == "0" || Value == "Off" || Value == "off" || Value == "False" || Value == "false")
         {
             Module_Debug = false;
         }
@@ -1495,11 +1495,11 @@ extern "C" void Interpreter(Data_Source *Data)
 
         if(Set_GUI_Visible != nullptr)
         {
-            if(Value == "1" || Value == "On" || Value == "True")
+            if(Value == "1" || Value == "On" || Value == "on" || Value == "True" || Value == "true")
             {
                 Set_GUI_Visible(true);
             }
-            else if(Value == "0" || Value == "Off" || Value == "False")
+            else if(Value == "0" || Value == "Off" || Value == "off" || Value == "False" || Value == "false")
             {
                 Set_GUI_Visible(false);
             }
@@ -1512,11 +1512,11 @@ extern "C" void Interpreter(Data_Source *Data)
 
         if(Set_GUI_Docking != nullptr)
         {
-            if(Value == "1" || Value == "On" || Value == "True" || Value == "true")
+            if(Value == "1" || Value == "On" || Value == "on" || Value == "True" || Value == "true")
             {
                 Set_GUI_Docking(true);
             }
-            else if(Value == "0" || Value == "Off" || Value == "False" || Value == "false")
+            else if(Value == "0" || Value == "Off" || Value == "off" || Value == "False" || Value == "false")
             {
                 Set_GUI_Docking(false);
             }

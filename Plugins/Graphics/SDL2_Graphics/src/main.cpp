@@ -1373,6 +1373,7 @@ void Draw_File_Picker(const GUI_Command &Command)
 {
     GUI_File_Picker_State &State = GUI_File_Pickers[Command.Name];
     Ensure_File_Picker_State(State, Command.Value_Text, Command.Extra_Text);
+    ImGui::PushID(Command.Name.c_str());
 
     fs::path Root_Path = Picker_Root_Path(State);
     fs::path Start_Path = Picker_Start_Path(State);
@@ -1422,10 +1423,16 @@ void Draw_File_Picker(const GUI_Command &Command)
     std::vector<Entry> Entries;
     try
     {
-        for(const fs::directory_entry &Item : fs::directory_iterator(Current_Path))
+        std::error_code Iterator_Error;
+        for(const fs::directory_entry &Item : fs::directory_iterator(Current_Path, Iterator_Error))
         {
+            std::error_code Status_Error;
             Entry New_Entry;
-            New_Entry.Directory = Item.is_directory();
+            New_Entry.Directory = Item.is_directory(Status_Error);
+            if(Status_Error)
+            {
+                continue;
+            }
             New_Entry.Display = Item.path().filename().generic_string();
             if(New_Entry.Directory)
             {
@@ -1433,6 +1440,10 @@ void Draw_File_Picker(const GUI_Command &Command)
             }
             New_Entry.Path = Item.path();
             Entries.push_back(New_Entry);
+        }
+        if(Iterator_Error)
+        {
+            ImGui::TextUnformatted("Unable to read this folder.");
         }
     }
     catch(const std::exception &)
@@ -1449,7 +1460,11 @@ void Draw_File_Picker(const GUI_Command &Command)
         return Left.Display < Right.Display;
     });
 
-    ImVec2 List_Size(-1.0f, std::max(180.0f, ImGui::GetContentRegionAvail().y - 40.0f));
+    float Available_Y = ImGui::GetContentRegionAvail().y;
+    float List_Height = std::clamp(Available_Y - 40.0f, 180.0f, 480.0f);
+    float Available_X = ImGui::GetContentRegionAvail().x;
+    float List_Width = std::clamp(Available_X, 280.0f, 460.0f);
+    ImVec2 List_Size(List_Width, List_Height);
     if(ImGui::BeginListBox(("##" + Command.Name + "_Files").c_str(), List_Size))
     {
         if(Can_Go_Back)
@@ -1482,6 +1497,7 @@ void Draw_File_Picker(const GUI_Command &Command)
         }
         ImGui::EndListBox();
     }
+    ImGui::PopID();
 }
 
 void Run_GUI_Function(const std::string &Name, int Value)
@@ -1932,41 +1948,7 @@ void Draw_GUI(Window_State &Window)
                 Tree_Stack.pop_back();
             }
         }
-        else if(Command.Kind == "Tab_Bar_Begin")
-        {
-            Ensure_GUI_Window(In_Window);
-            Tab_Bar_Stack.push_back(ImGui::BeginTabBar(Command.Name.c_str()));
-        }
-        else if(Command.Kind == "Tab_Bar_End")
-        {
-            Ensure_GUI_Window(In_Window);
-            if(!Tab_Bar_Stack.empty())
-            {
-                if(Tab_Bar_Stack.back())
-                {
-                    ImGui::EndTabBar();
-                }
-                Tab_Bar_Stack.pop_back();
-            }
-        }
-        else if(Command.Kind == "Tab_Item_Begin")
-        {
-            Ensure_GUI_Window(In_Window);
-            bool Parent_Open = Tab_Bar_Stack.empty() ? true : Tab_Bar_Stack.back();
-            Tab_Item_Stack.push_back(Parent_Open && ImGui::BeginTabItem(Command.Text.c_str()));
-        }
-        else if(Command.Kind == "Tab_Item_End")
-        {
-            Ensure_GUI_Window(In_Window);
-            if(!Tab_Item_Stack.empty())
-            {
-                if(Tab_Item_Stack.back())
-                {
-                    ImGui::EndTabItem();
-                }
-                Tab_Item_Stack.pop_back();
-            }
-        }
+
         else if(Command.Kind == "Menu_Bar_Begin")
         {
             Ensure_GUI_Window(In_Window);

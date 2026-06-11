@@ -9,7 +9,7 @@
 
 namespace
 {
-    bool Debug_Output = true;
+    bool Debug_Output = false;
     std::filesystem::path Resources_Path = "./Resources";
     std::filesystem::path Storage_Path = Resources_Path / "Storage";
     std::map<std::string, sqlite3 *> Databases;

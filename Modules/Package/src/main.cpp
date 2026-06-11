@@ -71,11 +71,11 @@ extern "C" void Interpreter(Data_Source *Data)
     {
         std::string Value;
         *Data >> Value;
-        if(Value == "1" || Value == "On" || Value == "True")
+        if(Value == "1" || Value == "On" || Value == "on" || Value == "True" || Value == "true")
         {
             Module_Debug = true;
         }
-        else if(Value == "0" || Value == "Off" || Value == "False")
+        else if(Value == "0" || Value == "Off" || Value == "off" || Value == "False" || Value == "false")
         {
             Module_Debug = false;
         }

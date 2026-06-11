@@ -120,11 +120,18 @@ void Appeal::Add_Dynamic_Module(std::string Name, std::string Plugin_Name)
 
 void Appeal::Add_Script(std::string Name)
 {
+    if(Appeal_Scripts.Find(Name))
+    {
+        Appeal_Scripts.Current->Value.Load(Appeal_Folder + "/" + Name + ".Appeal");
+        Data_Manager.Add_Source(Name, &Appeal_Scripts.Current->Value);
+        return;
+    }
+
     Appeal_Scripts.Add_Node();
     Appeal_Scripts.Current->Name = Name;
     Appeal_Scripts.Current->Value.Load(Appeal_Folder + "/" + Name + ".Appeal");
-    
-    Data_Manager.Add_Source(Name, &Appeal_Scripts.Current->Value);   
+
+    Data_Manager.Add_Source(Name, &Appeal_Scripts.Current->Value);
 }
 
 void Appeal::Run(std::string Script)
@@ -172,11 +179,11 @@ void Appeal::Run()
                 {
                     std::string Value;
                     Data_Manager >> Value;
-                    if(Value == "1" || Value == "On" || Value == "True")
+                    if(Value == "1" || Value == "On" || Value == "on" || Value == "True" || Value == "true")
                     {
                         Debug_Mode = true;
                     }
-                    else if(Value == "0" || Value == "Off" || Value == "False")
+                    else if(Value == "0" || Value == "Off" || Value == "off" || Value == "False" || Value == "false")
                     {
                         Debug_Mode = false;
                     }
