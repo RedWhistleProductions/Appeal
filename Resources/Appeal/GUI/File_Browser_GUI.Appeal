@@ -1,9 +1,0 @@
-Graphics GUI_Begin File_Browser
-Graphics GUI_File_Picker File_Browser Files Resources . None
-Set_Var_Global File_Browser_Current Graphics.GUI.File_Browser.Current
-Set_Var_Global File_Browser_Selected Graphics.GUI.File_Browser.Selected
-Set_Var_Global File_Browser_Selected_Path Graphics.GUI.File_Browser.Selected_Path
-Set_Var_Global File_Browser_Selected_Is_Directory Graphics.GUI.File_Browser.Selected_Is_Directory
-Graphics GUI_End
-
-Return

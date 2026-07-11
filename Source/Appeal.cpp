@@ -1,5 +1,7 @@
 #include "Appeal.h"
 
+#include <fstream>
+
 static Appeal *Active_Appeal = nullptr;
 
 namespace
@@ -32,6 +34,12 @@ namespace
             Result = 0.0f;
             return false;
         }
+    }
+
+    bool File_Exists(const std::string &File_Name)
+    {
+        std::ifstream File(File_Name.c_str());
+        return File.good();
     }
 }
 
@@ -70,6 +78,14 @@ public:
         return Manager->Get_Data();
     }
 };
+
+void Appeal::Set_Resource_Folder(std::string Folder)
+{
+    Resource_Folder = Folder;
+    Appeal_Folder = Resource_Folder + "/Appeal";
+    Modules_Folder = Resource_Folder + "/Modules";
+    Extensions_Folder = Resource_Folder + "/Extensions";
+}
 
 void Appeal::Add_Module(std::string Name, void (*Interpreter)(Data_Source *Data))
 {
@@ -118,20 +134,85 @@ void Appeal::Add_Dynamic_Module(std::string Name, std::string Plugin_Name)
     }
 }
 
-void Appeal::Add_Script(std::string Name)
+void Appeal::Add_Extension(std::string Name)
 {
-    if(Appeal_Scripts.Find(Name))
+    std::string Extension_Path;
+
+    if(Dictionary_List.Find(Name))
     {
-        Appeal_Scripts.Current->Value.Load(Appeal_Folder + "/" + Name + ".Appeal");
-        Data_Manager.Add_Source(Name, &Appeal_Scripts.Current->Value);
+        if(Debug_Mode) std::cout << "Extension already loaded: " << Name << std::endl;
         return;
     }
 
-    Appeal_Scripts.Add_Node();
-    Appeal_Scripts.Current->Name = Name;
-    Appeal_Scripts.Current->Value.Load(Appeal_Folder + "/" + Name + ".Appeal");
+    #ifdef __linux__
+        Extension_Path = Extensions_Folder + "/" + Name + "/" + Name + ".so";
+    #endif
+    #ifdef __MINGW32__
+        Extension_Path = Extensions_Folder + "/" + Name + "/" + Name + ".dll";
+    #endif
 
-    Data_Manager.Add_Source(Name, &Appeal_Scripts.Current->Value);
+    if(!File_Exists(Extension_Path))
+    {
+        std::cout << "Error: " << Extension_Path << " is missing." << std::endl;
+        return;
+    }
+
+    Dynamic_Modules.Add_Node(Name);
+    Dynamic_Modules.Current->Value.Debug = Debug_Mode;
+    Dynamic_Modules.Current->Value.Load(Extension_Path);
+
+    if(Dynamic_Modules.Current->Value.Interpreter == nullptr)
+    {
+        std::cout << "Error: Extension " << Name << " does not export Interpreter." << std::endl;
+        Dynamic_Modules.Current->Value.Unload();
+        Dynamic_Modules.Remove();
+        return;
+    }
+
+    Add_Module(Name, Dynamic_Modules.Current->Value.Interpreter);
+
+    if(Dynamic_Modules.Current->Value.Init_Globals != nullptr)
+    {
+        Dynamic_Modules.Current->Value.Init_Globals("", &Globals);
+    }
+    else if(Dynamic_Modules.Current->Value.Init != nullptr)
+    {
+        Dynamic_Modules.Current->Value.Init("");
+    }
+
+    if(Dynamic_Modules.Current->Value.Set_Function_Runner != nullptr)
+    {
+        Active_Appeal = this;
+        Dynamic_Modules.Current->Value.Set_Function_Runner(Appeal_Function_Callback, Appeal_Analog_Function_Callback);
+    }
+}
+
+bool Appeal::Add_Script(std::string Name)
+{
+    std::string File_Name = Appeal_Folder + "/" + Name + ".Appeal";
+    // First Check if the Script is already loaded
+    if(Appeal_Scripts.Find(Name))
+    {
+        Appeal_Scripts.Current->Value.Load(File_Name);
+        Data_Manager.Add_Source(Name, &Appeal_Scripts.Current->Value);
+        return true;
+    }
+
+    // Make sure the file exists before loading it
+    if(File_Exists(File_Name))
+    {
+        Appeal_Scripts.Add_Node();
+        Appeal_Scripts.Current->Name = Name;
+        Appeal_Scripts.Current->Value.Load(File_Name);
+
+        Data_Manager.Add_Source(Name, &Appeal_Scripts.Current->Value);
+        return true;
+    }
+    else
+    {
+        std::cout << "Error: " << File_Name << " is missing." << std::endl;
+        return false;
+    }
 }
 
 void Appeal::Run(std::string Script)
@@ -142,8 +223,10 @@ void Appeal::Run(std::string Script)
     }
     else
     {
-        Add_Script(Script);
-        Run();
+        if(Add_Script(Script))
+        {
+            Run();
+        }
     }
 }
 
@@ -196,6 +279,12 @@ void Appeal::Run()
                     Data_Manager >> Plugin_Name;
                     Add_Dynamic_Module(Name, Plugin_Name);
                 }
+                else if(Command == "Add_Extension" || Command == "Add_Dynamic_Extension")
+                {
+                    std::string Name;
+                    Data_Manager >> Name;
+                    Add_Extension(Name);
+                }
                 else if(Command == "Print")
                 {
                     std::string Str;
@@ -221,8 +310,10 @@ void Appeal::Run()
                             continue;
                         }
                     }
-                    Add_Script(Name);
-                    if(Debug_Mode) std::cout << "Running: " << Name << std::endl;
+                    if(Add_Script(Name))
+                    {
+                        if(Debug_Mode) std::cout << "Running: " << Name << std::endl;
+                    }
                 }
                 else if( Command == "Define_Function" )
                 {

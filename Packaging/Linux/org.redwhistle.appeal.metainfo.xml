@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>org.redwhistle.appeal</id>
+  <name>Appeal</name>
+  <summary>Appeal script runtime</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <description>
+    <p>Appeal is a small script runtime for building Appeal applications.</p>
+  </description>
+  <launchable type="desktop-id">org.redwhistle.appeal.desktop</launchable>
+  <releases>
+    <release version="1.0.0-beta.1" date="2026-07-10" />
+  </releases>
+</component>

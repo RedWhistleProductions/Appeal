@@ -27,6 +27,7 @@ class Appeal
     std::string Resource_Folder = "./Resources";
     std::string Appeal_Folder = Resource_Folder + "/Appeal";
     std::string Modules_Folder = Resource_Folder + "/Modules";
+    std::string Extensions_Folder = Resource_Folder + "/Extensions";
     
     Data_Source_Manager Data_Manager;
     Named_List<Appeal_Function> Appeal_Functions;
@@ -34,9 +35,11 @@ class Appeal
 
     Named_List<Module_Data>Globals;
 
+    void Set_Resource_Folder(std::string Folder);
     void Add_Module(std::string Name, void (*Interpreter)(Data_Source *Data));
     void Add_Dynamic_Module(std::string Name, std::string Plugin_Name);
-    void Add_Script(std::string Name);
+    void Add_Extension(std::string Name);
+    bool Add_Script(std::string Name);
     void Run();
     void Run(std::string Name);
     void Shutdown();

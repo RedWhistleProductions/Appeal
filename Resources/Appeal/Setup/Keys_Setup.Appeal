@@ -1,4 +1,0 @@
-Input Set_Key_Down Key_Escape Graphics.Close_All
-Input Set_Key_Down Key_Tab Graphics.Toggle_GUI
-
-Return

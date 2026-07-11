@@ -13,10 +13,10 @@
     public:
         bool Debug = false;
         Plugin Module_Plugin;
-        void (*Init)(std::string Plugin_Name);
+        void (*Init)(std::string Plugin_Name) = nullptr;
         void (*Init_Globals)(std::string Plugin_Name, Named_List<Module_Data> *Globals) = nullptr;
         void (*Set_Function_Runner)(void (*Run_Function)(std::string), void (*Run_Analog_Function)(std::string, int)) = nullptr;
-        void (*Interpreter)(Data_Source *Data);
+        void (*Interpreter)(Data_Source *Data) = nullptr;
         void (*Shutdown)() = nullptr;
         void Load(std::string Module_Name);
         void Unload();
@@ -47,10 +47,10 @@
     public:
         bool Debug = false;
         Plugin Module_Plugin;
-        void (*Init)(std::string Plugin_Name);
+        void (*Init)(std::string Plugin_Name) = nullptr;
         void (*Init_Globals)(std::string Plugin_Name, Named_List<Module_Data> *Globals) = nullptr;
         void (*Set_Function_Runner)(void (*Run_Function)(std::string), void (*Run_Analog_Function)(std::string, int)) = nullptr;
-        void (*Interpreter)(Data_Source *Data);
+        void (*Interpreter)(Data_Source *Data) = nullptr;
         void (*Shutdown)() = nullptr;
         void Load(std::string Module_Name);
         void Unload();

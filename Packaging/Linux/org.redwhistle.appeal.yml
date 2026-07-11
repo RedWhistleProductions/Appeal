@@ -1,0 +1,21 @@
+app-id: org.redwhistle.appeal
+runtime: org.freedesktop.Platform
+runtime-version: '24.08'
+sdk: org.freedesktop.Sdk
+command: appeal
+finish-args:
+  - --share=ipc
+  - --filesystem=home
+modules:
+  - name: appeal
+    buildsystem: simple
+    build-commands:
+      - make -f Makefile
+      - make -f Makefile install DESTDIR=/app PREFIX=/app
+      - install -Dm644 Packaging/Linux/org.redwhistle.appeal.desktop /app/share/applications/org.redwhistle.appeal.desktop
+      - install -Dm644 Packaging/Linux/org.redwhistle.appeal.metainfo.xml /app/share/metainfo/org.redwhistle.appeal.metainfo.xml
+      - install -Dm644 Resources/Graphics/Icons/red_whistle_icon.png /app/share/icons/hicolor/256x256/apps/org.redwhistle.appeal.png
+      - install -Dm644 LICENSE /app/share/licenses/appeal/LICENSE
+    sources:
+      - type: dir
+        path: ../..

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Appeal
+Comment=Appeal script runtime
+Exec=appeal
+Icon=org.redwhistle.appeal
+Terminal=true
+Categories=Development;Game;

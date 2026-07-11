@@ -9,21 +9,13 @@ LDLIBS =
 
 # Directories
 SRC_DIR = ./Source
-OBJ_DIR = ./Obj
+OBJ_ROOT = ./Obj
 BIN_DIR = .
-MODULES_DIR = ./Modules
-PLUGINS_DIR = ./Plugins
-
-MODULE_MAKEFILES = $(wildcard $(MODULES_DIR)/*/Makefile)
-PLUGIN_MAKEFILES = $(wildcard $(PLUGINS_DIR)/*/*/Makefile)
-MODULE_DIRS = $(sort $(dir $(MODULE_MAKEFILES)))
-PLUGIN_DIRS = $(sort $(dir $(PLUGIN_MAKEFILES)))
-MODULE_BUILD_TARGETS = $(foreach dir,$(MODULE_DIRS),build-$(subst /,_,$(dir)))
-PLUGIN_BUILD_TARGETS = $(foreach dir,$(PLUGIN_DIRS),build-$(subst /,_,$(dir)))
-MODULE_INSTALL_TARGETS = $(foreach dir,$(MODULE_DIRS),install-$(subst /,_,$(dir)))
-PLUGIN_INSTALL_TARGETS = $(foreach dir,$(PLUGIN_DIRS),install-$(subst /,_,$(dir)))
-MODULE_CLEAN_TARGETS = $(foreach dir,$(MODULE_DIRS),clean-$(subst /,_,$(dir)))
-PLUGIN_CLEAN_TARGETS = $(foreach dir,$(PLUGIN_DIRS),clean-$(subst /,_,$(dir)))
+PREFIX ?= /usr/local
+BINDIR ?= $(PREFIX)/bin
+LIBDIR ?= $(PREFIX)/lib/appeal
+DATADIR ?= $(PREFIX)/share/appeal
+DESTDIR ?=
 
 # Source files
 SRC_FILES = $(wildcard $(SRC_DIR)/*.cpp)
@@ -34,35 +26,28 @@ RES_FILES =
 
 # Executable
 ifeq ($(OS),Windows_NT)
-    EXE_EXT = .exe
-    RC_FILES = $(wildcard $(SRC_DIR)/*.rc)
-    RES_FILES = $(patsubst $(SRC_DIR)/%.rc, $(OBJ_DIR)/%.res, $(RC_FILES))
+	EXE_EXT = .exe
+	OBJ_DIR = $(OBJ_ROOT)/Windows
+	RC_FILES = $(wildcard $(SRC_DIR)/*.rc)
+	RES_FILES = $(patsubst $(SRC_DIR)/%.rc, $(OBJ_DIR)/%.res, $(RC_FILES))
 else
-    EXE_EXT =
+	EXE_EXT =
+	OBJ_DIR = $(OBJ_ROOT)/Linux
+	LDLIBS += -ldl
 endif
 TARGET = $(BIN_DIR)/Appeal$(EXE_EXT)
 
-# Detect OS
-ifeq ($(OS),Windows_NT)
-    RM = del /Q
-    MKDIR = if not exist $(OBJ_DIR) mkdir $(OBJ_DIR)
-else
-    RM = rm -rf
-    MKDIR = mkdir -p $(OBJ_DIR)
-endif
-
 # Default target
-all: $(TARGET) modules plugins
+all: $(TARGET)
 
-modules: $(MODULE_BUILD_TARGETS)
-
-plugins: $(PLUGIN_BUILD_TARGETS)
-
-install-modules: $(MODULE_INSTALL_TARGETS)
-
-install-plugins: $(PLUGIN_INSTALL_TARGETS)
-
-install: $(TARGET) install-modules install-plugins
+install: $(TARGET)
+	mkdir -p $(DESTDIR)$(LIBDIR)
+	mkdir -p $(DESTDIR)$(BINDIR)
+	mkdir -p $(DESTDIR)$(DATADIR)
+	cp $(TARGET) $(DESTDIR)$(LIBDIR)/Appeal$(EXE_EXT)
+	cp -R Resources $(DESTDIR)$(DATADIR)/
+	printf '#!/bin/sh\nAPPEAL_RESOURCE_FOLDER="$${APPEAL_RESOURCE_FOLDER:-$(DATADIR)/Resources}" exec "$(LIBDIR)/Appeal$(EXE_EXT)" "$$@"\n' > $(DESTDIR)$(BINDIR)/appeal
+	chmod +x $(DESTDIR)$(BINDIR)/appeal
 
 # Link object files to create the executable
 $(TARGET): $(OBJ_FILES) $(RES_FILES)
@@ -79,32 +64,7 @@ $(OBJ_DIR)/%.res: $(SRC_DIR)/%.rc
 	$(WINDRES) $< -O coff -o $@
 
 # Clean up
-clean: $(MODULE_CLEAN_TARGETS) $(PLUGIN_CLEAN_TARGETS)
-	rm -rf $(OBJ_DIR) $(TARGET)
+clean:
+	rm -rf $(OBJ_ROOT) $(TARGET)
 
-define BUILD_TARGET
-.PHONY: build-$(subst /,_,$(1))
-build-$(subst /,_,$(1)):
-	$$(MAKE) -C $(1)
-endef
-
-define INSTALL_TARGET
-.PHONY: install-$(subst /,_,$(1))
-install-$(subst /,_,$(1)):
-	$$(MAKE) -C $(1) install
-endef
-
-define CLEAN_TARGET
-.PHONY: clean-$(subst /,_,$(1))
-clean-$(subst /,_,$(1)):
-	$$(MAKE) -C $(1) clean
-endef
-
-$(foreach dir,$(MODULE_DIRS) $(PLUGIN_DIRS),$(eval $(call BUILD_TARGET,$(dir))))
-$(foreach dir,$(MODULE_DIRS) $(PLUGIN_DIRS),$(eval $(call INSTALL_TARGET,$(dir))))
-$(foreach dir,$(MODULE_DIRS) $(PLUGIN_DIRS),$(eval $(call CLEAN_TARGET,$(dir))))
-
-.PHONY: all modules plugins install-modules install-plugins install clean \
-	$(MODULE_BUILD_TARGETS) $(PLUGIN_BUILD_TARGETS) \
-	$(MODULE_INSTALL_TARGETS) $(PLUGIN_INSTALL_TARGETS) \
-	$(MODULE_CLEAN_TARGETS) $(PLUGIN_CLEAN_TARGETS)
+.PHONY: all install clean
