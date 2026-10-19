@@ -1,0 +1,7 @@
+Audio Debug On
+Audio Load_Play_List "Play_All.txt"
+
+Audio Auto_Play_Next 1
+Audio Play
+
+//Loop While 1 == 1 {}

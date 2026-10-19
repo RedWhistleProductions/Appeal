@@ -10,11 +10,13 @@ std::string Appeal_Function::Get_Data()
     std::string Data;
     if(Line_Number < Command_Vector.size())
     {
+        Exhausted = false;
         Data = Command_Vector[Line_Number];
         Line_Number++;
     }
     else 
     {
+        Exhausted = true;
         Line_Number = 0;
         Data = "Return";
     }

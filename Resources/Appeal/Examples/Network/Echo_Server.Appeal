@@ -1,0 +1,10 @@
+Network Configure Echo 127.0.0.1 34567
+Network Server
+
+Print "Echo Server listening on port 34567"
+
+Loop While 1 == 1
+{
+    Delay 1
+}
+Return

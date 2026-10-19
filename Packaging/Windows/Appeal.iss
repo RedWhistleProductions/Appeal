@@ -22,13 +22,13 @@ UninstallDisplayIcon={app}\{#MyAppExeName}
 
 [Files]
 Source: "..\..\Appeal.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\..\Resources\*"; DestDir: "{app}\Resources"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\Resources\*"; DestDir: "{userdocs}\Appeal\Resources"; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
 Source: "..\..\README.md"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\LICENSE"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\VERSION"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
-Name: "{group}\Appeal"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"
+Name: "{group}\Appeal"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{userdocs}\Appeal"
 
 [Run]
-Filename: "{app}\{#MyAppExeName}"; Description: "Launch Appeal"; Flags: nowait postinstall skipifsilent; WorkingDir: "{app}"
+Filename: "{app}\{#MyAppExeName}"; Description: "Launch Appeal"; Flags: nowait postinstall skipifsilent; WorkingDir: "{userdocs}\Appeal"

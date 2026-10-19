@@ -1,0 +1,12 @@
+Run Setup/Config
+Graphics Debug True
+Graphics Add_Window Install_Check "Appeal Graphics installation check" 320 240
+Graphics Window_Open Install_Check
+Print_Global Graphics.Window.Install_Check.Open
+Graphics Draw_Rect Check 10 10 100 50 255 0 0 255
+Graphics Render
+Graphics Close_All
+Graphics Window_Open Install_Check
+Print_Global Graphics.Window.Install_Check.Open
+Print "GRAPHICS_INSTALL_PASSED"
+Return

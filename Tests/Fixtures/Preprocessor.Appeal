@@ -1,0 +1,6 @@
+# Parentheses need no separating space from a command or argument.
+Print(Test Mouse_X)
+Print "text (not code)"
+Print(Run Tests/Fixtures/Returning.Appeal)
+Run Tests/Fixtures/Child.Appeal
+Print parent

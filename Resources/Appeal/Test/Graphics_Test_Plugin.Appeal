@@ -1,0 +1,4 @@
+Add_Dynamic_Module Graphics Test
+Run Test/Graphics
+Print "GRAPHICS_TEST_PLUGIN_PASSED"
+Done

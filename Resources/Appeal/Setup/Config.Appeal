@@ -1,2 +1,14 @@
 // Add Modules and Plugins Here
+
+//Add_Dynamic_Module Audio Test
+Add_Dynamic_Module Audio Appeal_SDL2_Audio
+
+//Add_Dynamic_Module Network Test
+Add_Dynamic_Module Network Appeal_SDL2_Network
+
+//Add_Dynamic_Module Graphics Test
+Add_Dynamic_Module Graphics Appeal_SDL2_Graphics
+//Add_Dynamic_Module Input Test
+Add_Dynamic_Module Input Appeal_SDL2_Input
+
 Return

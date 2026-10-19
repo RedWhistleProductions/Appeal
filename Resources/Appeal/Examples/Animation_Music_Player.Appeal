@@ -1,0 +1,69 @@
+// One window and one render/event loop for animation, music, and controls.
+// Standalone: Appeal.exe Examples/Animation_Music_Player
+Run Setup/Config
+Run Examples/Music_Player_Controls
+Run Examples/Graphics/Character_Animation_Controls
+Set_Var Music_Player_Overlay 1
+
+Graphics Add_Window Main "Adam and Eve - Music Player" 800 600
+Graphics Set_FPS 60
+Graphics Set_GUI_Docking False
+Graphics Set_GUI_Visible True
+Run Examples/Graphics/Setup_Characters
+// Leave room for the controls at the top of the window.
+Set_Var Adam_X 176
+Set_Var Adam_Y 320
+Set_Var Adam_Speed 10
+Set_Var Adam_Deadzone 24
+Set_Var Adam_DPad_Repeat 0
+Set_Var Eve_X 624
+Set_Var Eve_Y 320
+Set_Var Eve_Speed 10
+Graphics Paste Adam Var Adam_X Var Adam_Y 0
+Graphics Paste Eve Var Eve_X Var Eve_Y 0
+
+// One movement step per key press, using the same callbacks as the buttons.
+Input Set_Key_Down W Adam_Move_Up
+Input Set_Key_Down A Adam_Move_Left
+Input Set_Key_Down S Adam_Move_Down
+Input Set_Key_Down D Adam_Move_Right
+Input Set_Key_Down Up Eve_Move_Up
+Input Set_Key_Down Left Eve_Move_Left
+Input Set_Key_Down Down Eve_Move_Down
+Input Set_Key_Down Right Eve_Move_Right
+
+// Auto-open SDL controllers now and when they connect later (including reconnects).
+// Global bindings avoid depending on a Bluetooth controller's device index.
+Input Set_Controller_Button_Down DPad_Up Adam_Move_Up
+Input Set_Controller_Button_Down DPad_Left Adam_Move_Left
+Input Set_Controller_Button_Down DPad_Down Adam_Move_Down
+Input Set_Controller_Button_Down DPad_Right Adam_Move_Right
+Input Set_Controller_Deadzone Var Adam_Deadzone
+Input Set_Controller_Button_Repeat DPad_Up 0
+Input Set_Controller_Button_Repeat DPad_Down 0
+Input Set_Controller_Button_Repeat DPad_Left 0
+Input Set_Controller_Button_Repeat DPad_Right 0
+Input Set_Controller_Axis Left_Stick_X Adam_Stick_X
+Input Set_Controller_Axis Left_Stick_Y Adam_Stick_Y
+Input Open_Controller -1
+
+Audio Load_Play_List "Play_All.txt"
+Audio Auto_Play_Next 1
+Audio Set_Volume_Percent 100
+Audio Play
+
+Graphics Window_Open Main
+Set_Var_Global Music_Window_Open Graphics.Window.Main.Open
+Loop While Var Music_Window_Open == 1
+{
+    Input Update Default
+    Call Music_Player_GUI
+    Graphics Render
+    Graphics Update
+    Graphics Window_Open Main
+    Set_Var_Global Music_Window_Open Graphics.Window.Main.Open
+}
+
+Audio Stop
+Input Close_Controller -1
+Graphics Close_All

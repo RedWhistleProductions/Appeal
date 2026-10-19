@@ -1,0 +1,146 @@
+Graphics Debug True
+
+Graphics Set_Paths Resources
+
+Graphics Add_Window Main "Main Window" 800 600
+Graphics Set_Window_Title Main "Updated Main Window"
+Graphics Add_Full_Screen_Window Main 0
+Graphics Delete_Window Main
+Graphics Close_All
+Graphics Show Main
+Graphics Hide Main
+Graphics Set_Focus Main
+Graphics Set_Monitor Main 0
+Graphics Set_FPS 60
+Graphics Set_Window_Icon Main Icon.png
+
+Graphics Set_View_Port Main 0 0 800 600
+Graphics Set_Perspective Main 45 0.1 100
+Graphics Set_Ortho Main -1 1 -1 1 0.1 100
+
+Graphics Set_Camera_Location Main 0 0 0
+Graphics Set_Camera_Orientation Main 0 0 0
+Graphics Move_Camera Main 1 0 0
+Graphics Rotate_Camera Main 1 0 0
+Graphics Update_Camera Main
+
+Graphics Load_Shader Basic Basic.shader
+Graphics Load_Texture Wall Wall.png
+Graphics Load_Font Arial Arial.ttf 24
+Graphics Load_Mesh Cube Cube.obj
+Graphics Load_Asset Player Player.asset
+Graphics Free_Texture Wall
+Graphics Free_Asset Player
+
+Graphics Set_Texture Player Wall
+Graphics Set_Shader Player Basic
+Graphics Set_Location Player 0 0 0
+Graphics Set_Orientation Player 0 0 0
+Graphics Set_Scale Player 1 1 1
+Graphics Move_Asset Player 1 0 0
+Graphics Rotate_Asset Player 1 0 0
+Graphics Set_Active_Asset Player
+Graphics Rotate_Active_Yaw_Input 1
+Graphics Move_Active_Forward_Input 1
+
+Graphics Draw_Text Arial "Hello World" 10 10
+Graphics Draw_Rect Rect1 10 10 100 50 255 0 0 255
+Graphics GUI_Begin Window1
+Graphics GUI_Begin_Fullscreen Window1
+Graphics GUI_End_Window
+Graphics GUI_Text Label1 "Hello"
+Graphics GUI_Label_Text Label1 "Hello"
+Graphics GUI_Bullet_Text Label1 "Hello"
+Graphics GUI_Separator
+Graphics GUI_Separator_Text "Section"
+Graphics GUI_Same_Line
+Graphics GUI_New_Line
+Graphics GUI_Spacing
+Graphics GUI_Indent 10
+Graphics GUI_Unindent 10
+Graphics GUI_Group_Begin Group1
+Graphics GUI_Group_End
+Graphics GUI_Button Button1 "Click Me" ""
+Graphics GUI_New_Game_Project_Button Button2 "New Game" Name_Input Picker1
+Graphics GUI_New_Level_Project_Button Button3 "New Level" Game_Input Level_Input Picker1
+Graphics GUI_Small_Button Button4 "Small" ""
+Graphics GUI_Button_Clicked Button1
+Graphics Set_GUI_Button_Function Button1 On_Click
+Graphics GUI_Slider_Int Slider1 "Volume" 50 0 100 ""
+Graphics GUI_Slider_Int_Value Slider1
+Graphics GUI_Slider_Int_Changed Slider1
+Graphics GUI_Slider_Float Slider2 "Speed" 0.5 0 1 ""
+Graphics GUI_Float_Value Slider2
+Graphics GUI_Float_Changed Slider2
+Graphics GUI_Drag_Int Drag1 "Amount" 5 0 10 1 ""
+Graphics GUI_Drag_Float Drag2 "Amount" 0.5 0 1 0.1 ""
+Graphics GUI_Input_Text Input1 "Name" "Player" ""
+Graphics GUI_Input_Text_Multiline Input2 "Description" "Text" 200 100 ""
+Graphics GUI_Set_Text_Value Input1 "New Value"
+Graphics GUI_Text_Value Input1
+Graphics GUI_Text_Changed Input1
+Graphics GUI_Input_Int Input3 "Age" 25 ""
+Graphics GUI_Input_Float Input4 "Weight" 70.5 ""
+Graphics GUI_Int_Value Input3
+Graphics GUI_Int_Changed Input3
+Graphics Set_GUI_Slider_Int_Function Slider1 On_Slide
+Graphics GUI_Checkbox Check1 "Enable" 1 ""
+Graphics GUI_Checkbox_Value Check1
+Graphics GUI_Checkbox_Changed Check1
+Graphics Set_GUI_Checkbox_Function Check1 On_Check
+Graphics GUI_Radio_Button Radio1 "Option A" 0 ""
+Graphics GUI_Combo Combo1 "Choose" "A,B,C" 0 ""
+Graphics GUI_List_Box List1 "Items" "A,B,C" 0 ""
+Graphics GUI_File_Picker Picker1 "Choose File" Root Start ""
+Graphics GUI_File_Picker_Select Picker1 Path
+Graphics GUI_File_Picker_Set_Start Picker1 Start
+Graphics GUI_Selectable Select1 "Item" 0 ""
+Graphics GUI_Selection_Value Select1
+Graphics GUI_Selection_Text Select1
+Graphics GUI_Selection_Changed Select1
+// This command queries all six file-picker properties from the plugin.
+Graphics GUI_File_Picker_Value Picker1
+Graphics GUI_Music_Picker Music1 "Choose Song" Root Start ""
+// This command queries the title, path, and changed flag from the plugin.
+Graphics GUI_Music_Picker_Value Music1
+Graphics GUI_Playlist Playlist1 "Songs" File_Path ""
+Graphics GUI_Playlist_Load Playlist1 File_Path
+Graphics GUI_Playlist_Add Playlist1 "Song Title" File_Path
+Graphics GUI_Playlist_Clear Playlist1
+Graphics GUI_Playlist_Item_Count Playlist1
+Graphics GUI_Playlist_Changed Playlist1
+Graphics GUI_Progress_Bar Progress1 0.5 "Loading"
+Graphics GUI_Tooltip "Tooltip Text"
+Graphics GUI_Tree_Node Tree1
+Graphics GUI_Tree_End
+Graphics GUI_Tab_Bar_Begin TabBar1
+Graphics GUI_Tab_Bar_End
+Graphics GUI_Tab_Item_Begin Tab1
+Graphics GUI_Tab_Item_End
+Graphics GUI_Menu_Bar_Begin
+Graphics GUI_Menu_Bar_End
+Graphics GUI_Menu_Begin Menu1
+Graphics GUI_Menu_End
+Graphics GUI_Menu_Item Item1 "Open" ""
+Graphics Set_GUI_Function Window1 On_GUI
+Graphics Set_GUI_Visible True
+Graphics Set_GUI_Docking True
+Graphics Toggle_GUI
+Graphics GUI_End
+
+Graphics Render
+Graphics Update
+Graphics Wait_Until_Close Main
+Graphics Window_Open Main
+
+Graphics Load_Animation Adam Standing Examples/Characters/Adam_Movement.png 64 64 0 8
+Graphics Set_Animation Adam Standing
+Graphics Set_Animation_FPS Adam Standing 7
+Graphics Set_Animation_Mode Adam Standing Hold
+Graphics Rotate Adam 10 20 30
+Graphics Paste Adam 176 204 0
+Graphics Animation_Frame Adam
+Graphics Current_Animation Adam
+Graphics Reset_Animation Adam
+
+Return

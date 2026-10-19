@@ -1,0 +1,16 @@
+// Run from the Appeal folder with the SDL2 Network plugin configured.
+// Connect TCP chat clients to port 1234; messages are broadcast to all clients,
+// including the sender. The SDL2 server listens on all network interfaces.
+Network Debug On
+Network Configure Chat 10.0.0. 1234
+Network Server
+
+Print "Chat server started. Connect clients to port 1234."
+Print "Press Ctrl+C to stop the server."
+
+// The Network plugin accepts clients and relays messages in the background.
+Loop While 1 == 1
+{
+    Delay 1
+}
+Return

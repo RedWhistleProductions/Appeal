@@ -1,0 +1,24 @@
+Add_Dynamic_Module Graphics Appeal_SDL2_Graphics
+Add_Dynamic_Module Input Appeal_SDL2_Input
+Graphics Add_Window Input_Check "SDL2 Input installation check" 320 240
+Input Add_Control_Set Install_Check
+Input Set_Control_Set Install_Check
+Input Bind_Key Jump Space
+Input Bind_Mouse Select Left
+Input Update Install_Check
+Print "UNBOUND"
+Print (Input Down Missing)
+Print (Input Pressed Missing)
+Print (Input Released Missing)
+Print (Input Axis Missing)
+Print "NO_CONTROLLER"
+Print (Input Controller_Down 999 A)
+Print (Input Controller_Axis 999 Left_Stick_X)
+Graphics Render
+Graphics Update
+Input Update Install_Check
+Input Unbind Jump
+Input Unbind Select
+Graphics Close_All
+Print "INPUT_INSTALL_PASSED"
+Done

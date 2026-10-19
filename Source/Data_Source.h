@@ -1,5 +1,7 @@
 #pragma once
 #include <string>
+#include <stdexcept>
+#include "Data_Conversion.h"
 
 
 class Data_Source
@@ -12,5 +14,13 @@ class Data_Source
     void operator >>(float &Data);
     void operator >>(double &Data);
     void operator >>(bool &Data);
+
+    // A command publishes its results through the source it reads arguments
+    // from. A normal command discards them; an expression collects them.
+    virtual void Return_Value(std::string Value)
+    {
+    }
+    // Distinguish an exhausted source from a literal Return in a captured body.
+    virtual bool End_Of_Source() const { return false; }
 };
 

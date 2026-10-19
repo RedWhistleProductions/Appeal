@@ -1,0 +1,77 @@
+//This is a test of the Audio Module
+
+Audio Debug On
+
+// Check if Audio is Playing
+Audio Is_Playing
+
+// Go Back in the Playlist by 1 song
+Audio Back
+
+// Loads a Playlist
+Audio Load_Play_List File_Name
+
+// Load a Sound Effect
+Audio Load_SFX Name File_Name
+
+// Load a Song
+Audio Load_Song Name File_Name
+
+// Mute the Audio
+Audio Mute
+
+// Play the Next Song in the Playlist
+Audio Next
+
+// Play the Current Song in the Playlist
+Audio Play
+
+// Play The Currently Selected Sound Effect
+Audio Play_SFX
+
+// Select a Loaded Sound Effect by Name and play it
+Audio Play_SFX_Name Name
+
+// Select a Song from a loaded Playlist and Play it
+Audio Play_Song Name
+
+// Selects a Song in a loaded Playlist by its Track Number and Plays it
+Audio Play_Track 1
+
+// Changes the Path to Audio Files
+Audio Set_Paths "C:\"
+
+// Stop Playing the Current Song
+Audio Stop
+
+// Unmute the Audio
+Audio UnMute
+
+// Toggle Mute On or Off
+Audio Toggle_Mute
+
+// Set Volume 0 to 100
+Audio Set_Volume 100
+
+// Set the Current Song to Loop or not Loop
+Audio Set_Current_Loop 1
+
+// Play through the playlist or stop when this Song ends
+Audio Auto_Play_Next 1
+
+// Returns the current Volume 0 to 100
+Audio Get_Volume
+
+// Returns the Current Song's looping status
+Audio Current_Looping
+
+// Returns the status of Auto_Play
+Audio Auto_Play_Next_Status
+
+// Returns the Name of the Current Song in the playlist
+Audio Current_Song
+
+// Returns if the status of Muted
+Audio Is_Muted
+
+Return

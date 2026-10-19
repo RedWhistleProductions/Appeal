@@ -1,0 +1,13 @@
+// Standalone: Appeal.exe Examples/Graphics/Create_A_Window
+Run Setup/Config
+Graphics Add_Window Main "Appeal Window - Adam and Eve" 800 600
+Graphics Set_FPS 60
+Graphics Set_GUI_Visible False
+
+Run Examples/Graphics/Setup_Characters
+
+// Select Walking with: Graphics Set_Animation Adam Walking
+// Return to the first animation with: Graphics Reset_Animation Adam
+// The renderer advances animations automatically, including in this loop.
+Graphics Wait_Until_Close Main
+Graphics Close_All

@@ -1,0 +1,10 @@
+// Title Path
+"RPG 1" Samples/RPG_1.mp3
+"RPG 2" Samples/RPG_2.mp3
+"Peace at Last" Samples/Peace_At_Last.mp3
+"Running Through The Forest" Samples/Running_Through_The_Forest.mp3
+"Soul Of The Forest" Samples/Soul_Of_The_Forest.mp3
+"The Black Bagpipe" Samples/The_Black_Bagpipe.mp3
+"The Celebration" Samples/The_Celebration.mp3
+"The Last Stand - Electric Remix" Samples/The_Last_Stand_-_Electric_Remix.mp3
+"The Last Stand" Samples/The_Last_Stand.mp3

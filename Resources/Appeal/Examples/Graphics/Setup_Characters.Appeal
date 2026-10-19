@@ -1,0 +1,20 @@
+// Shared setup: requires an existing graphics window.
+// First row: Standing. Second row: Walking. Frames are 64x64, row-major.
+Graphics Load_Animation Adam Standing Examples/Characters/Adam_Movement.png 64 64 0 8
+Graphics Load_Animation Adam Walking Examples/Characters/Adam_Movement.png 64 64 8 8
+Graphics Load_Animation Eve Standing Examples/Characters/Eve_Movement.png 64 64 0 8
+Graphics Load_Animation Eve Walking Examples/Characters/Eve_Movement.png 64 64 8 8
+Graphics Set_Animation_FPS Adam Standing 7
+Graphics Set_Animation_FPS Eve Standing 7
+Graphics Set_Animation_FPS Adam Walking 10
+Graphics Set_Animation_FPS Eve Walking 10
+
+Graphics Set_Scale Adam 3 3 1
+// Negative width mirrors Eve; offset X by her 192-pixel display width.
+Graphics Set_Scale Eve -3 3 1
+Graphics Rotate Adam 0 0 0
+Graphics Rotate Eve 0 0 0
+Graphics Paste Adam 176 204 0
+Graphics Paste Eve 624 204 0
+
+Return

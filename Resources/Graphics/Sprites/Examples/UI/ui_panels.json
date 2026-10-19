@@ -1,0 +1,437 @@
+{
+  "schema": "bananas.sprite-atlas.v1",
+  "image": "ui_panels.png",
+  "format": "RGBA8",
+  "size": {
+    "w": 512,
+    "h": 352
+  },
+  "grid": {
+    "cell_width": 32,
+    "cell_height": 32,
+    "margin": 0,
+    "spacing": 0
+  },
+  "coordinate_origin": "top-left",
+  "license": "CC0-1.0",
+  "sprites": {
+    "button_normal": {
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 128,
+        "h": 32
+      },
+      "nine_slice": {
+        "left": 12,
+        "right": 12,
+        "top": 8,
+        "bottom": 8
+      },
+      "min_size": {
+        "w": 25,
+        "h": 17
+      },
+      "content_inset": {
+        "left": 12,
+        "right": 12,
+        "top": 8,
+        "bottom": 8
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "button_hover": {
+      "rect": {
+        "x": 128,
+        "y": 0,
+        "w": 128,
+        "h": 32
+      },
+      "nine_slice": {
+        "left": 12,
+        "right": 12,
+        "top": 8,
+        "bottom": 8
+      },
+      "min_size": {
+        "w": 25,
+        "h": 17
+      },
+      "content_inset": {
+        "left": 12,
+        "right": 12,
+        "top": 8,
+        "bottom": 8
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "button_pressed": {
+      "rect": {
+        "x": 256,
+        "y": 0,
+        "w": 128,
+        "h": 32
+      },
+      "nine_slice": {
+        "left": 12,
+        "right": 12,
+        "top": 8,
+        "bottom": 8
+      },
+      "min_size": {
+        "w": 25,
+        "h": 17
+      },
+      "content_inset": {
+        "left": 12,
+        "right": 12,
+        "top": 8,
+        "bottom": 8
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "button_disabled": {
+      "rect": {
+        "x": 384,
+        "y": 0,
+        "w": 128,
+        "h": 32
+      },
+      "nine_slice": {
+        "left": 12,
+        "right": 12,
+        "top": 8,
+        "bottom": 8
+      },
+      "min_size": {
+        "w": 25,
+        "h": 17
+      },
+      "content_inset": {
+        "left": 12,
+        "right": 12,
+        "top": 8,
+        "bottom": 8
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "dialogue_parchment": {
+      "rect": {
+        "x": 0,
+        "y": 32,
+        "w": 256,
+        "h": 128
+      },
+      "nine_slice": {
+        "left": 24,
+        "right": 24,
+        "top": 24,
+        "bottom": 24
+      },
+      "min_size": {
+        "w": 49,
+        "h": 49
+      },
+      "content_inset": {
+        "left": 24,
+        "right": 24,
+        "top": 24,
+        "bottom": 24
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "dialogue_wood": {
+      "rect": {
+        "x": 256,
+        "y": 32,
+        "w": 256,
+        "h": 128
+      },
+      "nine_slice": {
+        "left": 24,
+        "right": 24,
+        "top": 24,
+        "bottom": 24
+      },
+      "min_size": {
+        "w": 49,
+        "h": 49
+      },
+      "content_inset": {
+        "left": 24,
+        "right": 24,
+        "top": 24,
+        "bottom": 24
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "inventory_panel": {
+      "rect": {
+        "x": 0,
+        "y": 160,
+        "w": 128,
+        "h": 128
+      },
+      "nine_slice": {
+        "left": 24,
+        "right": 24,
+        "top": 24,
+        "bottom": 24
+      },
+      "min_size": {
+        "w": 49,
+        "h": 49
+      },
+      "content_inset": {
+        "left": 24,
+        "right": 24,
+        "top": 24,
+        "bottom": 24
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "tooltip_panel": {
+      "rect": {
+        "x": 128,
+        "y": 160,
+        "w": 256,
+        "h": 128
+      },
+      "nine_slice": {
+        "left": 24,
+        "right": 24,
+        "top": 24,
+        "bottom": 24
+      },
+      "min_size": {
+        "w": 49,
+        "h": 49
+      },
+      "content_inset": {
+        "left": 24,
+        "right": 24,
+        "top": 24,
+        "bottom": 24
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "bar_track": {
+      "rect": {
+        "x": 0,
+        "y": 288,
+        "w": 128,
+        "h": 32
+      },
+      "nine_slice": {
+        "left": 12,
+        "right": 12,
+        "top": 8,
+        "bottom": 8
+      },
+      "min_size": {
+        "w": 25,
+        "h": 17
+      },
+      "content_inset": {
+        "left": 12,
+        "right": 12,
+        "top": 8,
+        "bottom": 8
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "bar_health_preview": {
+      "rect": {
+        "x": 128,
+        "y": 288,
+        "w": 128,
+        "h": 32
+      },
+      "nine_slice": {
+        "left": 12,
+        "right": 12,
+        "top": 8,
+        "bottom": 8
+      },
+      "min_size": {
+        "w": 25,
+        "h": 17
+      },
+      "content_inset": {
+        "left": 12,
+        "right": 12,
+        "top": 8,
+        "bottom": 8
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "bar_fill_health": {
+      "rect": {
+        "x": 12,
+        "y": 328,
+        "w": 104,
+        "h": 12
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "usage": "clip_width_by_value",
+      "grid_container": {
+        "x": 0,
+        "y": 320,
+        "w": 128,
+        "h": 32
+      }
+    },
+    "bar_stamina_preview": {
+      "rect": {
+        "x": 256,
+        "y": 288,
+        "w": 128,
+        "h": 32
+      },
+      "nine_slice": {
+        "left": 12,
+        "right": 12,
+        "top": 8,
+        "bottom": 8
+      },
+      "min_size": {
+        "w": 25,
+        "h": 17
+      },
+      "content_inset": {
+        "left": 12,
+        "right": 12,
+        "top": 8,
+        "bottom": 8
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "bar_fill_stamina": {
+      "rect": {
+        "x": 140,
+        "y": 328,
+        "w": 104,
+        "h": 12
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "usage": "clip_width_by_value",
+      "grid_container": {
+        "x": 128,
+        "y": 320,
+        "w": 128,
+        "h": 32
+      }
+    },
+    "bar_experience_preview": {
+      "rect": {
+        "x": 384,
+        "y": 288,
+        "w": 128,
+        "h": 32
+      },
+      "nine_slice": {
+        "left": 12,
+        "right": 12,
+        "top": 8,
+        "bottom": 8
+      },
+      "min_size": {
+        "w": 25,
+        "h": 17
+      },
+      "content_inset": {
+        "left": 12,
+        "right": 12,
+        "top": 8,
+        "bottom": 8
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "bar_fill_experience": {
+      "rect": {
+        "x": 268,
+        "y": 328,
+        "w": 104,
+        "h": 12
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "usage": "clip_width_by_value",
+      "grid_container": {
+        "x": 256,
+        "y": 320,
+        "w": 128,
+        "h": 32
+      }
+    }
+  },
+  "button_states": {
+    "normal": "button_normal",
+    "hover": "button_hover",
+    "pressed": "button_pressed",
+    "disabled": "button_disabled"
+  },
+  "dynamic_bars": {
+    "track": "bar_track",
+    "fill_rect_in_track": {
+      "x": 12,
+      "y": 10,
+      "w": 104,
+      "h": 12
+    },
+    "fill_sprites": [
+      "bar_fill_health",
+      "bar_fill_stamina",
+      "bar_fill_experience"
+    ],
+    "value_range": [
+      0,
+      1
+    ],
+    "fill_rule": "draw leftmost floor(104*value) pixels of fill sprite at track+(12,10)"
+  }
+}

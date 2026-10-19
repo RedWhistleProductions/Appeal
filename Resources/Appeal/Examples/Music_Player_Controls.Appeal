@@ -1,0 +1,50 @@
+// Shared callbacks and GUI; caller sets Music_Player_Overlay to 0 or 1.
+Define_Function Music_Player_Next
+    Audio Next
+End_Function
+
+Define_Function Music_Player_Back
+    Audio Back
+End_Function
+
+Define_Function Music_Player_Play_Stop
+    Set_Var Music_Was_Playing (Audio Is_Playing)
+    If Var Music_Was_Playing == 1
+    {
+        Audio Stop
+    }
+    If Var Music_Was_Playing == 0
+    {
+        Audio Play
+    }
+End_Function
+
+Define_Function Music_Player_GUI
+    Set_Var Play_Stop_Label "Play"
+    If (Audio Is_Playing) == 1
+    {
+        Set_Var Play_Stop_Label "Stop"
+    }
+    If Var Music_Player_Overlay == 1
+    {
+        Graphics GUI_Begin "Music Controls"
+        Graphics GUI_Text Music_Current_Song (Audio Current_Song)
+    }
+    If Var Music_Player_Overlay == 0
+    {
+        Graphics GUI_Begin_Fullscreen "Music Player"
+    }
+    Graphics GUI_Button Music_Player_Back_Button "Back" Music_Player_Back
+    Graphics GUI_Same_Line
+    Graphics GUI_Button Music_Player_Play_Stop_Button Var Play_Stop_Label Music_Player_Play_Stop
+    Graphics GUI_Same_Line
+    Graphics GUI_Button Music_Player_Next_Button "Next" Music_Player_Next
+    Graphics GUI_Slider_Int Music_Player_Volume "Volume (%)" 100 0 100 Audio.Set_Volume_Percent
+    If Var Music_Player_Overlay == 1
+    {
+        Call Character_Animation_GUI
+    }
+    Graphics GUI_End_Window
+End_Function
+
+Return

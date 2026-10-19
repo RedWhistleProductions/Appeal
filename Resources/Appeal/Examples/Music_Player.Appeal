@@ -1,0 +1,35 @@
+// Standalone: Appeal.exe Examples/Music_Player
+Run Setup/Config
+Run Examples/Music_Player_Controls
+Set_Var Music_Player_Overlay 0
+
+Audio Load_Play_List "Play_All.txt"
+
+Audio Auto_Play_Next 1
+Audio Set_Volume_Percent 100
+Audio Play
+
+Set_Var Window_Song (Audio Current_Song)
+Graphics Add_Window Main Var Window_Song 800 600
+Graphics Set_GUI_Docking False
+Graphics Set_GUI_Visible True
+Graphics Set_FPS 60
+Graphics Window_Open Main
+Set_Var_Global Music_Window_Open Graphics.Window.Main.Open
+Loop While Var Music_Window_Open == 1
+{
+    Set_Var Current_Song (Audio Current_Song)
+    If Var Current_Song != Var Window_Song
+    {
+        Graphics Set_Window_Title Main Var Current_Song
+        Set_Var Window_Song Var Current_Song
+    }
+    Call Music_Player_GUI
+    Graphics Render
+    Graphics Update
+    Graphics Window_Open Main
+    Set_Var_Global Music_Window_Open Graphics.Window.Main.Open
+}
+
+Audio Stop
+Graphics Close_All

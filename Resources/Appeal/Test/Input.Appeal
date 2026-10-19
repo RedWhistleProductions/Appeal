@@ -1,0 +1,47 @@
+Input Debug True
+
+Input Set_Paths Resources
+
+Input Add_Control_Set Default
+Input Set_Control_Set Default
+Input Update Default
+
+Input Bind_Key Jump Space
+Input Bind_Mouse Fire Left
+Input Bind_Button Fire A
+Input Bind_Axis Move Left_Stick
+Input Unbind Jump
+
+Input Down Jump
+Input Pressed Jump
+Input Released Jump
+Input Axis Move
+
+Input Mouse_X
+Input Mouse_Y
+Input Mouse_Delta_X
+Input Mouse_Delta_Y
+Input Mouse_Wheel
+Input Mouse_Down Left
+Input Mouse_Pressed Left
+Input Mouse_Released Left
+
+Input Set_Key_Down Space On_Jump_Down
+Input Set_Key_Up Space On_Jump_Up
+Input Set_Mouse_Down Left On_Fire_Down
+Input Set_Mouse_Up Left On_Fire_Up
+Input Set_Controller_Button_Down A On_Fire_Down
+Input Set_Controller_Button_Up A On_Fire_Up
+Input Set_Controller_Axis Left_Stick On_Move
+Input Open_Controller 0
+Input Close_Controller 0
+Input Controller_Down 0 A
+Input Controller_Pressed 0 A
+Input Controller_Released 0 A
+Input Controller_Axis 0 Left_Stick
+Input Set_Controller_Button_Down_For 0 A On_Fire_Down
+Input Set_Controller_Button_Up_For 0 A On_Fire_Up
+Input Set_Controller_Axis_For 0 Left_Stick On_Move
+Input Set_Controller_Axis_Range 0 Left_Stick -100 100 On_Move
+
+Return

@@ -58,7 +58,11 @@ void Dynamic_Module::Load(std::string Module_Name)
     handle = LoadLibraryW(std::wstring(Module_Name.begin(), Module_Name.end()).c_str());
     if (!handle) 
     {
-        if(Debug) std::cout << "Error: " << Module_Name << " not found" << std::endl;
+        // Loading failures must remain visible even when script Debug is off.
+        // Include the Windows error because a dependency can be missing even
+        // when the requested module DLL itself exists.
+        std::cerr << "Error: Could not load module " << Module_Name
+                  << " (Windows error " << GetLastError() << ")" << std::endl;
         exit(1);
     }
     else

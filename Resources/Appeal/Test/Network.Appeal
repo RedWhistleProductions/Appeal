@@ -1,0 +1,14 @@
+Network Debug On
+Network Set_Paths Resources
+Network Configure HTML 172.0.0.1 80
+Network Server
+Network Stop_Server
+Network Connect Chat
+Network Disconnect Chat
+Network Send	Chat "Hello World"
+Network Receive Chat
+Network Get_IP Google.com
+Network Run Server_Side_Script
+Network Download	Appeal Test_File.txt
+
+Return

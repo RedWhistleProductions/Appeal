@@ -1,0 +1,116 @@
+// Select independently from the animations loaded by Setup_Characters.
+Define_Function Adam_Select_Animation
+    Graphics GUI_Selection_Text Adam_Animation
+    Set_Var_Global Adam_Selected_Animation Graphics.GUI.Adam_Animation.Text
+    Graphics Set_Animation Adam Var Adam_Selected_Animation
+End_Function
+
+Define_Function Eve_Select_Animation
+    Graphics GUI_Selection_Text Eve_Animation
+    Set_Var_Global Eve_Selected_Animation Graphics.GUI.Eve_Animation.Text
+    Graphics Set_Animation Eve Var Eve_Selected_Animation
+End_Function
+
+Define_Function Adam_Set_Speed
+    Set_Var Adam_Speed Var Callback_Value
+End_Function
+
+Define_Function Adam_Move_Up
+    Set_Var Adam_Y (Subtract Var Adam_Y Var Adam_Speed)
+    Graphics Paste Adam Var Adam_X Var Adam_Y 0
+End_Function
+
+Define_Function Adam_Move_Down
+    Set_Var Adam_Y (Add Var Adam_Y Var Adam_Speed)
+    Graphics Paste Adam Var Adam_X Var Adam_Y 0
+End_Function
+
+Define_Function Adam_Move_Left
+    Set_Var Adam_X (Subtract Var Adam_X Var Adam_Speed)
+    Graphics Paste Adam Var Adam_X Var Adam_Y 0
+End_Function
+
+Define_Function Adam_Move_Right
+    Set_Var Adam_X (Add Var Adam_X Var Adam_Speed)
+    Graphics Paste Adam Var Adam_X Var Adam_Y 0
+End_Function
+
+Define_Function Eve_Set_Speed
+    Set_Var Eve_Speed Var Callback_Value
+End_Function
+
+Define_Function Eve_Move_Up
+    Set_Var Eve_Y (Subtract Var Eve_Y Var Eve_Speed)
+    Graphics Paste Eve Var Eve_X Var Eve_Y 0
+End_Function
+
+Define_Function Eve_Move_Down
+    Set_Var Eve_Y (Add Var Eve_Y Var Eve_Speed)
+    Graphics Paste Eve Var Eve_X Var Eve_Y 0
+End_Function
+
+Define_Function Eve_Move_Left
+    Set_Var Eve_X (Subtract Var Eve_X Var Eve_Speed)
+    Graphics Paste Eve Var Eve_X Var Eve_Y 0
+End_Function
+
+Define_Function Eve_Move_Right
+    Set_Var Eve_X (Add Var Eve_X Var Eve_Speed)
+    Graphics Paste Eve Var Eve_X Var Eve_Y 0
+End_Function
+
+Define_Function Adam_Stick_X
+    Set_Var Adam_X (Add Var Adam_X Var Callback_Value)
+    Graphics Paste Adam Var Adam_X Var Adam_Y 0
+End_Function
+
+Define_Function Adam_Stick_Y
+    Set_Var Adam_Y (Add Var Adam_Y Var Callback_Value)
+    Graphics Paste Adam Var Adam_X Var Adam_Y 0
+End_Function
+
+Define_Function Adam_Set_Deadzone
+    Set_Var Adam_Deadzone Var Callback_Value
+    Input Set_Controller_Deadzone Var Adam_Deadzone
+End_Function
+
+Define_Function Adam_Set_DPad_Repeat
+    Set_Var Adam_DPad_Repeat Var Callback_Value
+    Input Set_Controller_Button_Repeat DPad_Up Var Adam_DPad_Repeat
+    Input Set_Controller_Button_Repeat DPad_Down Var Adam_DPad_Repeat
+    Input Set_Controller_Button_Repeat DPad_Left Var Adam_DPad_Repeat
+    Input Set_Controller_Button_Repeat DPad_Right Var Adam_DPad_Repeat
+End_Function
+
+// Tabs keep both sets of controls within the existing top panel.
+Define_Function Character_Animation_GUI
+    Graphics GUI_Separator_Text "Characters"
+    Graphics GUI_Tab_Bar_Begin Character_Controls
+    Graphics GUI_Tab_Item_Begin Adam
+    Graphics GUI_Checkbox Adam_DPad_Repeat_Control "Repeat D-pad while held" Var Adam_DPad_Repeat Adam_Set_DPad_Repeat
+    Graphics GUI_Slider_Int Adam_Deadzone_Control "Stick dead zone (%)" Var Adam_Deadzone 0 99 Adam_Set_Deadzone
+    Graphics GUI_Combo Adam_Animation "Adam animation" "Standing|Walking" 0 Adam_Select_Animation
+    Graphics GUI_Slider_Int Adam_Speed_Control "Speed (pixels/click)##Adam" Var Adam_Speed 1 50 Adam_Set_Speed
+    Graphics GUI_Button Adam_Up_Button "^ Up##Adam" Adam_Move_Up
+    Graphics GUI_Same_Line
+    Graphics GUI_Button Adam_Down_Button "v Down##Adam" Adam_Move_Down
+    Graphics GUI_Same_Line
+    Graphics GUI_Button Adam_Left_Button "< Left##Adam" Adam_Move_Left
+    Graphics GUI_Same_Line
+    Graphics GUI_Button Adam_Right_Button "Right >##Adam" Adam_Move_Right
+    Graphics GUI_Tab_Item_End
+    Graphics GUI_Tab_Item_Begin Eve
+    Graphics GUI_Combo Eve_Animation "Eve animation" "Standing|Walking" 0 Eve_Select_Animation
+    Graphics GUI_Slider_Int Eve_Speed_Control "Speed (pixels/click)##Eve" Var Eve_Speed 1 50 Eve_Set_Speed
+    Graphics GUI_Button Eve_Up_Button "^ Up##Eve" Eve_Move_Up
+    Graphics GUI_Same_Line
+    Graphics GUI_Button Eve_Down_Button "v Down##Eve" Eve_Move_Down
+    Graphics GUI_Same_Line
+    Graphics GUI_Button Eve_Left_Button "< Left##Eve" Eve_Move_Left
+    Graphics GUI_Same_Line
+    Graphics GUI_Button Eve_Right_Button "Right >##Eve" Eve_Move_Right
+    Graphics GUI_Tab_Item_End
+    Graphics GUI_Tab_Bar_End
+End_Function
+
+Return

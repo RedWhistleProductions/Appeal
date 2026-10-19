@@ -1,5 +1,20 @@
 Obj/
-Appeal
-Appeal.exe
+/Appeal
+/Appeal.exe
 Dist/
 .vscode/
+
+# Local module repositories and build outputs live here.
+Resources/Modules/*
+!Resources/Modules/.gitkeep
+
+# Local extension repositories and build outputs live here.
+Resources/Extensions/*
+!Resources/Extensions/.gitkeep
+
+# Local design reference.
+/Docs/Design_Reference.txt
+
+# Local runtime libraries and GUI layout.
+/*.dll
+/imgui.ini

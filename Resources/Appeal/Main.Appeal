@@ -1,2 +1,24 @@
+//Debug On
 Run Setup/Config
+
+//Run Test/Audio
+//Run Examples/Audio/Using_A_Playlist
+
+//Run Test/Network
+//Run Examples/Network/HTML_Server
+//Run Examples/Network/Chat_Server
+//Run Examples/Network/Chat_Client
+//Run Examples/Network/Appeal_Server
+//Run Examples/Network/Appeal_Client
+
+//Run Test/Graphics
+//Run Examples/Graphics/Create_A_Window
+
+// Music Player uses the Audio module and Graphics module together
+//Run Examples/Music_Player
+Run Examples/Animation_Music_Player
+
+//Run Test/Input
+
+
 Done

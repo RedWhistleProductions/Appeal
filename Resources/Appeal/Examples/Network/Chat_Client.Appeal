@@ -1,0 +1,24 @@
+// Run from the Appeal folder with Chat_Server.Appeal running first.
+Network Debug On
+Network Configure Chat 10.0.0.35 1234
+Network Connect Chat
+
+Print "Type a message and press Enter to send it. Type Done to disconnect."
+Set_Var Reading 1
+Loop While Var Reading == 1
+{
+    Print "Message:"
+    // Read a complete terminal line; Reading becomes 0 at end of input.
+    Read_Line Message Reading
+    If Var Message == "Done"
+    {
+        Set_Var Reading 0
+    }
+    If Var Reading == 1
+    {
+        Network Send Chat Var Message
+        Network Receive Chat
+    }
+}
+Network Disconnect Chat
+Return

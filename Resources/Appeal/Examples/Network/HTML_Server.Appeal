@@ -1,0 +1,13 @@
+// HTML Server Example
+// Run from the Appeal folder with the SDL2 Network plugin configured.
+Network Set_HTML_Path Resources/Network/HTML
+Network Configure HTTP 127.0.0.1 80
+Network Server
+
+Print "HTML Server Online"
+
+Loop While 1 == 1
+{
+    Delay 1
+}
+Return
