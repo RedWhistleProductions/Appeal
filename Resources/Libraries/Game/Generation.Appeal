@@ -1,0 +1,64 @@
+// Deterministic connected 2D tile layouts using existing SQLite TEMP/JSON APIs.
+Set_Var Generation_Database ""
+Set_Var Generation_Width 16
+Set_Var Generation_Height 12
+Set_Var Generation_Seed 1
+Set_Var Generation_Density 35
+Set_Var Generation_OK 0
+Set_Var Generation_Cell_Index 0
+Set_Var Generation_Section Generated
+Set_Var Generation_Floor ""
+Set_Var Generation_Wall ""
+
+Define_Function Generation_Init
+    Storage Use Var Generation_Database
+    Storage Execute_SQL "CREATE TEMP TABLE IF NOT EXISTS Gen_Context (Key TEXT PRIMARY KEY,Value TEXT NOT NULL DEFAULT ''); CREATE TEMP VIEW IF NOT EXISTS Gen_Config AS SELECT 'Current' AS Key,CAST((SELECT Value FROM Gen_Context WHERE Key='Width') AS INTEGER) AS Width,CAST((SELECT Value FROM Gen_Context WHERE Key='Height') AS INTEGER) AS Height,CAST((SELECT Value FROM Gen_Context WHERE Key='Seed') AS INTEGER) AS Seed,CAST((SELECT Value FROM Gen_Context WHERE Key='Density') AS INTEGER) AS Density; CREATE TEMP VIEW IF NOT EXISTS Gen_Valid AS SELECT Key,CASE WHEN Width BETWEEN 3 AND 64 AND Height BETWEEN 3 AND 64 AND Seed BETWEEN 0 AND 2147483646 AND Density BETWEEN 0 AND 90 AND (SELECT count(*) FROM Gen_Context WHERE Key IN('Width','Height','Seed','Density'))=4 AND NOT EXISTS(SELECT 1 FROM Gen_Context WHERE Value='' OR Value GLOB '*[^0-9]*') THEN '1' ELSE '0' END AS Valid FROM Gen_Config; CREATE TEMP TABLE IF NOT EXISTS Gen_Stage (Cell_Index INTEGER PRIMARY KEY,X INTEGER,Y INTEGER,Walkable INTEGER); CREATE TEMP TABLE IF NOT EXISTS Gen_Cells (Cell_Index INTEGER PRIMARY KEY,X INTEGER,Y INTEGER,Walkable INTEGER); CREATE TEMP TABLE IF NOT EXISTS Gen_Meta (Key TEXT PRIMARY KEY,Width INTEGER,Height INTEGER,Seed INTEGER,Density INTEGER); CREATE TEMP VIEW IF NOT EXISTS Gen_Export AS SELECT Key,json_object('version',1,'width',Width,'height',Height,'seed',Seed,'density',Density,'cells',json((SELECT json_group_array(Walkable) FROM (SELECT Walkable FROM Gen_Cells ORDER BY Cell_Index)))) AS Data FROM Gen_Meta;"
+End_Function
+
+Define_Function Generation_Create
+    Storage Use Var Generation_Database
+    Storage Set_Field Gen_Context Key Width Value Var Generation_Width
+    Storage Set_Field Gen_Context Key Height Value Var Generation_Height
+    Storage Set_Field Gen_Context Key Seed Value Var Generation_Seed
+    Storage Set_Field Gen_Context Key Density Value Var Generation_Density
+    Set_Var Generation_OK 0
+    Set_Var Generation_Status "Use integer dimensions 3..64, seed 0..2147483646, density 0..90."
+    If (Storage Get_Field Gen_Valid Key Current Valid) == 1
+    {
+        Set_Var Generation_Status (Storage Try_SQL "SAVEPOINT Gen_Write; DELETE FROM Gen_Stage; WITH RECURSIVE seq(n) AS (VALUES(0) UNION ALL SELECT n+1 FROM seq WHERE n+1<(SELECT Width*Height FROM Gen_Config)),coords AS (SELECT n,n%(SELECT Width FROM Gen_Config) AS x,n/(SELECT Width FROM Gen_Config) AS y FROM seq),hashed AS (SELECT n,x,y,(((SELECT Seed FROM Gen_Config)*1103515245+(n+1)*2654435761)%2147483647) AS h FROM coords) INSERT INTO Gen_Stage SELECT n,x,y,CASE WHEN x=0 OR y=0 OR x=(SELECT Width-1 FROM Gen_Config) OR y=(SELECT Height-1 FROM Gen_Config) THEN 0 WHEN y=1 OR x=(SELECT Width-2 FROM Gen_Config) THEN 1 WHEN ((h*h+12345)%2147483647)%100<(SELECT Density FROM Gen_Config) THEN 0 ELSE 1 END FROM hashed; WITH RECURSIVE reachable(n) AS (SELECT Cell_Index FROM Gen_Stage WHERE X=1 AND Y=1 UNION SELECT c.Cell_Index FROM Gen_Stage c JOIN reachable r ON c.Cell_Index IN(r.n-1,r.n+1,r.n-(SELECT Width FROM Gen_Config),r.n+(SELECT Width FROM Gen_Config)) WHERE c.Walkable=1) UPDATE Gen_Stage SET Walkable=0 WHERE Walkable=1 AND Cell_Index NOT IN(SELECT n FROM reachable); DELETE FROM Gen_Cells; INSERT INTO Gen_Cells SELECT * FROM Gen_Stage; DELETE FROM Gen_Meta; INSERT INTO Gen_Meta SELECT Key,Width,Height,Seed,Density FROM Gen_Config; RELEASE Gen_Write;")
+        If Var Generation_Status != "" { Storage Try_SQL "ROLLBACK TO Gen_Write; RELEASE Gen_Write;" }
+        If Var Generation_Status == ""
+        {
+            Set_Var Generation_OK 1
+            Set_Var Generation_Status Generated
+        }
+    }
+End_Function
+
+Define_Function Generation_Read
+    Storage Use Var Generation_Database
+    Set_Var Generation_X (Storage Get_Field Gen_Cells Cell_Index Var Generation_Cell_Index X)
+    Set_Var Generation_Y (Storage Get_Field Gen_Cells Cell_Index Var Generation_Cell_Index Y)
+    Set_Var Generation_Walkable (Storage Get_Field Gen_Cells Cell_Index Var Generation_Cell_Index Walkable)
+End_Function
+Define_Function Generation_Export
+    Storage Use Var Generation_Database
+    Return_Value (Storage Get_Field Gen_Export Key Current Data)
+End_Function
+
+// Existing active World scene and prototype entities are required.
+Define_Function Generation_Build_World
+    Storage Use Var Generation_Database
+    Set_Var Generation_Output_Width (Storage Get_Field Gen_Meta Key Current Width)
+    Set_Var Generation_Output_Height (Storage Get_Field Gen_Meta Key Current Height)
+    World Create_Section Var Generation_Section Var Generation_Output_Width Var Generation_Output_Height
+    Set_Var Generation_Count (Multiply Var Generation_Output_Width Var Generation_Output_Height)
+    Set_Var Generation_Cell_Index 0
+    Loop While Var Generation_Cell_Index < Var Generation_Count
+    {
+        Call Generation_Read
+        If Var Generation_Walkable == 1 { World Set_Tile Var Generation_Section Var Generation_X Var Generation_Y Var Generation_Floor }
+        If Var Generation_Walkable == 0 { World Set_Tile Var Generation_Section Var Generation_X Var Generation_Y Var Generation_Wall }
+        Set_Var Generation_Cell_Index (Add Var Generation_Cell_Index 1)
+    }
+End_Function

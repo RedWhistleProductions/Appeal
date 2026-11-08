@@ -38,3 +38,4 @@ Available libraries:
 - `Game/Turns` / `Game/Grid`: action budgets, turn order and logical grid moves.
 - `Game/View_3D`: static model/camera/physics-position helpers; animated 3D remains partial.
 - `Game/Crafting`: atomic multi-ingredient resource costs and item production.
+- `Game/Generation`: deterministic connected tile layouts and World map construction.

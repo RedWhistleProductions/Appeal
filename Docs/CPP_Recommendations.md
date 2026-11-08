@@ -237,6 +237,11 @@ expanding the C++ implementation. These are recommendations, not implemented wor
   batch C++ functions. No speculative replacement of simple gameplay scripts.
 - Step 1's small sample was about 0.19 seconds for 1,000 updates with one event
   each, including process startup. This is not a large-scene performance result.
+- Procedural generation sample: repeated 32x24 seeds plus a 64x64 generation
+  batch took about 1.0 seconds; a separate 32x24 generation/World tile build took
+  about 0.13 seconds, both including interpreter process startup. Keep generation
+  off the per-frame path. Profile native recursive-query connectivity and per-cell
+  World calls separately before considering a native generator or bulk tile API.
 
 Add measured scene/object costs and new recommendations as implementation and
 full games expose them. Keep utilities and packaging work on separate lists.
