@@ -33,3 +33,4 @@ Available libraries:
 - `Game/Poses`: animation selection from gameplay state without per-frame resets.
 - `Game/FSM`: simple NPC state/enter/exit/update lifecycle and gameplay-time age.
 - `Game/Inventory`: item stacks, per-owner equipment and saveable snapshots.
+- `Game/Combat`: health/armor, protection windows, healing and resource/cooldown gates.

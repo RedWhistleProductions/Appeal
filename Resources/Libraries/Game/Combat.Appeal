@@ -1,0 +1,105 @@
+// Shared target scratch state; the host loads/stores it per actor.
+Set_Var Combat_Target ""
+Set_Var Combat_Health 100
+Set_Var Combat_Max_Health 100
+Set_Var Combat_Armor 0
+Set_Var Combat_Damage 10
+Set_Var Combat_Grace_MS 0
+Set_Var Combat_Protected_Until 0
+Set_Var Combat_Active 1
+Set_Var Combat_Accepted 0
+Set_Var Combat_Dealt 0
+Set_Var Combat_On_Hit ""
+Set_Var Combat_Heal_Amount 0
+Set_Var Combat_Busy 0
+
+Define_Function Combat_Resolve_Hit
+    Set_Var Combat_Accepted 0
+    Set_Var Combat_Dealt 0
+    Set_Var Combat_Allowed 1
+    Set_Var Combat_Reason "Target unavailable or protected."
+    If Var Game_Running == 0 { Set_Var Combat_Allowed 0 }
+    If Var Game_Paused == 1 { Set_Var Combat_Allowed 0 }
+    If Var Combat_Active == 0 { Set_Var Combat_Allowed 0 }
+    If Var Combat_Target == "" { Set_Var Combat_Allowed 0 }
+    If Var Combat_Health <= 0 { Set_Var Combat_Allowed 0 }
+    If Var Game_Time < Var Combat_Protected_Until { Set_Var Combat_Allowed 0 }
+    If Var Combat_Allowed == 1
+    {
+        Set_Var Combat_Accepted 1
+        Set_Var Combat_Reason ""
+        Set_Var Combat_Effective_Armor Var Combat_Armor
+        If Var Combat_Effective_Armor < 0 { Set_Var Combat_Effective_Armor 0 }
+        Set_Var Combat_Dealt (Subtract Var Combat_Damage Var Combat_Effective_Armor)
+        If Var Combat_Dealt < 0 { Set_Var Combat_Dealt 0 }
+        If Var Combat_Dealt > Var Combat_Health { Set_Var Combat_Dealt Var Combat_Health }
+        Set_Var Combat_Health (Subtract Var Combat_Health Var Combat_Dealt)
+        Set_Var Combat_Effective_Grace Var Combat_Grace_MS
+        If Var Combat_Effective_Grace < 0 { Set_Var Combat_Effective_Grace 0 }
+        Set_Var Combat_Protected_Until (Add Var Game_Time Var Combat_Effective_Grace)
+        If Var Combat_On_Hit != "" { Call Var Combat_On_Hit }
+        Events Emit Combat_Hit Var Combat_Target
+        If Var Combat_Health == 0 { Events Emit Combat_Defeated Var Combat_Target }
+    }
+End_Function
+
+Define_Function Combat_Heal
+    Set_Var Combat_Accepted 0
+    If Var Game_Running == 1
+    {
+        If Var Game_Paused == 0
+        {
+            If Var Combat_Health > 0
+            {
+                If Var Combat_Heal_Amount > 0
+                {
+                    If Var Combat_Active == 1
+                    {
+                        If Var Combat_Max_Health > 0
+                        {
+                            Set_Var Combat_Health (Add Var Combat_Health Var Combat_Heal_Amount)
+                            If Var Combat_Health > Var Combat_Max_Health { Set_Var Combat_Health Var Combat_Max_Health }
+                            Set_Var Combat_Accepted 1
+                        }
+                    }
+                }
+            }
+        }
+    }
+End_Function
+
+Define_Function Combat_Hit
+    If Var Combat_Busy == 0
+    {
+        Set_Var Combat_Busy 1
+        Call Combat_Resolve_Hit
+        Set_Var Combat_Busy 0
+    }
+End_Function
+
+Set_Var Ability_Name ""
+Set_Var Ability_Enabled 1
+Set_Var Ability_Resource 100
+Set_Var Ability_Cost 0
+Set_Var Ability_Cooldown_MS 0
+Set_Var Ability_Ready_At 0
+Set_Var Ability_Accepted 0
+Define_Function Ability_Try
+    Set_Var Ability_Accepted 0
+    Set_Var Ability_Allowed 1
+    If Var Game_Running == 0 { Set_Var Ability_Allowed 0 }
+    If Var Game_Paused == 1 { Set_Var Ability_Allowed 0 }
+    If Var Ability_Enabled == 0 { Set_Var Ability_Allowed 0 }
+    If Var Ability_Name == "" { Set_Var Ability_Allowed 0 }
+    If Var Ability_Cost < 0 { Set_Var Ability_Allowed 0 }
+    If Var Ability_Cooldown_MS < 0 { Set_Var Ability_Allowed 0 }
+    If Var Ability_Resource < Var Ability_Cost { Set_Var Ability_Allowed 0 }
+    If Var Game_Time < Var Ability_Ready_At { Set_Var Ability_Allowed 0 }
+    If Var Ability_Allowed == 1
+    {
+        Set_Var Ability_Resource (Subtract Var Ability_Resource Var Ability_Cost)
+        Set_Var Ability_Ready_At (Add Var Game_Time Var Ability_Cooldown_MS)
+        Set_Var Ability_Accepted 1
+        Events Emit Ability_Used Var Ability_Name
+    }
+End_Function
