@@ -25,3 +25,4 @@ Available libraries:
 - `Game/Saves`: named save slots, custom progress values, and settings.
 - `Game/Rules`: reusable All/Any condition groups and failure feedback.
 - `Game/Interactions`: guarded actions and result notifications.
+- `Game/Controls`: game/UI input gating and queued commands.

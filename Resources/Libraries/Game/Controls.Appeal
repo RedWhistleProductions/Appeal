@@ -1,0 +1,74 @@
+// Load after Runtime and Input. Host updates Input once per frame.
+Set_Var Controls_Context Game
+Set_Var Controls_Blocked 0
+Set_Var Controls_Action ""
+Set_Var Controls_Event ""
+Set_Var Controls_Value ""
+Set_Var Controls_Allowed 0
+Set_Var Controls_Down 0
+Set_Var Controls_Pressed 0
+Set_Var Controls_Released 0
+Set_Var Controls_Axis 0
+
+Define_Function Controls_Check
+    Set_Var Controls_Allowed 0
+    If Var Controls_Blocked == 0
+    {
+        If Var Controls_Context == UI
+        {
+            If (Input Focus) == GUI { Set_Var Controls_Allowed 1 }
+        }
+        If Var Controls_Context == Game
+        {
+            If (Input Focus) == Game
+            {
+                If Var Game_Running == 1
+                {
+                    If Var Game_Paused == 0 { Set_Var Controls_Allowed 1 }
+                }
+            }
+        }
+    }
+End_Function
+
+Define_Function Controls_Read_Button
+    Set_Var Controls_Down 0
+    Set_Var Controls_Pressed 0
+    Set_Var Controls_Released 0
+    Call Controls_Check
+    If Var Controls_Context == Game
+    {
+        If Var Controls_Allowed == 1
+        {
+            Set_Var Controls_Down (Input Down Var Controls_Action)
+            Set_Var Controls_Pressed (Input Pressed Var Controls_Action)
+            Set_Var Controls_Released (Input Released Var Controls_Action)
+        }
+    }
+End_Function
+
+Define_Function Controls_Read_Axis
+    Set_Var Controls_Axis 0
+    Call Controls_Check
+    If Var Controls_Context == Game
+    {
+        If Var Controls_Allowed == 1
+        {
+            Set_Var Controls_Axis (Input Axis Var Controls_Action)
+        }
+    }
+End_Function
+
+// Use for native GUI callbacks too. Only queuing is permitted during rendering.
+Define_Function Controls_Queue
+    Call Controls_Check
+    If Var Controls_Allowed == 1
+    {
+        If Var Controls_Event != "" { Events Emit Var Controls_Event Var Controls_Value }
+    }
+End_Function
+
+Define_Function Controls_Queue_Pressed
+    Call Controls_Read_Button
+    If Var Controls_Pressed == 1 { Call Controls_Queue }
+End_Function

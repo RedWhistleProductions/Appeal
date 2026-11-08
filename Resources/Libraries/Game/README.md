@@ -50,3 +50,8 @@ See [Saves](Saves.md) for custom progress hooks, settings, and restoration limit
 Load `Game/Rules` and `Game/Interactions` after Runtime. Games provide condition
 and effect hooks; the libraries handle group evaluation, gating and notifications.
 See [Interactions](Interactions.md) for pickups, doors and other guarded actions.
+
+## Input routing
+
+`Game/Controls` supplies explicit game/UI gates, neutral input reads when blocked,
+and queued commands. See [Controls](Controls.md); the host retains binding/focus ownership.
