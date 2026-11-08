@@ -1,0 +1,44 @@
+// Round-robin scheduling for expensive decisions, not a replacement physics loop.
+Set_Var Agents_Count 0
+Set_Var Agents_Budget 32
+Set_Var Agents_Cursor 0
+Set_Var Agents_Enabled 1
+Set_Var Agents_Remaining 0
+Set_Var Agents_Index -1
+
+Define_Function Agents_Begin
+    Set_Var Agents_Remaining 0
+    If Var Agents_Enabled == 1
+    {
+        If Var Game_Running == 1
+        {
+            If Var Game_Paused == 0
+            {
+                If Var Agents_Count > 0
+                {
+                    If Var Agents_Budget > 0
+                    {
+                        Set_Var Agents_Active_Count Var Agents_Count
+                        If Var Agents_Cursor < 0 { Set_Var Agents_Cursor 0 }
+                        If Var Agents_Cursor >= Var Agents_Active_Count { Set_Var Agents_Cursor 0 }
+                        Set_Var Agents_Remaining Var Agents_Budget
+                        If Var Agents_Remaining > Var Agents_Active_Count { Set_Var Agents_Remaining Var Agents_Active_Count }
+                    }
+                }
+            }
+        }
+    }
+End_Function
+
+Define_Function Agents_Next
+    Set_Var Agents_Ready 0
+    If Var Agents_Remaining > 0
+    {
+        Set_Var Agents_Index Var Agents_Cursor
+        Set_Var Agents_Cursor (Add Var Agents_Cursor 1)
+        If Var Agents_Cursor >= Var Agents_Active_Count { Set_Var Agents_Cursor 0 }
+        Set_Var Agents_Remaining (Subtract Var Agents_Remaining 1)
+        Set_Var Agents_Ready 1
+    }
+    Return_Value Var Agents_Ready
+End_Function
