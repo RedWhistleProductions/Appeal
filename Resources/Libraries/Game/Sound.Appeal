@@ -1,0 +1,25 @@
+// Load after Audio. Host loads assets once and owns music policy.
+Set_Var Sound_Enabled 1
+Set_Var Sound_Cue ""
+Set_Var Sound_Music ""
+
+Define_Function Sound_Play_Cue
+    If Var Sound_Enabled == 1
+    {
+        If Var Sound_Cue != "" { Audio Play_SFX_Name Var Sound_Cue }
+    }
+End_Function
+
+// Optional event adapter: Events Bind Sound_Cue Sound_Receive_Cue.
+Define_Function Sound_Receive_Cue
+    Set_Var Sound_Cue Var Event_Value
+    Call Sound_Play_Cue
+End_Function
+
+Define_Function Sound_Refresh_Music
+    Audio Stop
+    If Var Sound_Enabled == 1
+    {
+        If Var Sound_Music != "" { Audio Play_Song Var Sound_Music }
+    }
+End_Function

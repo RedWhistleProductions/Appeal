@@ -26,3 +26,4 @@ Available libraries:
 - `Game/Rules`: reusable All/Any condition groups and failure feedback.
 - `Game/Interactions`: guarded actions and result notifications.
 - `Game/Controls`: game/UI input gating and queued commands.
+- `Game/Sound`: event-driven sound cues and explicit music selection.

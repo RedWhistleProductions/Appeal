@@ -178,6 +178,18 @@ expanding the C++ implementation. These are recommendations, not implemented wor
 - **Acceptance:** queued results preserve each request's actor, target, action
   and reason across multiple attempts, scene transitions and deferred delivery.
 
+## 14. Audio groups and explicit playback lifetime
+
+- **Evidence:** SDL Audio Set_Volume adjusts music/video gain rather than a
+  separate SFX group; the current script interface lacks general stop/pause/
+  unload-by-effect operations. Suppressing new effects does not stop active ones.
+- **MVP approach:** short loaded-once cues, a script enable flag, and deliberate
+  music stop/select. Do not claim sample-accurate pause/resume or scene unloading.
+- **Recommended change:** explicit effects/music buses, per-instance/group
+  stop/pause/fade/unload and returned playback/load status.
+- **Acceptance:** group volume and scene cleanup affect the intended sounds
+  without changing unrelated playback; errors and lifecycle states are queryable.
+
 ## Performance watch list — no bottleneck established yet
 
 - Native timer collection currently scans every active timer each update.
