@@ -35,3 +35,4 @@ Available libraries:
 - `Game/Inventory`: item stacks, per-owner equipment and saveable snapshots.
 - `Game/Combat`: health/armor, protection windows, healing and resource/cooldown gates.
 - `Game/Dialogue`: guarded branching conversations with stale-choice rejection.
+- `Game/Turns` / `Game/Grid`: action budgets, turn order and logical grid moves.

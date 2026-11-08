@@ -1,0 +1,54 @@
+Set_Var Grid_Columns 8
+Set_Var Grid_Rows 8
+Set_Var Grid_From_X 0
+Set_Var Grid_From_Y 0
+Set_Var Grid_To_X 0
+Set_Var Grid_To_Y 0
+Set_Var Grid_Blocked 0
+Set_Var Grid_Diagonal 0
+Set_Var Grid_Corner_Clear 1
+Set_Var Grid_Max_Distance 1
+Set_Var Grid_Allowed 0
+Set_Var Grid_Origin_X 0
+Set_Var Grid_Origin_Y 0
+Set_Var Grid_Cell_Width 64
+Set_Var Grid_Cell_Height 64
+
+Define_Function Grid_Check
+    Set_Var Grid_Allowed 1
+    Set_Var Grid_DX (Subtract Var Grid_To_X Var Grid_From_X)
+    Set_Var Grid_DY (Subtract Var Grid_To_Y Var Grid_From_Y)
+    If Var Grid_DX < 0 { Set_Var Grid_DX (Multiply Var Grid_DX -1) }
+    If Var Grid_DY < 0 { Set_Var Grid_DY (Multiply Var Grid_DY -1) }
+    Set_Var Grid_Distance (Add Var Grid_DX Var Grid_DY)
+    If Var Grid_Diagonal == 1
+    {
+        Set_Var Grid_Distance Var Grid_DX
+        If Var Grid_DY > Var Grid_Distance { Set_Var Grid_Distance Var Grid_DY }
+        If Var Grid_DX > 0
+        {
+            If Var Grid_DY > 0
+            {
+                If Var Grid_Corner_Clear == 0 { Set_Var Grid_Allowed 0 }
+            }
+        }
+    }
+    If Var Grid_Columns <= 0 { Set_Var Grid_Allowed 0 }
+    If Var Grid_Rows <= 0 { Set_Var Grid_Allowed 0 }
+    If Var Grid_From_X < 0 { Set_Var Grid_Allowed 0 }
+    If Var Grid_From_Y < 0 { Set_Var Grid_Allowed 0 }
+    If Var Grid_From_X >= Var Grid_Columns { Set_Var Grid_Allowed 0 }
+    If Var Grid_From_Y >= Var Grid_Rows { Set_Var Grid_Allowed 0 }
+    If Var Grid_To_X < 0 { Set_Var Grid_Allowed 0 }
+    If Var Grid_To_Y < 0 { Set_Var Grid_Allowed 0 }
+    If Var Grid_To_X >= Var Grid_Columns { Set_Var Grid_Allowed 0 }
+    If Var Grid_To_Y >= Var Grid_Rows { Set_Var Grid_Allowed 0 }
+    If Var Grid_Blocked == 1 { Set_Var Grid_Allowed 0 }
+    If Var Grid_Distance <= 0 { Set_Var Grid_Allowed 0 }
+    If Var Grid_Distance > Var Grid_Max_Distance { Set_Var Grid_Allowed 0 }
+End_Function
+
+Define_Function Grid_To_World
+    Set_Var Grid_World_X (Add Var Grid_Origin_X (Multiply Var Grid_To_X Var Grid_Cell_Width))
+    Set_Var Grid_World_Y (Add Var Grid_Origin_Y (Multiply Var Grid_To_Y Var Grid_Cell_Height))
+End_Function

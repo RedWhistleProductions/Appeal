@@ -1,0 +1,71 @@
+Set_Var Turn_Count 2
+Set_Var Turn_Budget 2
+Set_Var Turn_Owner 0
+Set_Var Turn_Number 1
+Set_Var Turn_AP 0
+Set_Var Turn_Active 0
+Set_Var Turn_Revision 0
+Set_Var Turn_Actor -1
+Set_Var Turn_Expected_Revision -1
+Set_Var Turn_Cost 1
+Set_Var Turn_Accepted 0
+
+Define_Function Turn_Start
+    Set_Var Turn_Active 0
+    If Var Turn_Count > 0
+    {
+        If Var Turn_Budget >= 0
+        {
+            Set_Var Turn_Owner 0
+            Set_Var Turn_Number 1
+            Set_Var Turn_AP Var Turn_Budget
+            Set_Var Turn_Active 1
+            Set_Var Turn_Revision (Add Var Turn_Revision 1)
+            Events Emit Turn_Began Var Turn_Owner
+        }
+    }
+End_Function
+
+Define_Function Turn_Check
+    Set_Var Turn_Allowed 1
+    Set_Var Turn_Accepted 0
+    If Var Turn_Active == 0 { Set_Var Turn_Allowed 0 }
+    If Var Game_Running == 0 { Set_Var Turn_Allowed 0 }
+    If Var Game_Paused == 1 { Set_Var Turn_Allowed 0 }
+    If Var Turn_Actor != Var Turn_Owner { Set_Var Turn_Allowed 0 }
+    If Var Turn_Expected_Revision != Var Turn_Revision { Set_Var Turn_Allowed 0 }
+End_Function
+
+Define_Function Turn_Spend
+    Call Turn_Check
+    If Var Turn_Allowed == 1
+    {
+        If Var Turn_Cost >= 0
+        {
+            If Var Turn_Cost <= Var Turn_AP
+            {
+                Set_Var Turn_AP (Subtract Var Turn_AP Var Turn_Cost)
+                Set_Var Turn_Accepted 1
+                Set_Var Turn_Revision (Add Var Turn_Revision 1)
+                Events Emit Turn_Action Var Turn_Owner
+            }
+        }
+    }
+End_Function
+
+Define_Function Turn_End
+    Call Turn_Check
+    If Var Turn_Allowed == 1
+    {
+        Set_Var Turn_Owner (Add Var Turn_Owner 1)
+        If Var Turn_Owner >= Var Turn_Count
+        {
+            Set_Var Turn_Owner 0
+            Set_Var Turn_Number (Add Var Turn_Number 1)
+        }
+        Set_Var Turn_AP Var Turn_Budget
+        Set_Var Turn_Revision (Add Var Turn_Revision 1)
+        Set_Var Turn_Accepted 1
+        Events Emit Turn_Began Var Turn_Owner
+    }
+End_Function
