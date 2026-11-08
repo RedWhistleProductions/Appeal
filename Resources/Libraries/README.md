@@ -1,0 +1,21 @@
+# Appeal Libraries
+
+Reusable libraries written in Appeal live here, organized into subfolders by
+purpose. Unlike standalone utilities, libraries supply functions for a host
+script to use and normally do not own its window or application loop.
+
+Load a library using its resource-relative name:
+
+```text
+Run Libraries/Game/Runtime
+Call Game_Start
+```
+
+`Libraries/...` resolves beneath the configured resource folder, independently
+of the working directory. The `.Appeal` suffix is optional. Use subfolders such
+as `Game`, and document each library's inputs, outputs, dependencies, and naming
+prefix to avoid collisions in Appeal's shared function/variable namespace.
+
+Available libraries:
+
+- `Game/Runtime`: game state, timing, events, and timers.

@@ -1,0 +1,30 @@
+// Headless example; no graphics, storage or platform plugins required.
+Run Libraries/Game/Runtime
+Set_Var Demo_Finished 0
+
+Define_Function Demo_Message
+    Print Var Event_Name
+    Print Var Event_Value
+End_Function
+Define_Function Demo_Finish
+    Set_Var Demo_Finished 1
+    Call Game_Stop
+End_Function
+
+Events Bind Game_State_Changed Demo_Message
+Events Bind Greeting Demo_Message
+Events Bind Finish Demo_Finish
+Call Game_Start
+Events Emit Greeting "A reusable game loop"
+Events After End_Demo 100 Finish ""
+
+Loop While Var Demo_Finished == 0
+{
+    Call Game_Update
+    Call Game_Dispatch_Events
+    // A graphical host updates input and renders here. Game_Delta_Seconds is
+    // the elapsed gameplay time to use for movement and other simulation.
+}
+Call Game_Dispatch_Events
+Print GAME_RUNTIME_DEMO_PASSED
+Done

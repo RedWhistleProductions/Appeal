@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reusable Game Runtime — Appeal</title>
+<style>
+:root{color-scheme:light dark}body{font:16px/1.6 system-ui,sans-serif;max-width:1100px;margin:auto;padding:24px}
+a{color:light-dark(#075d91,#83caff)}table{border-collapse:collapse;width:100%;margin:16px 0}
+th,td{border:1px solid #8886;padding:10px;text-align:left;vertical-align:top}code{overflow-wrap:anywhere}
+pre{padding:16px;background:#8881;overflow:auto}
+</style>
+</head>
+<body><main>
+<h1>Game state, timing, and events</h1>
+<p><a href="index.html">Appeal docs</a> · <a href="Language.html">Language reference</a></p>
+<p>This reusable Appeal script supplies one game's lifecycle and clocks. The host owns its loop,
+input, simulation, rendering, and game-specific reset behavior. No modules, plugins, database,
+window, or assets are required by the runtime itself. Load the script once per interpreter.</p>
+<pre>Run Libraries/Game/Runtime
+Call Game_Start
+
+// Inside your existing host loop, once each frame:
+Call Game_Update
+Call Game_Dispatch_Events
+// Update your simulation using Game_Delta_Seconds, then render.</pre>
+<p>Keep updating and dispatching while paused or stopped so menus and real-time timers remain responsive.
+Do not call the gameplay simulation when paused/stopped. A zero delta is not a substitute for guarding
+actions that do not depend on time. The runtime does not automatically pause Audio, Mechanics, Physics,
+Graphics animation, or World; the host must gate/update those systems appropriately. Existing modules
+with their own clocks are not automatically driven by these deltas.</p>
+
+<h2>Basic script functions</h2>
+<table><thead><tr><th>Call</th><th>Behavior</th></tr></thead><tbody>
+<tr><td><code>Call Game_Start</code></td><td>Reset both clocks, deltas, fixed-step backlog, pending events, and timers; preserve bindings and configuration. Set running, clear pause, select Playing, and queue Game_Started. Does not recreate game objects or reset score.</td></tr>
+<tr><td><code>Call Game_Restart</code></td><td>Perform Game_Start, then queue Game_Restarted. Bind shared initialization to Game_Started; bind restart-only behavior to Game_Restarted.</td></tr>
+<tr><td><code>Call Game_Pause</code> / <code>Call Game_Resume</code></td><td>Freeze/unfreeze gameplay time without changing the named game state. Repeated calls are harmless. Pause only applies while running. Queue Game_Paused or Game_Resumed on an actual change.</td></tr>
+<tr><td><code>Call Game_Stop</code></td><td>Stop gameplay time, clear pause and fixed-step backlog, select Stopped, and queue Game_Stopped. Timers and events remain; real-time work can continue. Repeated stops are harmless.</td></tr>
+<tr><td><code>Set_Var Game_Next_State Name<br>Call Game_Set_State</code></td><td>Select a game-defined state such as Menu, Battle, or Results. Record the previous state and queue Game_State_Changed only when the name changes. State names do not automatically change running or paused status.</td></tr>
+<tr><td><code>Call Game_Update</code></td><td>Measure elapsed time from the monotonic clock and advance game/real clocks. Does not dispatch events or simulate objects.</td></tr>
+<tr><td><code>Call Game_Dispatch_Events</code></td><td>Dispatch up to Game_Event_Limit queued events. Call at a deliberate point in the host loop, normally after Game_Update.</td></tr>
+</tbody></table>
+
+<h2>Basic events and timers</h2>
+<p><code>Clock_Milliseconds</code> and <code>Events</code> are built into Appeal. No dynamic module is needed.
+Events are asynchronous within the host's single thread: Emit queues work; Dispatch runs handlers.</p>
+<pre>Define_Function Show_Message
+    Print Var Event_Value
+End_Function
+Events Bind Message Show_Message
+Call Game_Start
+Events Emit Message "Hello now"
+Events After Greeting 1000 Message "Hello after one gameplay second"
+Events After_Real Reminder 2000 Message "This timer also advances while paused"
+// Continue calling Game_Update and Game_Dispatch_Events in your loop.</pre>
+<table><thead><tr><th>Command</th><th>Arguments and behavior</th></tr></thead><tbody>
+<tr><td><code>Clock_Milliseconds</code></td><td>Return fractional milliseconds since this interpreter was constructed, using std::chrono::steady_clock. Monotonic, not a calendar timestamp or an audio clock.</td></tr>
+<tr><td><code>Events Bind Event Function</code></td><td>Both names are nonempty strings. Function must already be defined. Multiple handlers run in binding order; binding the same pair twice has no effect.</td></tr>
+<tr><td><code>Events Unbind Event Function</code></td><td>Remove that binding. Missing bindings are harmless.</td></tr>
+<tr><td><code>Events Emit Event Value</code></td><td>Queue a named event with one string payload; use <code>""</code> for no payload. Numbers may be carried as strings. Event name must not be empty.</td></tr>
+<tr><td><code>Events After Timer Delay Event Value</code></td><td>Schedule a one-shot event relative to the current gameplay clock. Delay is finite, nonnegative milliseconds. Reusing the timer name replaces it. Zero delay becomes due at the next clock update.</td></tr>
+<tr><td><code>Events After_Real Timer Delay Event Value</code></td><td>The same operation using unscaled real elapsed time, including paused/stopped frames. Timer names are shared across both clock domains.</td></tr>
+<tr><td><code>Events Cancel Timer</code></td><td>Cancel a timer that has not expired. Missing timers are harmless. Does not remove an already queued expiry event.</td></tr>
+<tr><td><code>Events Pending</code></td><td>Return the number of queued events, excluding the batch currently being dispatched.</td></tr>
+<tr><td><code>Events Timer_Count</code></td><td>Return the number of scheduled timers.</td></tr>
+<tr><td><code>Events Clear</code></td><td>Discard queued events and the remainder of an active dispatch batch. Preserve timers, clocks, and bindings.</td></tr>
+</tbody></table>
+<p>Timers expire during Game_Update/Game_Advance. If several expire in one update, they queue in
+timer-name order, after events already queued. They run at dispatch time, not at an exact wall-clock
+instant. For repetition, schedule the next timer in its handler. This deliberately skips missed
+intervals rather than producing a catch-up burst.</p>
+
+<h2>Advanced functions</h2>
+<table><thead><tr><th>Call/command</th><th>Behavior</th></tr></thead><tbody>
+<tr><td><code>Set_Var Game_Elapsed Milliseconds<br>Call Game_Advance</code></td><td>Inject elapsed time instead of reading the clock. Useful for deterministic tests or an external clock. Negative elapsed time becomes zero; invalid/nonfinite arithmetic fails. Do not alternate with Game_Update without rebasing Game_Last_Clock.</td></tr>
+<tr><td><code>Call Game_Next_Step</code></td><td>Expression function returning 1 if a fixed simulation step is available, otherwise 0. Consumes Game_Fixed_Delta from the accumulator and sets Game_Step_Seconds. Does not update module clocks or run simulation for you.</td></tr>
+<tr><td><code>Call Game_Reset_Clock</code></td><td>Reset clocks/backlog, timers, and pending events without changing state/running/pause/configuration/bindings. Rebase the wall-clock measurement.</td></tr>
+<tr><td><code>Events Update GameMilliseconds RealMilliseconds</code></td><td>Advance the native timer clocks and enqueue expiries. Both arguments must be finite, nonnegative, and nondecreasing. Normally managed by Game_Update/Game_Advance.</td></tr>
+<tr><td><code>Events Dispatch Limit</code></td><td>Dispatch a snapshot of at most Limit events; integer 1..65536. Events emitted in handlers wait for a later dispatch. Nested dispatch is rejected. No return value.</td></tr>
+<tr><td><code>Events Reset</code></td><td>Clear timers and events, cancel any active batch remainder, and reset native clocks to zero. Preserve bindings. Normally managed by Game_Start/Game_Reset_Clock.</td></tr>
+</tbody></table>
+<p>Events are FIFO. The handler list is copied for each delivered event; binding changes affect
+subsequent events. During each handler, Event_Name and Event_Value contain that event's strings.
+Their previous values (or absence) are restored after dispatch, including on error. Reset/Clear
+inside a handler cancels the remaining handlers and events in the active batch; newly emitted
+events survive for the next dispatch. A handler error stops execution; the selected batch is
+not retried. Queue and timer capacities are each 65536; exceeding either reports an error.</p>
+
+<h2>Optional fixed-step simulation</h2>
+<pre>// After defining Simulate_One_Step, use this instead of variable-delta simulation:
+Call Game_Update
+Call Game_Dispatch_Events
+Loop While (Call Game_Next_Step) == 1
+{
+    Call Simulate_One_Step
+    // That function uses Game_Step_Seconds, not Game_Delta_Seconds.
+}
+// Render once, outside the simulation loop.</pre>
+<p>The default step is approximately 1/60 second. At most eight steps are consumed per frame;
+when a further step is requested after that limit, remaining backlog is discarded to prevent
+a catch-up spiral. Game_Max_Delta clamps real elapsed time before applying the time scale.
+Consequently gameplay time can intentionally lag wall time after a stall. Gameplay timers
+follow Game_Time, not the number of fixed steps actually simulated. This is not a lockstep
+networking or deterministic-physics guarantee. Consume the fixed steps each frame if using
+this path; do not run both variable and fixed simulation for the same objects.</p>
+
+<h2>Script variables (not module globals)</h2>
+<p>Names beginning Game_ are owned by this library. Read status/output variables; change only
+configuration or documented inputs. All times use double-precision arithmetic and milliseconds
+unless their names end in Seconds.</p>
+<table><thead><tr><th>Variable</th><th>Default / meaning</th></tr></thead><tbody>
+<tr><td>Game_State / Game_Previous_State</td><td>Stopped / empty; current and last different state names.</td></tr>
+<tr><td>Game_Running / Game_Paused</td><td>0 / 0; lifecycle flags. Use functions to change them.</td></tr>
+<tr><td>Game_Time / Game_Real_Time</td><td>0 / 0; scaled active-game elapsed time and unscaled elapsed time since reset.</td></tr>
+<tr><td>Game_Delta / Game_Real_Delta / Game_Delta_Seconds</td><td>0; latest gameplay milliseconds, real milliseconds, and gameplay seconds.</td></tr>
+<tr><td>Game_Time_Scale</td><td>1; configuration. Finite nonnegative multiplier; 0 freezes gameplay time. Negative values become 0. Does not change Game_Paused.</td></tr>
+<tr><td>Game_Max_Delta</td><td>250 ms; configuration. Maximum elapsed contribution before scaling. Finite nonnegative; negative values become 0.</td></tr>
+<tr><td>Game_Event_Limit</td><td>256; configuration. Integer 1..65536 events dispatched per call.</td></tr>
+<tr><td>Game_Fixed_Delta / Game_Max_Steps</td><td>16.666666666666668 ms / 8; optional fixed-step configuration. Use a finite positive step and positive integer step budget. Nonpositive step resets to the default.</td></tr>
+<tr><td>Game_Accumulator / Game_Steps_Taken / Game_Step_Seconds</td><td>0; outstanding fixed-step time, consumed steps this frame, and latest step in seconds.</td></tr>
+<tr><td>Game_Step_Available</td><td>0; internal result flag for Game_Next_Step.</td></tr>
+<tr><td>Game_Next_State / Game_Elapsed</td><td>Inputs to Game_Set_State and Game_Advance. Set before calling.</td></tr>
+<tr><td>Game_Last_Clock / Game_Clock</td><td>Internal monotonic-clock samples; do not edit during normal use.</td></tr>
+<tr><td>Event_Name / Event_Value</td><td>Temporary strings supplied during event callbacks; previous values restored afterward.</td></tr>
+</tbody></table>
+<p>Lifecycle events: Game_State_Changed carries the new state; Game_Paused and Game_Resumed
+carry the current state; Game_Started, Game_Restarted and Game_Stopped carry an empty string.
+They are queued, not immediate callbacks. State changes happen immediately; event payloads
+describe each change even if another change occurs before dispatch.</p>
+
+<h2>Scope, cost, and validation</h2>
+<p>This first Step 1 implementation supplies reusable state/timing policy in Appeal with a small
+native clock, event queue, and named timer service. Native timer collection scans active timers
+once per update; callbacks execute Appeal scripts. High timer/listener counts or heavy handlers
+must be profiled in their actual game before adding more C++ acceleration. This layer does not
+yet prove integration of every module with one authoritative simulation clock.</p>
+<p>Language simplicity finding: Return inside an If exits its anonymous block, not the enclosing
+function. Game_Next_Step therefore uses nested guards and one final Return_Value. Game authors
+do not need to repeat this implementation; an enclosing-function return is a possible future
+language improvement.</p>
+<p>Run <code>python Tests/Game_Runtime_Tests.py</code> for lifecycle, pause/scaling, timer,
+event ordering/reentrancy, fixed-step, and monotonic-clock checks plus a small cost sample.
+Run <code>Appeal.exe Examples/Game/State_Timing_Events</code> for the headless example.</p>
+</main></body></html>

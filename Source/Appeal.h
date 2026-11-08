@@ -12,6 +12,7 @@
 #include "Data_Source_Preprocessor.h"
 #include "File_Data_Source.h"
 #include "Appeal_Function.h"
+#include "Runtime_Events.h"
 
 /****NOTE********************************************
  * Appeal uses a File_Data_Source by default,       *
@@ -77,6 +78,9 @@ class Appeal
     void Run_Commands();
     void Execute_Expression(const std::vector<std::string> &Script,
                             Return_Value_Data_Source &Results);
+    void Run_Events();
+    Runtime_Events Events;
+    const std::chrono::steady_clock::time_point Clock_Origin = std::chrono::steady_clock::now();
     Named_List<Appeal_Dictionary> Dictionary_List;
     void (*Interpreter)(Data_Source *Data);
 

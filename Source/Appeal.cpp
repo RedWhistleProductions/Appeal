@@ -82,12 +82,18 @@ namespace
         return Value.compare(Value.length() - Suffix.length(), Suffix.length(), Suffix) == 0;
     }
 
-    std::string Script_File_Name(const std::string &Appeal_Folder, const std::string &Name)
+    std::string Script_File_Name(const std::string &Resource_Folder,
+                                 const std::string &Appeal_Folder, const std::string &Name)
     {
         if(File_Exists(Name))
         {
             return Name;
         }
+
+        // Reusable scripts have an explicit resource-root namespace. Resolve
+        // it independently of the process working directory, including suffixes.
+        if(Name.rfind("Libraries/", 0) == 0 || Name.rfind("Libraries\\", 0) == 0)
+            return Resource_Folder + "/" + Name + (Ends_With(Name, ".Appeal") ? "" : ".Appeal");
 
         if(Ends_With(Name, ".Appeal"))
         {
@@ -231,7 +237,7 @@ void Appeal::Add_Extension(std::string Name)
 
 bool Appeal::Add_Script(std::string Name)
 {
-    std::string File_Name = Script_File_Name(Appeal_Folder, Name);
+    std::string File_Name = Script_File_Name(Resource_Folder, Appeal_Folder, Name);
     // First Check if the Script is already loaded
     if(Appeal_Scripts.Find(Name))
     {
@@ -435,6 +441,16 @@ void Appeal::Run_Commands()
                 std::string Str;
                 *Preprocessor >> Str;
                 std::cout << Str << std::endl;
+            }
+            else if(Command == "Clock_Milliseconds")
+            {
+                const double Milliseconds = std::chrono::duration<double, std::milli>(
+                    std::chrono::steady_clock::now() - Clock_Origin).count();
+                Preprocessor->Return_Value(Arithmetic_Result(Milliseconds));
+            }
+            else if(Command == "Events")
+            {
+                Run_Events();
             }
             else if( Command == "Run" )
             {

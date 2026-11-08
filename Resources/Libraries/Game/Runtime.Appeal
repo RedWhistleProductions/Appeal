@@ -1,0 +1,171 @@
+// Reusable single-game runtime. The host owns input, simulation and rendering.
+// Load once, then Call Game_Start. All times are milliseconds unless suffixed Seconds.
+Set_Var Game_State Stopped
+Set_Var Game_Previous_State ""
+Set_Var Game_Running 0
+Set_Var Game_Paused 0
+Set_Var Game_Time 0
+Set_Var Game_Real_Time 0
+Set_Var Game_Delta 0
+Set_Var Game_Real_Delta 0
+Set_Var Game_Delta_Seconds 0
+Set_Var Game_Time_Scale 1
+Set_Var Game_Max_Delta 250
+Set_Var Game_Event_Limit 256
+Set_Var Game_Fixed_Delta 16.666666666666668
+Set_Var Game_Max_Steps 8
+Set_Var Game_Accumulator 0
+Set_Var Game_Steps_Taken 0
+Set_Var Game_Step_Seconds 0
+Set_Var Game_Step_Available 0
+Set_Var Game_Last_Clock (Clock_Milliseconds)
+
+Define_Function Game_Set_State
+    If Var Game_Next_State != Var Game_State
+    {
+        Set_Var Game_Previous_State Var Game_State
+        Set_Var Game_State Var Game_Next_State
+        Events Emit Game_State_Changed Var Game_State
+    }
+End_Function
+
+Define_Function Game_Reset_Clock
+    Set_Var Game_Time 0
+    Set_Var Game_Real_Time 0
+    Set_Var Game_Delta 0
+    Set_Var Game_Real_Delta 0
+    Set_Var Game_Delta_Seconds 0
+    Set_Var Game_Accumulator 0
+    Set_Var Game_Steps_Taken 0
+    Set_Var Game_Step_Seconds 0
+    Set_Var Game_Last_Clock (Clock_Milliseconds)
+    Events Reset
+End_Function
+
+Define_Function Game_Start
+    Call Game_Reset_Clock
+    Set_Var Game_Running 1
+    Set_Var Game_Paused 0
+    Set_Var Game_Next_State Playing
+    Call Game_Set_State
+    Events Emit Game_Started ""
+End_Function
+
+Define_Function Game_Restart
+    Call Game_Start
+    Events Emit Game_Restarted ""
+End_Function
+
+Define_Function Game_Pause
+    If Var Game_Running == 1
+    {
+        If Var Game_Paused == 0
+        {
+            Set_Var Game_Paused 1
+            Set_Var Game_Delta 0
+            Set_Var Game_Delta_Seconds 0
+            Events Emit Game_Paused Var Game_State
+        }
+    }
+End_Function
+
+Define_Function Game_Resume
+    If Var Game_Paused == 1
+    {
+        Set_Var Game_Paused 0
+        Events Emit Game_Resumed Var Game_State
+    }
+End_Function
+
+Define_Function Game_Stop
+    If Var Game_Running == 1
+    {
+        Set_Var Game_Running 0
+        Set_Var Game_Paused 0
+        Set_Var Game_Delta 0
+        Set_Var Game_Delta_Seconds 0
+        Set_Var Game_Accumulator 0
+        Set_Var Game_Next_State Stopped
+        Call Game_Set_State
+        Events Emit Game_Stopped ""
+    }
+End_Function
+
+// Deterministic entry point: set Game_Elapsed to a nonnegative elapsed duration.
+// Used by Game_Update and by hosts/tests supplying their own clock.
+Define_Function Game_Advance
+    Set_Var Game_Real_Delta (Add Var Game_Elapsed 0)
+    If Var Game_Real_Delta < 0
+    {
+        Set_Var Game_Real_Delta 0
+    }
+    Set_Var Game_Real_Time (Add Var Game_Real_Time Var Game_Real_Delta)
+    Set_Var Game_Delta 0
+    If Var Game_Time_Scale < 0
+    {
+        Set_Var Game_Time_Scale 0
+    }
+    If Var Game_Max_Delta < 0
+    {
+        Set_Var Game_Max_Delta 0
+    }
+    If Var Game_Running == 1
+    {
+        If Var Game_Paused == 0
+        {
+            Set_Var Game_Delta Var Game_Real_Delta
+            If Var Game_Delta > Var Game_Max_Delta
+            {
+                Set_Var Game_Delta Var Game_Max_Delta
+            }
+            Set_Var Game_Delta (Multiply Var Game_Delta Var Game_Time_Scale)
+        }
+    }
+    Set_Var Game_Time (Add Var Game_Time Var Game_Delta)
+    Set_Var Game_Delta_Seconds (Divide Var Game_Delta 1000)
+    Set_Var Game_Accumulator (Add Var Game_Accumulator Var Game_Delta)
+    Set_Var Game_Steps_Taken 0
+    Events Update Var Game_Time Var Game_Real_Time
+End_Function
+
+// Optional fixed-step simulation. Use instead of variable-delta simulation.
+// Keep one result at the end: Return inside an If only exits that block.
+Define_Function Game_Next_Step
+    Set_Var Game_Step_Available 0
+    If Var Game_Fixed_Delta <= 0
+    {
+        Set_Var Game_Fixed_Delta 16.666666666666668
+    }
+    If Var Game_Steps_Taken >= Var Game_Max_Steps
+    {
+        Set_Var Game_Accumulator 0
+    }
+    If Var Game_Running == 1
+    {
+        If Var Game_Paused == 0
+        {
+            If Var Game_Steps_Taken < Var Game_Max_Steps
+            {
+                If Var Game_Accumulator >= Var Game_Fixed_Delta
+                {
+                    Set_Var Game_Accumulator (Subtract Var Game_Accumulator Var Game_Fixed_Delta)
+                    Set_Var Game_Steps_Taken (Add Var Game_Steps_Taken 1)
+                    Set_Var Game_Step_Seconds (Divide Var Game_Fixed_Delta 1000)
+                    Set_Var Game_Step_Available 1
+                }
+            }
+        }
+    }
+    Return_Value Var Game_Step_Available
+End_Function
+
+Define_Function Game_Update
+    Set_Var Game_Clock (Clock_Milliseconds)
+    Set_Var Game_Elapsed (Subtract Var Game_Clock Var Game_Last_Clock)
+    Set_Var Game_Last_Clock Var Game_Clock
+    Call Game_Advance
+End_Function
+
+Define_Function Game_Dispatch_Events
+    Events Dispatch Var Game_Event_Limit
+End_Function
