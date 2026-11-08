@@ -85,6 +85,31 @@ expanding the C++ implementation. These are recommendations, not implemented wor
 - **Acceptance:** equivalent 0/1 and False/True inputs produce identical behavior
   without diagnostics; malformed values report a useful error.
 
+## 7. GUI callback payloads and stable control IDs
+
+- **Evidence:** Graphics button callbacks receive a function name without the
+  control ID/payload. The menu adapter therefore needs a small per-row callback
+  to select the matching menu entry. The legacy backend renders buttons using
+  ImGui::Button(Command.Text), so identical visible labels share an ImGui ID
+  even when the script control names differ.
+- **MVP approach:** keep callbacks short and route selection through the reusable
+  library; use unique labels or ImGui's hidden ## suffix for duplicate labels.
+- **Recommended change:** expose callback control ID/payload context and use
+  the script control name as a stable native widget ID independently of its label.
+- **Acceptance:** one generic handler can identify any activated menu row;
+  two buttons with the same visible label activate their own actions correctly.
+
+## 8. Explicit input contexts for custom interface navigation
+
+- **Evidence:** Input gameplay getters are suppressed in GUI focus, while
+  Graphics provides native GUI keyboard/gamepad navigation in that focus.
+- **MVP approach:** use native GUI navigation for GUI menus, or script menu
+  navigation with Game focus and custom drawing. Avoid per-frame focus toggling.
+- **Recommended change:** consider explicit menu/game input contexts if custom
+  scripted GUI navigation needs independent bindings without enabling gameplay.
+- **Acceptance:** menu actions can be read while GUI is focused and gameplay
+  actions remain suppressed; transitions neither leak nor repeat held actions.
+
 ## Performance watch list — no bottleneck established yet
 
 - Native timer collection currently scans every active timer each update.

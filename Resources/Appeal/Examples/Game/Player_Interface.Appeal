@@ -1,0 +1,86 @@
+Add_Dynamic_Module Graphics Appeal_SDL2_Legacy_OpenGL_Graphics
+Add_Dynamic_Module Input Appeal_SDL2_Input
+Run Libraries/Game/Runtime
+Run Libraries/Game/Menus
+Run Libraries/Game/Interface
+Graphics Add_Window Main "Reusable player interface" 800 600
+Graphics Set_FPS 60
+Graphics Set_GUI_Docking False
+Graphics Set_GUI_Visible True
+Input Set_Focus GUI
+Input Open_Controller -1
+Set_Var Demo_Quit 0
+Set_Var Demo_Status "Choose an action"
+
+Define_Function Demo_Click_Play
+    Set_Var UI_Selected_Item 1
+    Call UI_Select_Item
+End_Function
+Define_Function Demo_Click_Options
+    Set_Var UI_Selected_Item 2
+    Call UI_Select_Item
+End_Function
+Define_Function Demo_Click_Quit
+    Set_Var UI_Selected_Item 3
+    Call UI_Select_Item
+End_Function
+Define_Function Demo_Play
+    Set_Var Demo_Status "Play selected - connect your scene here"
+End_Function
+Define_Function Demo_Options
+    Set_Var Demo_Status "Options selected - add your settings controls here"
+End_Function
+Define_Function Demo_Quit
+    Set_Var Demo_Quit 1
+End_Function
+Events Bind Play Demo_Play
+Events Bind Options Demo_Options
+Events Bind Quit Demo_Quit
+Events Bind Menu_Back Demo_Quit
+
+Define_Function Demo_Menu
+    Call Menu_Begin
+    Graphics GUI_Begin_Fullscreen Player_Menu
+    Graphics GUI_Text Heading "Example game"
+    Graphics GUI_Text Help "Mouse or Tab/arrows + Enter. Controller navigation uses the GUI backend."
+    Set_Var UI_Item_ID Demo_Play
+    Set_Var UI_Item_Label Play
+    Set_Var UI_Item_Callback Demo_Click_Play
+    Set_Var Menu_Item_Event Play
+    Set_Var Menu_Item_Value ""
+    Call UI_Menu_Item
+    Set_Var UI_Item_ID Demo_Options
+    Set_Var UI_Item_Label Options
+    Set_Var UI_Item_Callback Demo_Click_Options
+    Set_Var Menu_Item_Event Options
+    Call UI_Menu_Item
+    Set_Var UI_Item_ID Demo_Quit
+    Set_Var UI_Item_Label Quit
+    Set_Var UI_Item_Callback Demo_Click_Quit
+    Set_Var Menu_Item_Event Quit
+    Call UI_Menu_Item
+    Graphics GUI_Text Status Var Demo_Status
+    Graphics GUI_End
+    Call Menu_End
+End_Function
+
+Call Game_Start
+Set_Var Menu_Next Title
+Call Menu_Show
+Graphics Window_Open Main
+Set_Var_Global Demo_Open Graphics.Window.Main.Open
+Loop While Var Demo_Open == 1
+{
+    Input Update Default
+    Call Game_Update
+    Call Game_Dispatch_Events
+    Call Demo_Menu
+    Graphics Render
+    Graphics Update
+    Graphics Window_Open Main
+    Set_Var_Global Demo_Open Graphics.Window.Main.Open
+    If Var Demo_Quit == 1 { Set_Var Demo_Open 0 }
+}
+Input Close_Controller -1
+Graphics Close_All
+Done

@@ -1,0 +1,36 @@
+// Optional Graphics adapter for Game/Menus. Host owns windows/GUI frame/render.
+Set_Var UI_Item_ID ""
+Set_Var UI_Item_Label ""
+Set_Var UI_Marker " "
+Set_Var UI_Item_Callback ""
+Set_Var UI_Selected_Item 1
+Set_Var UI_Show_Marker 0
+
+// Set a unique UI_Item_ID and UI_Item_Label plus Menu_Item_Event/Value.
+// Button callbacks select a row for the next menu build; game actions are queued.
+Define_Function UI_Menu_Item
+    If Var Menu_Open == 1
+    {
+        Set_Var UI_Marker " "
+        If (Add Var Menu_Index 1) == Var Menu_Selected
+        {
+            Set_Var UI_Marker ">"
+        }
+        If Var UI_Show_Marker == 1
+        {
+            Graphics GUI_Text UI_Menu_Marker Var UI_Marker
+            Graphics GUI_Same_Line
+        }
+        Graphics GUI_Button Var UI_Item_ID Var UI_Item_Label Var UI_Item_Callback
+        Call Menu_Item
+    }
+End_Function
+
+// Each row callback sets UI_Selected_Item to its 1-based row, then calls this.
+Define_Function UI_Select_Item
+    If Var Menu_Open == 1
+    {
+        Set_Var Menu_Selected Var UI_Selected_Item
+        Call Menu_Accept
+    }
+End_Function

@@ -1,0 +1,109 @@
+// Reusable, renderer-independent menu navigation. Load after Game/Runtime.
+// One active menu; host supplies an ordered list of entries each frame.
+Set_Var Menu_Name ""
+Set_Var Menu_Next ""
+Set_Var Menu_Open 0
+Set_Var Menu_Selected 1
+Set_Var Menu_Count 0
+Set_Var Menu_Index 0
+Set_Var Menu_Move 0
+Set_Var Menu_Confirm 0
+Set_Var Menu_Accepted 0
+Set_Var Menu_Item_Event ""
+Set_Var Menu_Item_Value ""
+
+Define_Function Menu_Show
+    Set_Var Menu_Name Var Menu_Next
+    Set_Var Menu_Open 1
+    Set_Var Menu_Selected 1
+    Set_Var Menu_Count 0
+    Set_Var Menu_Move 0
+    Set_Var Menu_Confirm 0
+End_Function
+
+Define_Function Menu_Hide
+    Set_Var Menu_Open 0
+    Set_Var Menu_Move 0
+    Set_Var Menu_Confirm 0
+End_Function
+
+Define_Function Menu_Previous
+    If Var Menu_Open == 1
+    {
+        Set_Var Menu_Move -1
+    }
+End_Function
+
+Define_Function Menu_Next_Item
+    If Var Menu_Open == 1
+    {
+        Set_Var Menu_Move 1
+    }
+End_Function
+
+Define_Function Menu_Accept
+    If Var Menu_Open == 1
+    {
+        Set_Var Menu_Confirm 1
+    }
+End_Function
+
+Define_Function Menu_Back
+    If Var Menu_Open == 1
+    {
+        Events Emit Menu_Back Var Menu_Name
+    }
+End_Function
+
+Define_Function Menu_Begin
+    Set_Var Menu_Index 0
+    Set_Var Menu_Accepted 0
+    Set_Var Menu_Selected (Add Var Menu_Selected Var Menu_Move)
+    Set_Var Menu_Move 0
+    If Var Menu_Count > 0
+    {
+        If Var Menu_Selected < 1
+        {
+            Set_Var Menu_Selected Var Menu_Count
+        }
+        If Var Menu_Selected > Var Menu_Count
+        {
+            Set_Var Menu_Selected 1
+        }
+    }
+    If Var Menu_Count == 0
+    {
+        Set_Var Menu_Selected 1
+    }
+End_Function
+
+// Set Menu_Item_Event and Menu_Item_Value before each entry.
+Define_Function Menu_Item
+    Set_Var Menu_Index (Add Var Menu_Index 1)
+    If Var Menu_Open == 1
+    {
+        If Var Menu_Index == Var Menu_Selected
+        {
+            If Var Menu_Confirm == 1
+            {
+                If Var Menu_Accepted == 0
+                {
+                    If Var Menu_Item_Event != ""
+                    {
+                        Events Emit Var Menu_Item_Event Var Menu_Item_Value
+                        Set_Var Menu_Accepted 1
+                    }
+                }
+            }
+        }
+    }
+End_Function
+
+Define_Function Menu_End
+    Set_Var Menu_Count Var Menu_Index
+    If Var Menu_Selected > Var Menu_Count
+    {
+        Set_Var Menu_Selected 1
+    }
+    Set_Var Menu_Confirm 0
+End_Function

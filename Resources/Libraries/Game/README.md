@@ -32,3 +32,9 @@ See [Scenes](Scenes.md) for usage, object commands, and ownership limitations.
 
 Deferred native improvements are tracked in
 [C++ recommendations](../../../Docs/CPP_Recommendations.md).
+
+## Player interface and navigation
+
+Load `Game/Menus` after Runtime for renderer-independent menu selection and
+event actions. `Game/Interface` adds an optional Graphics GUI adapter.
+See [Menus](Menus.md) for focus handling, host integration, and MVP limitations.

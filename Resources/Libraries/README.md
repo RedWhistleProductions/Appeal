@@ -20,3 +20,5 @@ Available libraries:
 
 - `Game/Runtime`: game state, timing, events, and timers.
 - `Game/Scenes`: scene transitions, reload/cleanup, and update/draw hooks.
+- `Game/Menus`: renderer-independent menu selection and action events.
+- `Game/Interface`: optional Graphics GUI adapter for menu entries.
