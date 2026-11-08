@@ -110,6 +110,47 @@ expanding the C++ implementation. These are recommendations, not implemented wor
 - **Acceptance:** menu actions can be read while GUI is focused and gameplay
   actions remain suppressed; transitions neither leak nor repeat held actions.
 
+## 9. Save validation, recovery, and migration
+
+- **Evidence:** existing World snapshots and Storage transactions can save a
+  complete scene, but the script cannot catch native import/hook failures or
+  validate a snapshot's embedded scene name before lifecycle cleanup. Numeric
+  and snapshot corruption can still stop execution; no format migration API exists.
+- **MVP approach:** versioned slots, basic metadata checks, atomic writes, and
+  explicit hooks; reject missing/unsupported slots before touching live state.
+  Keep the previous World scene until import succeeds. Document corrupted data
+  and external-resource recovery as limitations.
+- **Recommended change:** nonmutating snapshot validation with returned metadata,
+  explicit operation results, staged restoration, and version migration hooks.
+- **Acceptance:** a malformed or incompatible save produces a useful error
+  without damaging a running game's scene or external resources.
+
+## 10. Runtime/module state serialization
+
+- **Evidence:** Step 4 can restore World data and selected script runtime fields,
+  but not enumerate Appeal variables, pending events/timers, or module-owned
+  animation, physics, audio, AI, and input state through one existing API.
+- **MVP approach:** explicit Save_On_Save/Save_On_Load hooks and custom string
+  values. Clear stale events/timers on load; rebuild resources and schedules
+  through the load hook instead of serializing native pointers.
+- **Recommended change:** explicit opt-in serializers for registered variables,
+  timer schedules, and modules, with stable IDs and ownership/version contracts.
+- **Acceptance:** a representative game resumes the needed animation, movement,
+  abilities and timed actions without duplicating or reviving stale work.
+
+## 11. Higher-level save data operations if script complexity warrants them
+
+- **Evidence:** generic slot replacement currently needs temporary key/value
+  and metadata tables plus static SQL/savepoint plumbing. This is hidden inside
+  Game/Saves; game-facing use is a database, slot, and short progress hooks.
+- **MVP approach:** retain the tested reusable script; use bound field values,
+  avoid string-built SQL, and keep save I/O off the normal per-frame path.
+- **Recommended change:** consider a compatible high-level Storage save-bundle
+  API or script record/map facility after evaluating real-game requirements.
+  No performance bottleneck has been established for this save path.
+- **Acceptance:** equivalent atomic replacement/error handling with substantially
+  less script plumbing; profile real saves before adding asynchronous/batch APIs.
+
 ## Performance watch list — no bottleneck established yet
 
 - Native timer collection currently scans every active timer each update.

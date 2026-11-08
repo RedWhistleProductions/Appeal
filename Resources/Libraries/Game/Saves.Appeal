@@ -1,0 +1,224 @@
+// Load after Runtime, Scenes, World and SQLite Storage. Host sets Save_Database
+// to a per-game/profile database name or path, then calls Save_Init once.
+Set_Var Save_Database ""
+Set_Var Save_Slot ""
+Set_Var Save_Key ""
+Set_Var Save_Value ""
+Set_Var Save_On_Save ""
+Set_Var Save_On_Load ""
+Set_Var Save_Ready 0
+Set_Var Save_Busy 0
+Set_Var Save_OK 0
+Set_Var Save_Status "Not initialized."
+
+Define_Function Save_Init
+    Set_Var Save_OK 0
+    Set_Var Save_Ready 0
+    Set_Var Save_Status "Set Save_Database first."
+    If Var Save_Database != ""
+    {
+        Storage Use Var Save_Database
+        Storage Execute_SQL "CREATE TABLE IF NOT EXISTS Game_Save_Slots (Slot TEXT PRIMARY KEY, Version TEXT NOT NULL DEFAULT '', Scene TEXT NOT NULL DEFAULT '', Snapshot TEXT NOT NULL DEFAULT '', State TEXT NOT NULL DEFAULT '', Running TEXT NOT NULL DEFAULT '', Paused TEXT NOT NULL DEFAULT '', Game_Time TEXT NOT NULL DEFAULT '', Time_Scale TEXT NOT NULL DEFAULT ''); CREATE TABLE IF NOT EXISTS Game_Save_Values (Slot TEXT NOT NULL, Key TEXT NOT NULL, Value TEXT NOT NULL, PRIMARY KEY(Slot,Key)); CREATE TABLE IF NOT EXISTS Game_Save_Settings (Key TEXT PRIMARY KEY, Value TEXT NOT NULL DEFAULT ''); CREATE VIEW IF NOT EXISTS Game_Save_Catalog AS SELECT Slot, Version, Scene, '1' AS Present FROM Game_Save_Slots; CREATE TEMP TABLE IF NOT EXISTS Game_Save_Draft (Key TEXT PRIMARY KEY, Value TEXT NOT NULL DEFAULT ''); CREATE TEMP TABLE IF NOT EXISTS Game_Save_Context (Key TEXT PRIMARY KEY, Value TEXT NOT NULL DEFAULT ''); CREATE TEMP TABLE IF NOT EXISTS Game_Save_Meta (Slot TEXT PRIMARY KEY, Version TEXT NOT NULL DEFAULT '', Scene TEXT NOT NULL DEFAULT '', Snapshot TEXT NOT NULL DEFAULT '', State TEXT NOT NULL DEFAULT '', Running TEXT NOT NULL DEFAULT '', Paused TEXT NOT NULL DEFAULT '', Game_Time TEXT NOT NULL DEFAULT '', Time_Scale TEXT NOT NULL DEFAULT '');"
+        Set_Var Save_Ready 1
+        Set_Var Save_OK 1
+        Set_Var Save_Status Ready
+    }
+End_Function
+
+// Custom slot data helpers. Save_Put is for Save_On_Save; Save_Get for
+// Save_On_Load. The draft is deliberately separate from permanent settings.
+Define_Function Save_Put
+    Storage Use Var Save_Database
+    Storage Set_Field Game_Save_Draft Key Var Save_Key Value Var Save_Value
+End_Function
+
+Define_Function Save_Get
+    Storage Use Var Save_Database
+    Return_Value (Storage Get_Field Game_Save_Draft Key Var Save_Key Value)
+End_Function
+
+Define_Function Save_Setting_Put
+    Storage Use Var Save_Database
+    Storage Set_Field Game_Save_Settings Key Var Save_Key Value Var Save_Value
+End_Function
+
+Define_Function Save_Setting_Get
+    Storage Use Var Save_Database
+    Return_Value (Storage Get_Field Game_Save_Settings Key Var Save_Key Value)
+End_Function
+
+Define_Function Save_Check
+    Set_Var Save_OK 0
+    Set_Var Save_Allowed 0
+    Set_Var Save_Status "Save library is not initialized."
+    If Var Save_Ready == 1
+    {
+        Set_Var Save_Status "Set a nonempty Save_Slot."
+        If Var Save_Slot != ""
+        {
+            Set_Var Save_Status "A save or scene operation is busy."
+            If Var Save_Busy == 0
+            {
+                If Var Scene_Busy == 0
+                {
+                    Set_Var Save_Allowed 1
+                    Set_Var Save_Active_Slot Var Save_Slot
+                    Storage Use Var Save_Database
+                    Storage Set_Field Game_Save_Context Key Slot Value Var Save_Active_Slot
+                }
+            }
+        }
+    }
+End_Function
+
+Define_Function Save_To_Slot
+    Call Save_Check
+    If Var Save_Allowed == 1
+    {
+        Set_Var Save_Status "No scene is open."
+        If Var Scene_Name != ""
+        {
+            Set_Var Save_Busy 1
+            Set_Var Scene_Busy 1
+            Storage Execute_SQL "DELETE FROM Game_Save_Draft; DELETE FROM Game_Save_Meta;"
+            If Var Save_On_Save != ""
+            {
+                Call Var Save_On_Save
+            }
+            Storage Use Var Save_Database
+            World Switch Var Scene_Name
+            Storage Set_Field Game_Save_Meta Slot Var Save_Active_Slot Version 1
+            Storage Set_Field Game_Save_Meta Slot Var Save_Active_Slot Scene Var Scene_Name
+            Storage Set_Field Game_Save_Meta Slot Var Save_Active_Slot Snapshot (World Export_Level)
+            Storage Set_Field Game_Save_Meta Slot Var Save_Active_Slot State Var Game_State
+            Storage Set_Field Game_Save_Meta Slot Var Save_Active_Slot Running Var Game_Running
+            Storage Set_Field Game_Save_Meta Slot Var Save_Active_Slot Paused Var Game_Paused
+            Storage Set_Field Game_Save_Meta Slot Var Save_Active_Slot Game_Time Var Game_Time
+            Storage Set_Field Game_Save_Meta Slot Var Save_Active_Slot Time_Scale Var Game_Time_Scale
+            Set_Var Save_Error (Storage Try_SQL "SAVEPOINT Game_Save_Write; DELETE FROM Game_Save_Slots WHERE Slot=(SELECT Slot FROM Game_Save_Meta); INSERT INTO Game_Save_Slots SELECT * FROM Game_Save_Meta; DELETE FROM Game_Save_Values WHERE Slot=(SELECT Slot FROM Game_Save_Meta); INSERT INTO Game_Save_Values SELECT (SELECT Slot FROM Game_Save_Meta), Key, Value FROM Game_Save_Draft; RELEASE Game_Save_Write;")
+            Set_Var Save_Status Var Save_Error
+            If Var Save_Error != ""
+            {
+                Storage Try_SQL "ROLLBACK TO Game_Save_Write; RELEASE Game_Save_Write;"
+            }
+            If Var Save_Error == ""
+            {
+                Set_Var Save_OK 1
+                Set_Var Save_Status Saved
+                Events Emit Game_Saved Var Save_Active_Slot
+            }
+            Set_Var Scene_Busy 0
+            Set_Var Save_Busy 0
+        }
+    }
+End_Function
+
+Define_Function Save_Load_Slot
+    Call Save_Check
+    If Var Save_Allowed == 1
+    {
+        Set_Var Save_Status "Save slot not found."
+        If (Storage Get_Field Game_Save_Catalog Slot Var Save_Active_Slot Present) == 1
+        {
+            Set_Var Save_Status "Unsupported save version."
+            If (Storage Get_Field Game_Save_Slots Slot Var Save_Active_Slot Version) == 1
+            {
+                Set_Var Save_Loaded_Scene (Storage Get_Field Game_Save_Slots Slot Var Save_Active_Slot Scene)
+                Set_Var Save_Snapshot (Storage Get_Field Game_Save_Slots Slot Var Save_Active_Slot Snapshot)
+                Set_Var Save_Loaded_State (Storage Get_Field Game_Save_Slots Slot Var Save_Active_Slot State)
+                Set_Var Save_Loaded_Running (Storage Get_Field Game_Save_Slots Slot Var Save_Active_Slot Running)
+                Set_Var Save_Loaded_Paused (Storage Get_Field Game_Save_Slots Slot Var Save_Active_Slot Paused)
+                Set_Var Save_Loaded_Time (Add (Storage Get_Field Game_Save_Slots Slot Var Save_Active_Slot Game_Time) 0)
+                Set_Var Save_Loaded_Scale (Add (Storage Get_Field Game_Save_Slots Slot Var Save_Active_Slot Time_Scale) 0)
+                Call Save_Validate_Load
+                If Var Save_Load_Valid == 1
+                {
+                    Set_Var Save_Busy 1
+                    Set_Var Scene_Busy 1
+                    Storage Execute_SQL "DELETE FROM Game_Save_Draft; INSERT INTO Game_Save_Draft SELECT Key,Value FROM Game_Save_Values WHERE Slot=(SELECT Value FROM Game_Save_Context WHERE Key='Slot');"
+                    Set_Var Save_Old_Scene Var Scene_Name
+                    If Var Scene_Name != ""
+                    {
+                        World Switch Var Scene_Name
+                        If Var Scene_On_Exit != ""
+                        {
+                            Call Var Scene_On_Exit
+                        }
+                    }
+                    // Import validates before replacing the saved-name World scene.
+                    // Keep the previous World scene until import succeeds.
+                    World Import_Level Var Save_Snapshot
+                    If Var Save_Old_Scene != ""
+                    {
+                        If Var Save_Old_Scene != Var Save_Loaded_Scene
+                        {
+                            World Close_Scene Var Save_Old_Scene
+                        }
+                    }
+                    World Switch Var Save_Loaded_Scene
+                    Set_Var Scene_Previous Var Save_Old_Scene
+                    Set_Var Scene_Name Var Save_Loaded_Scene
+                    Set_Var Scene_Requested ""
+                    Set_Var Scene_Pending 0
+                    Set_Var Scene_Reload 0
+                    Set_Var Game_Previous_State Var Game_State
+                    Call Game_Reset_Clock
+                    Set_Var Game_State Var Save_Loaded_State
+                    Set_Var Game_Running Var Save_Loaded_Running
+                    Set_Var Game_Paused Var Save_Loaded_Paused
+                    Set_Var Game_Time Var Save_Loaded_Time
+                    Set_Var Game_Time_Scale Var Save_Loaded_Scale
+                    Events Update Var Game_Time Var Game_Real_Time
+                    If Var Save_On_Load != ""
+                    {
+                        Call Var Save_On_Load
+                    }
+                    Set_Var Scene_Busy 0
+                    Set_Var Save_Busy 0
+                    Set_Var Save_OK 1
+                    Set_Var Save_Status Loaded
+                    Events Emit Scene_Changed Var Scene_Name
+                    Events Emit Game_Loaded Var Save_Active_Slot
+                }
+            }
+        }
+    }
+End_Function
+
+Define_Function Save_Validate_Load
+    Set_Var Save_Load_Valid 1
+    If Var Save_Loaded_Scene == "" { Set_Var Save_Load_Valid 0 }
+    If Var Save_Snapshot == "" { Set_Var Save_Load_Valid 0 }
+    If Var Save_Loaded_Time < 0 { Set_Var Save_Load_Valid 0 }
+    If Var Save_Loaded_Scale < 0 { Set_Var Save_Load_Valid 0 }
+    If Var Save_Loaded_Running != 0
+    {
+        If Var Save_Loaded_Running != 1 { Set_Var Save_Load_Valid 0 }
+    }
+    If Var Save_Loaded_Paused != 0
+    {
+        If Var Save_Loaded_Paused != 1 { Set_Var Save_Load_Valid 0 }
+    }
+    If Var Save_Load_Valid == 0
+    {
+        Set_Var Save_Status "Invalid save metadata."
+    }
+End_Function
+
+Define_Function Save_Delete_Slot
+    Call Save_Check
+    If Var Save_Allowed == 1
+    {
+        Set_Var Save_Error (Storage Try_SQL "SAVEPOINT Game_Save_Delete; DELETE FROM Game_Save_Values WHERE Slot=(SELECT Value FROM Game_Save_Context WHERE Key='Slot'); DELETE FROM Game_Save_Slots WHERE Slot=(SELECT Value FROM Game_Save_Context WHERE Key='Slot'); RELEASE Game_Save_Delete;")
+        Set_Var Save_Status Var Save_Error
+        If Var Save_Error != ""
+        {
+            Storage Try_SQL "ROLLBACK TO Game_Save_Delete; RELEASE Game_Save_Delete;"
+        }
+        If Var Save_Error == ""
+        {
+            Set_Var Save_OK 1
+            Set_Var Save_Status Deleted
+        }
+    }
+End_Function

@@ -38,3 +38,9 @@ Deferred native improvements are tracked in
 Load `Game/Menus` after Runtime for renderer-independent menu selection and
 event actions. `Game/Interface` adds an optional Graphics GUI adapter.
 See [Menus](Menus.md) for focus handling, host integration, and MVP limitations.
+
+## Save/load
+
+Load `Game/Saves` after Runtime, Scenes, World and SQLite Storage. Configure a
+per-game/profile database and call Save_Init, then save/load named slots.
+See [Saves](Saves.md) for custom progress hooks, settings, and restoration limits.

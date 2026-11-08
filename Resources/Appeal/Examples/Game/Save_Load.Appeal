@@ -1,0 +1,46 @@
+// In-memory demonstration, so running it does not overwrite disk save games.
+// For persistent saves, choose a game/profile database path instead.
+Add_Dynamic_Module World Appeal_Standard_World
+Add_Dynamic_Module Storage Appeal_SQLite_Storage
+Run Libraries/Game/Runtime
+Run Libraries/Game/Scenes
+Run Libraries/Game/Saves
+Storage Open_Memory Save_Load_Demo
+Set_Var Save_Database Save_Load_Demo
+Call Save_Init
+
+Define_Function Demo_Build
+    World Create_Typed_Entity Player Character 1 0
+    World Set Player Health 80
+    World Set_Position Player 10 20 0
+End_Function
+Define_Function Demo_Collect
+    Set_Var Save_Key Score
+    Set_Var Save_Value Var Demo_Score
+    Call Save_Put
+End_Function
+Define_Function Demo_Restore
+    Set_Var Save_Key Score
+    Set_Var Demo_Score (Call Save_Get)
+    // Recreate Graphics/Physics/etc. resources here without recreating World entities.
+End_Function
+Set_Var Scene_On_Enter Demo_Build
+Set_Var Save_On_Save Demo_Collect
+Set_Var Save_On_Load Demo_Restore
+Call Game_Start
+Set_Var Scene_Next Garden
+Call Scene_Request
+Call Scene_Apply
+Set_Var Demo_Score 42
+Set_Var Save_Slot Quick_Save
+Call Save_To_Slot
+Print Var Save_Status
+World Set Player Health 1
+Set_Var Demo_Score 0
+Call Save_Load_Slot
+Print Var Save_Status
+World Get Player Health
+Print Var Demo_Score
+Storage Close Save_Load_Demo
+Print SAVE_LOAD_DEMO_PASSED
+Done
