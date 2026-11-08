@@ -1,0 +1,16 @@
+// Run with Appeal.exe Test/New_Modules_Install_Smoke
+Add_Dynamic_Module AI Test
+Run Test/AI
+Add_Dynamic_Module Storage Test
+Run Test/Storage
+Add_Dynamic_Module Package Test
+Run Test/Package
+Add_Dynamic_Module World Test
+Run Test/World
+Add_Dynamic_Module Files Test
+Run Test/Files
+Add_Dynamic_Module Mechanics Test
+Run Test/Mechanics
+Add_Dynamic_Module Physics Test
+Run Test/Physics
+Done

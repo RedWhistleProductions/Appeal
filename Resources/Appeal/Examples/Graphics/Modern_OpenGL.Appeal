@@ -1,0 +1,31 @@
+// Run: Appeal.exe Examples/Graphics/Modern_OpenGL
+Run Setup/Modern_Graphics
+Graphics Add_Window Main "Appeal - Modern OpenGL shaders" 1024 704
+Graphics Set_FPS 60
+Graphics Set_GUI_Docking False
+Graphics Set_GUI_Visible True
+Graphics Load_Shader Surface Modern_OpenGL/Default.shader
+Graphics Load_Mesh Cube Examples/Shader_Cube.obj
+Graphics Load_Asset Cube Cube
+Graphics Set_Shader Cube Surface
+Graphics Set_Orientation Cube 25 15 0
+Graphics Load_Animation Adam Standing Examples/Characters/Adam/Adam_Movement.png 64 64 0 8
+Graphics Set_Scale Adam 3 3 1
+Graphics Set_Shader Adam Surface
+Set_Var Modern_Open 1
+Loop While Var Modern_Open == 1
+{
+    Graphics Update
+    Graphics Rotate_Asset Cube 0.6 0.25 0
+    Graphics Paste Adam 48 480 0
+    Graphics GUI_Begin_Window "Shader renderer"
+    Graphics GUI_Text Backend "SDL2 - OpenGL 3.3 core - GLSL shaders"
+    Graphics GUI_Text Pipeline "Indexed vertex buffers, textured sprites, and lit 3D meshes"
+    Graphics GUI_Text Source "Shader config: Modern_OpenGL/Default.shader"
+    Graphics GUI_End_Window
+    Graphics Render
+    Graphics Window_Open Main
+    Set_Var_Global Modern_Open Graphics.Window.Main.Open
+}
+Graphics Close_All
+Done

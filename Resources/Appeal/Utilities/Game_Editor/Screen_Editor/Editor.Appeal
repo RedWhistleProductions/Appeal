@@ -1,0 +1,367 @@
+// Embeddable splash/title definitions and nonblocking playback. Caller owns Storage + window.
+Storage Execute_SQL "CREATE TABLE IF NOT EXISTS Editor_Games (Name TEXT PRIMARY KEY);"
+Storage Execute_SQL "CREATE TABLE IF NOT EXISTS Editor_Game_Screens (Game_Name TEXT PRIMARY KEY,Splash_Image TEXT DEFAULT '',Title_Image TEXT DEFAULT '',Splash_SFX TEXT DEFAULT '',Theme_Song TEXT DEFAULT '',Splash_Seconds REAL DEFAULT 3);"
+Storage Execute_SQL "CREATE TEMP TABLE IF NOT EXISTS SS_Context (Name TEXT PRIMARY KEY,Value TEXT);"
+Storage Execute_SQL "CREATE TEMP TABLE IF NOT EXISTS SS_Loaded_SFX (File TEXT PRIMARY KEY,Loaded TEXT);"
+Storage Execute_SQL "CREATE TEMP VIEW IF NOT EXISTS SS_Number AS SELECT 'All' AS Name,CASE WHEN json_valid(Value) THEN CASE WHEN json_type(Value) IN ('integer','real') THEN CAST(Value AS REAL)>=0 AND CAST(Value AS REAL)<=86400 ELSE 0 END ELSE 0 END AS Valid FROM SS_Context WHERE Name='Duration';"
+Storage Execute_SQL "CREATE TEMP VIEW IF NOT EXISTS SS_Games AS SELECT CAST(row_number() OVER (ORDER BY Name)-1 AS TEXT) AS Number,Name FROM Editor_Games;"
+Storage Execute_SQL "CREATE TEMP VIEW IF NOT EXISTS SS_Game_List AS SELECT 'All' AS Name,group_concat(replace(Name,'|','/'),'|') AS Items FROM (SELECT * FROM SS_Games ORDER BY CAST(Number AS INTEGER));"
+Set_Var SS_Ready 1
+Set_Var SS_Game ""
+Set_Var SS_Next_Game ""
+Set_Var SS_Splash ""
+Set_Var SS_Title ""
+Set_Var SS_SFX ""
+Set_Var SS_Theme ""
+Set_Var SS_Seconds 3
+Set_Var SS_Dirty 0
+Set_Var SS_Discard 0
+Set_Var SS_GUI_Ready 0
+Set_Var SS_Audio_Ready 0
+Set_Var SS_Playing 0
+Set_Var SS_Phase Stopped
+Set_Var SS_Blend 0
+Set_Var SS_Pick ""
+Set_Var SS_Asset_Root Resources
+Set_Var SS_New_Game My_Game
+Set_Var SS_Status "Open a game and select its splash and title images. Audio files are optional."
+Define_Function SS_Stop
+    If Var SS_Playing == 1
+    {
+        If Var SS_Audio_Ready == 1
+        {
+            Audio Auto_Play_Next 0
+            Audio Stop
+        }
+    }
+    Set_Var SS_Playing 0
+    Set_Var SS_Phase Stopped
+End_Function
+Define_Function SS_Check
+    Set_Var SS_Allowed 1
+    If Var SS_Dirty == 1
+    {
+        If Var SS_Discard == 0
+        {
+            Set_Var SS_Allowed 0
+            Set_Var SS_Status "Save screen settings or check Discard screen changes before changing games."
+        }
+    }
+End_Function
+Define_Function SS_Sync_GUI
+    If Var SS_GUI_Ready == 1
+    {
+        Graphics GUI_Set_Text_Value SS_Splash_Control Var SS_Splash
+        Graphics GUI_Set_Text_Value SS_Title_Control Var SS_Title
+        Graphics GUI_Set_Text_Value SS_SFX_Control Var SS_SFX
+        Graphics GUI_Set_Text_Value SS_Theme_Control Var SS_Theme
+        Graphics GUI_Set_Text_Value SS_Seconds_Control Var SS_Seconds
+    }
+End_Function
+Define_Function SS_Read_GUI
+    If Var SS_GUI_Ready == 1
+    {
+        Graphics GUI_Text_Value SS_Splash_Control
+        Set_Var_Global SS_Splash Graphics.GUI.SS_Splash_Control.Value
+        Graphics GUI_Text_Value SS_Title_Control
+        Set_Var_Global SS_Title Graphics.GUI.SS_Title_Control.Value
+        Graphics GUI_Text_Value SS_SFX_Control
+        Set_Var_Global SS_SFX Graphics.GUI.SS_SFX_Control.Value
+        Graphics GUI_Text_Value SS_Theme_Control
+        Set_Var_Global SS_Theme Graphics.GUI.SS_Theme_Control.Value
+        Graphics GUI_Text_Value SS_Seconds_Control
+        Set_Var_Global SS_Seconds Graphics.GUI.SS_Seconds_Control.Value
+    }
+End_Function
+Define_Function SS_Use_Game
+    Call SS_Check
+    If Var SS_Allowed == 1
+    {
+        If (Storage Get_Field Editor_Games Name Var SS_Next_Game Name) != ""
+        {
+            Call SS_Stop
+            Set_Var SS_Game Var SS_Next_Game
+            Set_Var SS_Splash ""
+            Set_Var SS_Title ""
+            Set_Var SS_SFX ""
+            Set_Var SS_Theme ""
+            Set_Var SS_Seconds 3
+            If (Storage Get_Field Editor_Game_Screens Game_Name Var SS_Game Game_Name) != ""
+            {
+                Set_Var SS_Splash (Storage Get_Field Editor_Game_Screens Game_Name Var SS_Game Splash_Image)
+                Set_Var SS_Title (Storage Get_Field Editor_Game_Screens Game_Name Var SS_Game Title_Image)
+                Set_Var SS_SFX (Storage Get_Field Editor_Game_Screens Game_Name Var SS_Game Splash_SFX)
+                Set_Var SS_Theme (Storage Get_Field Editor_Game_Screens Game_Name Var SS_Game Theme_Song)
+                Set_Var SS_Seconds (Storage Get_Field Editor_Game_Screens Game_Name Var SS_Game Splash_Seconds)
+            }
+            Set_Var SS_Blend 0
+            Set_Var SS_Pick ""
+            Set_Var SS_Dirty 0
+            Set_Var SS_Discard 0
+            Call SS_Sync_GUI
+            Set_Var SS_Status "Screen settings loaded. Test previews the current settings, including unsaved edits."
+        }
+    }
+End_Function
+Define_Function SS_Changed
+    Call SS_Stop
+    Set_Var SS_Dirty 1
+End_Function
+Define_Function SS_Discard_Changed
+    Set_Var SS_Discard Var Callback_Value
+End_Function
+Define_Function SS_Validate
+    Set_Var SS_Allowed 1
+    Storage Set_Field SS_Context Name Duration Value Var SS_Seconds
+    If (Storage Get_Field SS_Number Name All Valid) != 1
+    {
+        Set_Var SS_Allowed 0
+        Set_Var SS_Status "Splash duration must be a number from 0 to 86400 seconds."
+    }
+End_Function
+Define_Function SS_Save
+    Call SS_Read_GUI
+    Call SS_Validate
+    If Var SS_Game == "" { Set_Var SS_Allowed 0 }
+    If Var SS_Allowed == 1
+    {
+        Storage Begin
+        Storage Set_Field Editor_Game_Screens Game_Name Var SS_Game Splash_Image Var SS_Splash
+        Storage Set_Field Editor_Game_Screens Game_Name Var SS_Game Title_Image Var SS_Title
+        Storage Set_Field Editor_Game_Screens Game_Name Var SS_Game Splash_SFX Var SS_SFX
+        Storage Set_Field Editor_Game_Screens Game_Name Var SS_Game Theme_Song Var SS_Theme
+        Storage Set_Field Editor_Game_Screens Game_Name Var SS_Game Splash_Seconds Var SS_Seconds
+        Storage Commit
+        Set_Var SS_Dirty 0
+        Set_Var SS_Discard 0
+        Set_Var SS_Status "Splash and title screen settings saved."
+    }
+End_Function
+Define_Function SS_Init_Audio
+    If Var SS_Audio_Ready == 0
+    {
+        Add_Dynamic_Module Audio Appeal_SDL2_Audio
+        Set_Var SS_Audio_Ready 1
+    }
+    Audio Auto_Play_Next 0
+    If Var PE_Audio_Ready == 1 { Set_Var PE_Audio_Dirty 1 }
+End_Function
+Define_Function SS_Check_Audio_File
+    If Var SS_Check_File != ""
+    {
+        Files Open SS_Audio_Check Var SS_Check_File Read
+        Set_Var_Global SS_File_Open Files.File.SS_Audio_Check.Open
+        Files Close SS_Audio_Check
+        If Var SS_File_Open == 0
+        {
+            Set_Var SS_Allowed 0
+            Set_Var SS_Status "An audio file could not be opened. Choose a valid file path."
+        }
+    }
+End_Function
+Define_Function SS_Test
+    Call SS_Stop
+    Call SS_Read_GUI
+    Call SS_Validate
+    If Var SS_Game == "" { Set_Var SS_Allowed 0 }
+    If Var SS_Splash == "" { Set_Var SS_Allowed 0 }
+    If Var SS_Title == "" { Set_Var SS_Allowed 0 }
+    If Var SS_Allowed == 1
+    {
+        Set_Var SS_Images_Ready (Graphics GUI_Image_Blend SS_Check_Images Var SS_Splash Var SS_Title 0)
+        If Var SS_Images_Ready == 0
+        {
+            Set_Var SS_Allowed 0
+            Set_Var SS_Status "An image could not be loaded. Choose valid image files."
+        }
+    }
+    If Var SS_Allowed == 1
+    {
+        Set_Var SS_Check_File Var SS_SFX
+        Call SS_Check_Audio_File
+        Set_Var SS_Check_File Var SS_Theme
+        Call SS_Check_Audio_File
+    }
+    If Var SS_Allowed == 1
+    {
+        If Var PE_Visible == 1 { Call PE_Close }
+        If Var SS_SFX != ""
+        {
+            Call SS_Init_Audio
+            If (Storage Get_Field SS_Loaded_SFX File Var SS_SFX Loaded) != 1
+            {
+                Audio Load_SFX Var SS_SFX Var SS_SFX
+                Storage Set_Field SS_Loaded_SFX File Var SS_SFX Loaded 1
+            }
+        }
+        If Var SS_Theme != ""
+        {
+            Call SS_Init_Audio
+            Audio Stop
+            Audio Clear_Play_List
+            Audio Load_Song SS_Theme Var SS_Theme
+        }
+        Set_Var SS_Phase Splash
+        Set_Var SS_Blend 0
+        Set_Var SS_Playing 1
+        Set_Var SS_Start (Graphics Milliseconds)
+        If Var SS_SFX != "" { Audio Play_SFX_Name Var SS_SFX }
+        Set_Var SS_Status "Testing: splash, one-second crossfade, then title. Stop test ends playback."
+    }
+    If Var SS_Splash == "" { Set_Var SS_Status "Choose a splash image before testing." }
+    If Var SS_Title == "" { Set_Var SS_Status "Choose a title image before testing." }
+End_Function
+Define_Function SS_Step
+    If Var SS_Playing == 1
+    {
+        Set_Var SS_Elapsed (Subtract Var SS_Now Var SS_Start)
+        Set_Var SS_Hold (Multiply Var SS_Seconds 1000)
+        If Var SS_Elapsed >= Var SS_Hold
+        {
+            If Var SS_Phase == Splash
+            {
+                Set_Var SS_Phase Fade
+                If Var SS_Theme != "" { Audio Play_Song SS_Theme }
+            }
+            Set_Var SS_Blend (Divide (Subtract Var SS_Elapsed Var SS_Hold) 1000)
+            If Var SS_Blend >= 1
+            {
+                Set_Var SS_Blend 1
+                Set_Var SS_Phase Title
+            }
+        }
+    }
+End_Function
+Define_Function SS_Update
+    Set_Var SS_Now (Graphics Milliseconds)
+    Call SS_Step
+End_Function
+Define_Function SS_Show_Splash
+    Call SS_Stop
+    Call SS_Read_GUI
+    Set_Var SS_Blend 0
+End_Function
+Define_Function SS_Show_Title
+    Call SS_Stop
+    Call SS_Read_GUI
+    Set_Var SS_Blend 1
+End_Function
+Define_Function SS_Browse_Splash
+    Set_Var SS_Pick Splash
+    Graphics GUI_Set_Window_Open "Select screen asset" True
+End_Function
+Define_Function SS_Browse_Title
+    Set_Var SS_Pick Title
+    Graphics GUI_Set_Window_Open "Select screen asset" True
+End_Function
+Define_Function SS_Browse_SFX
+    Set_Var SS_Pick SFX
+    Graphics GUI_Set_Window_Open "Select screen asset" True
+End_Function
+Define_Function SS_Browse_Theme
+    Set_Var SS_Pick Theme
+    Graphics GUI_Set_Window_Open "Select screen asset" True
+End_Function
+Define_Function SS_Picked
+    Graphics GUI_File_Picker_Value SS_File_Picker
+    Set_Var_Global SS_Selected_Relative Graphics.GUI.SS_File_Picker.Selected_Relative
+    Files Join Var SS_Asset_Root Var SS_Selected_Relative
+    Set_Var_Global SS_Selected Files.Last_Path
+    Set_Var_Global SS_Is_Directory Graphics.GUI.SS_File_Picker.Selected_Is_Directory
+    If Var SS_Is_Directory == 0
+    {
+        If Var SS_Selected != ""
+        {
+            Call SS_Read_GUI
+            Call SS_Changed
+            If Var SS_Pick == Splash { Set_Var SS_Splash Var SS_Selected }
+            If Var SS_Pick == Title { Set_Var SS_Title Var SS_Selected }
+            If Var SS_Pick == SFX { Set_Var SS_SFX Var SS_Selected }
+            If Var SS_Pick == Theme { Set_Var SS_Theme Var SS_Selected }
+            Set_Var SS_Pick ""
+            Call SS_Sync_GUI
+        }
+    }
+End_Function
+Define_Function SS_Close_Picker
+    Set_Var SS_Pick ""
+End_Function
+Define_Function SS_Game_Changed
+    Set_Var SS_Next_Game (Storage Get_Field SS_Games Number Var Callback_Value Name)
+    Call SS_Use_Game
+End_Function
+Define_Function SS_Create_Game
+    Call SS_Check
+    If Var SS_GUI_Ready == 1
+    {
+        Graphics GUI_Text_Value SS_New_Game_Control
+        Set_Var_Global SS_New_Game Graphics.GUI.SS_New_Game_Control.Value
+    }
+    If Var SS_New_Game == "" { Set_Var SS_Allowed 0 }
+    If Var SS_Allowed == 1
+    {
+        Storage Set_Field Editor_Games Name Var SS_New_Game Name Var SS_New_Game
+        Set_Var SS_Next_Game Var SS_New_Game
+        Call SS_Use_Game
+    }
+End_Function
+Define_Function SS_GUI
+    Set_Var SS_GUI_Ready 1
+    Graphics GUI_Begin_Window "Editor Controls"
+    Graphics GUI_Text SS_Heading "Splash / Title Screen Editor"
+    Graphics GUI_Text SS_Status_Label Var SS_Status
+    Graphics GUI_Text SS_Game_Label Var SS_Game
+    If Var GE_Host != 1
+    {
+        Set_Var SS_Game_Items (Storage Get_Field SS_Game_List Name All Items)
+        If Var SS_Game_Items == "" { Set_Var SS_Game_Items "No games" }
+        Set_Var SS_Game_Index (Storage Get_Field SS_Games Name Var SS_Game Number)
+        If Var SS_Game_Index == "" { Set_Var SS_Game_Index -1 }
+        Graphics GUI_Set_Selection_Value SS_Game_Menu Var SS_Game_Index
+        Graphics GUI_Combo SS_Game_Menu Game Var SS_Game_Items Var SS_Game_Index SS_Game_Changed
+        Graphics GUI_Input_Text SS_New_Game_Control "Game name" Var SS_New_Game None
+        Graphics GUI_Button SS_Create_Game_Button "Create / open game" SS_Create_Game
+    }
+    If Var SS_Game != ""
+    {
+        Graphics GUI_Input_Text SS_Splash_Control "Splash image" Var SS_Splash SS_Changed
+        Graphics GUI_Button SS_Browse_Splash_Button "Browse splash image" SS_Browse_Splash
+        Graphics GUI_Input_Text SS_Title_Control "Title image" Var SS_Title SS_Changed
+        Graphics GUI_Button SS_Browse_Title_Button "Browse title image" SS_Browse_Title
+        Graphics GUI_Input_Text SS_SFX_Control "Splash SFX (optional)" Var SS_SFX SS_Changed
+        Graphics GUI_Button SS_Browse_SFX_Button "Browse splash SFX" SS_Browse_SFX
+        Graphics GUI_Input_Text SS_Theme_Control "Theme song (optional)" Var SS_Theme SS_Changed
+        Graphics GUI_Button SS_Browse_Theme_Button "Browse theme song" SS_Browse_Theme
+        Graphics GUI_Input_Text SS_Seconds_Control "Splash duration (seconds)" Var SS_Seconds SS_Changed
+        Graphics GUI_Text SS_Fade_Help "The theme starts with the one-second crossfade into the title."
+        Graphics GUI_Button SS_Save_Button "Save screen settings" SS_Save
+        Graphics GUI_Checkbox SS_Discard_Control "Discard screen changes when switching games" Var SS_Discard SS_Discard_Changed
+        Graphics GUI_Button SS_Test_Button Test SS_Test
+        Graphics GUI_Button SS_Stop_Button "Stop test" SS_Stop
+        Graphics GUI_Button SS_Splash_Button "Show splash" SS_Show_Splash
+        Graphics GUI_Button SS_Title_Button "Show title" SS_Show_Title
+    }
+    Graphics GUI_End_Window
+    If Var SS_Pick != ""
+    {
+        Graphics GUI_Begin_Window "Select screen asset"
+        Graphics GUI_File_Picker SS_File_Picker "Select image or audio file" Var SS_Asset_Root . SS_Picked
+        Graphics GUI_Button SS_Cancel_Picker Cancel SS_Close_Picker
+        Graphics GUI_End_Window
+    }
+End_Function
+Define_Function SS_View
+    If Var SS_Game == ""
+    {
+        Graphics GUI_Text SS_No_Game "Open a game to configure splash and title screens."
+    }
+    If Var SS_Game != ""
+    {
+        If Var SS_Splash != ""
+        {
+            Graphics GUI_Image_Blend SS_Preview Var SS_Splash Var SS_Title Var SS_Blend
+        }
+        If Var SS_Splash == "" { Graphics GUI_Text SS_No_Images "Choose full-screen image files in Editor Controls." }
+    }
+End_Function
+Return

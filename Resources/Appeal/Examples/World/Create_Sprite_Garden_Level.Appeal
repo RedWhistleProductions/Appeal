@@ -1,0 +1,6 @@
+// Standalone, explicit initial save of the bundled design. Does not run on game startup.
+Run Setup/Config
+Run Examples/World/Setup_Sprite_Garden
+Run Examples/World/Save_Sprite_Garden_Level
+Print SPRITE_GARDEN_LEVEL_SAVED
+Done

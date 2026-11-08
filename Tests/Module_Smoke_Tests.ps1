@@ -1,9 +1,10 @@
-# Run the real Main script with the bundled Test plugins. Unlike the small
+# Run the explicit core-module test script with the bundled Test plugins. Unlike the small
 # preprocessor tests, this catches missing DLLs and script/module API drift.
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
 $start = New-Object System.Diagnostics.ProcessStartInfo
 $start.FileName = Join-Path $root 'Appeal.exe'
+$start.Arguments = 'Test/Core_Modules_Smoke'
 $start.WorkingDirectory = $root
 $start.UseShellExecute = $false
 $start.CreateNoWindow = $true

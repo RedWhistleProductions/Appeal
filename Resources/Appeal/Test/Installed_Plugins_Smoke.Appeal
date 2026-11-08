@@ -1,0 +1,51 @@
+Add_Dynamic_Module AI Appeal_Recast_BehaviorTree_AI
+AI Debug 1
+AI Use InstallSmoke Default
+AI Event InstallSmoke PlayerSeen
+AI Decide InstallSmoke
+AI Think InstallSmoke
+AI Release InstallSmoke
+
+Add_Dynamic_Module Files Appeal_Standard_Files
+Files Set_Paths .
+Files Create_Directory Tests/Installed_Plugins_Data/source
+Files Write_All Tests/Installed_Plugins_Data/source/files.txt FILES_INSTALL_PASSED
+Files Read_All Tests/Installed_Plugins_Data/source/files.txt
+
+Add_Dynamic_Module Package Appeal_Standard_Package
+Package Set_Paths Tests/Installed_Plugins_Data
+Package Create Smoke Tests/Installed_Plugins_Data/source Tests/Installed_Plugins_Data/packed
+Package Extract Tests/Installed_Plugins_Data/packed/Smoke.apkg Tests/Installed_Plugins_Data/extracted
+
+Add_Dynamic_Module Storage Appeal_SQLite_Storage
+Storage Set_Paths Tests/Installed_Plugins_Data
+Storage Open Smoke
+Storage Set Install STORAGE_INSTALL_PASSED
+Storage Get Install
+Storage Close Smoke
+
+Add_Dynamic_Module World Appeal_Standard_World
+World Set_Paths Tests/Installed_Plugins_Data
+World Create Smoke
+World Use_Scene Smoke
+World Create_Entity InstallSmoke
+World Set InstallSmoke Status WORLD_INSTALL_PASSED
+World Save Smoke
+World Close_Scene Smoke
+World Load Smoke
+World Get InstallSmoke Status
+
+Add_Dynamic_Module Physics Appeal_Box2D_Physics
+Physics Debug 1
+Physics Use InstallSmoke Default
+Physics Set_Position InstallSmoke 1 2 3
+Physics Update InstallSmoke
+Physics Release InstallSmoke
+
+Physics Add_Plugin Jolt Resources/Modules/Appeal_Module_Physics/Appeal_Jolt_Physics/Appeal_Jolt_Physics.dll
+Physics Load_Plugin Jolt
+Physics Use InstallSmoke Jolt
+Physics Set_Position InstallSmoke 1 2 3
+Physics Update InstallSmoke
+Physics Release InstallSmoke
+Done

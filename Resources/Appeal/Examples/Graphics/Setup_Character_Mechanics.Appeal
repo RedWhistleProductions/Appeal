@@ -1,0 +1,154 @@
+// Shared side-scrolling mechanics state and callbacks; no Graphics or Input calls.
+// Caller loads the Mechanics module before running this script.
+
+Mechanics Select Adam
+Mechanics Set Adam Speed 180
+Mechanics Set Adam Jump_Speed 600
+Mechanics Set Adam Gravity 1800
+Mechanics Set Adam Position_X 176
+Mechanics Set Adam Grounded 1
+Mechanics Stand
+Set_Var Adam_Speed 180
+Set_Var Adam_Direction 0
+Set_Var Adam_Stick 0
+Set_Var Adam_Run 0
+Set_Var Adam_Duck 0
+Set_Var Adam_Pad_Left 0
+Set_Var Adam_Pad_Right 0
+Set_Var Adam_Pad_Run 0
+Set_Var Adam_Pad_Duck 0
+Set_Var Adam_Axis 0
+Set_Var Adam_Running 0
+Set_Var Adam_Ducking 0
+Set_Var Adam_Last_Action None
+Set_Var Adam_Facing 3
+
+Define_Function Adam_Move_Left
+    Set_Var Adam_Direction -100
+End_Function
+Define_Function Adam_Move_Right
+    Set_Var Adam_Direction 100
+End_Function
+Define_Function Adam_Stop
+    Set_Var Adam_Direction 0
+    Mechanics Select Adam
+    Mechanics Stop
+End_Function
+Define_Function Adam_Jump
+    Mechanics Select Adam
+    Mechanics Jump
+End_Function
+Define_Function Adam_Set_Speed
+    Set_Var Adam_Speed Var Callback_Value
+    Mechanics Set Adam Speed Var Adam_Speed
+End_Function
+Define_Function Adam_Set_Run
+    Set_Var Adam_Run Var Callback_Value
+End_Function
+Define_Function Adam_Set_Duck
+    Set_Var Adam_Duck Var Callback_Value
+End_Function
+Define_Function Adam_Apply_Mechanics
+    Mechanics Select Adam
+    Mechanics Walk_Analog Var Adam_Axis
+    If Var Adam_Running == 1
+    {
+        Mechanics Run_Analog Var Adam_Axis
+    }
+    If Var Adam_Ducking == 1
+    {
+        Mechanics Duck_Walk_Analog Var Adam_Axis
+        If Var Adam_Axis == 0
+        {
+            Mechanics Duck_Stand
+        }
+    }
+    If Var Adam_Axis < 0
+    {
+        Set_Var Adam_Facing -3
+    }
+    If Var Adam_Axis > 0
+    {
+        Set_Var Adam_Facing 3
+    }
+End_Function
+
+Mechanics Select Eve
+Mechanics Set Eve Speed 180
+Mechanics Set Eve Jump_Speed 600
+Mechanics Set Eve Gravity 1800
+Mechanics Set Eve Position_X 432
+Mechanics Set Eve Grounded 1
+Mechanics Stand
+Set_Var Eve_Speed 180
+Set_Var Eve_Direction 0
+Set_Var Eve_Stick 0
+Set_Var Eve_Run 0
+Set_Var Eve_Duck 0
+Set_Var Eve_Pad_Left 0
+Set_Var Eve_Pad_Right 0
+Set_Var Eve_Pad_Run 0
+Set_Var Eve_Pad_Duck 0
+Set_Var Eve_Axis 0
+Set_Var Eve_Running 0
+Set_Var Eve_Ducking 0
+Set_Var Eve_Last_Action None
+Set_Var Eve_Facing -3
+
+Define_Function Eve_Move_Left
+    Set_Var Eve_Direction -100
+End_Function
+Define_Function Eve_Move_Right
+    Set_Var Eve_Direction 100
+End_Function
+Define_Function Eve_Stop
+    Set_Var Eve_Direction 0
+    Mechanics Select Eve
+    Mechanics Stop
+End_Function
+Define_Function Eve_Jump
+    Mechanics Select Eve
+    Mechanics Jump
+End_Function
+Define_Function Eve_Set_Speed
+    Set_Var Eve_Speed Var Callback_Value
+    Mechanics Set Eve Speed Var Eve_Speed
+End_Function
+Define_Function Eve_Set_Run
+    Set_Var Eve_Run Var Callback_Value
+End_Function
+Define_Function Eve_Set_Duck
+    Set_Var Eve_Duck Var Callback_Value
+End_Function
+Define_Function Eve_Apply_Mechanics
+    Mechanics Select Eve
+    Mechanics Walk_Analog Var Eve_Axis
+    If Var Eve_Running == 1
+    {
+        Mechanics Run_Analog Var Eve_Axis
+    }
+    If Var Eve_Ducking == 1
+    {
+        Mechanics Duck_Walk_Analog Var Eve_Axis
+        If Var Eve_Axis == 0
+        {
+            Mechanics Duck_Stand
+        }
+    }
+    If Var Eve_Axis < 0
+    {
+        Set_Var Eve_Facing -3
+    }
+    If Var Eve_Axis > 0
+    {
+        Set_Var Eve_Facing 3
+    }
+End_Function
+
+Define_Function Character_Mechanics_Update
+    Call Adam_Apply_Mechanics
+    Call Eve_Apply_Mechanics
+    Mechanics Update Adam
+    Mechanics Update Eve
+End_Function
+Return

@@ -1,0 +1,602 @@
+{
+  "schema": "bananas.sprite-atlas.v1",
+  "image": "ships_docks.png",
+  "format": "RGBA8",
+  "size": {
+    "w": 512,
+    "h": 256
+  },
+  "grid": {
+    "cell_width": 64,
+    "cell_height": 64,
+    "margin": 0,
+    "spacing": 0
+  },
+  "coordinate_origin": "top-left",
+  "projection": "top-down-oblique",
+  "sprites": {
+    "warm_0": {
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 0,
+      "walkable_mask": "alpha"
+    },
+    "warm_1": {
+      "rect": {
+        "x": 64,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 1,
+      "walkable_mask": "alpha"
+    },
+    "warm_2": {
+      "rect": {
+        "x": 128,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 2,
+      "walkable_mask": "alpha"
+    },
+    "warm_3": {
+      "rect": {
+        "x": 192,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 3,
+      "walkable_mask": "alpha"
+    },
+    "warm_4": {
+      "rect": {
+        "x": 256,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 4,
+      "walkable_mask": "alpha"
+    },
+    "warm_5": {
+      "rect": {
+        "x": 320,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 5,
+      "walkable_mask": "alpha"
+    },
+    "warm_6": {
+      "rect": {
+        "x": 384,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 6,
+      "walkable_mask": "alpha"
+    },
+    "warm_7": {
+      "rect": {
+        "x": 448,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 7,
+      "walkable_mask": "alpha"
+    },
+    "warm_8": {
+      "rect": {
+        "x": 0,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 8,
+      "walkable_mask": "alpha"
+    },
+    "warm_9": {
+      "rect": {
+        "x": 64,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 9,
+      "walkable_mask": "alpha"
+    },
+    "warm_10": {
+      "rect": {
+        "x": 128,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 10,
+      "walkable_mask": "alpha"
+    },
+    "warm_11": {
+      "rect": {
+        "x": 192,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 11,
+      "walkable_mask": "alpha"
+    },
+    "warm_12": {
+      "rect": {
+        "x": 256,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 12,
+      "walkable_mask": "alpha"
+    },
+    "warm_13": {
+      "rect": {
+        "x": 320,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 13,
+      "walkable_mask": "alpha"
+    },
+    "warm_14": {
+      "rect": {
+        "x": 384,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 14,
+      "walkable_mask": "alpha"
+    },
+    "warm_15": {
+      "rect": {
+        "x": 448,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 15,
+      "walkable_mask": "alpha"
+    },
+    "weathered_0": {
+      "rect": {
+        "x": 0,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 0,
+      "walkable_mask": "alpha"
+    },
+    "weathered_1": {
+      "rect": {
+        "x": 64,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 1,
+      "walkable_mask": "alpha"
+    },
+    "weathered_2": {
+      "rect": {
+        "x": 128,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 2,
+      "walkable_mask": "alpha"
+    },
+    "weathered_3": {
+      "rect": {
+        "x": 192,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 3,
+      "walkable_mask": "alpha"
+    },
+    "weathered_4": {
+      "rect": {
+        "x": 256,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 4,
+      "walkable_mask": "alpha"
+    },
+    "weathered_5": {
+      "rect": {
+        "x": 320,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 5,
+      "walkable_mask": "alpha"
+    },
+    "weathered_6": {
+      "rect": {
+        "x": 384,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 6,
+      "walkable_mask": "alpha"
+    },
+    "weathered_7": {
+      "rect": {
+        "x": 448,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 7,
+      "walkable_mask": "alpha"
+    },
+    "weathered_8": {
+      "rect": {
+        "x": 0,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 8,
+      "walkable_mask": "alpha"
+    },
+    "weathered_9": {
+      "rect": {
+        "x": 64,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 9,
+      "walkable_mask": "alpha"
+    },
+    "weathered_10": {
+      "rect": {
+        "x": 128,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 10,
+      "walkable_mask": "alpha"
+    },
+    "weathered_11": {
+      "rect": {
+        "x": 192,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 11,
+      "walkable_mask": "alpha"
+    },
+    "weathered_12": {
+      "rect": {
+        "x": 256,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 12,
+      "walkable_mask": "alpha"
+    },
+    "weathered_13": {
+      "rect": {
+        "x": 320,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 13,
+      "walkable_mask": "alpha"
+    },
+    "weathered_14": {
+      "rect": {
+        "x": 384,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 14,
+      "walkable_mask": "alpha"
+    },
+    "weathered_15": {
+      "rect": {
+        "x": 448,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 15,
+      "walkable_mask": "alpha"
+    }
+  },
+  "adjacency_rules": {
+    "N": 1,
+    "E": 2,
+    "S": 4,
+    "W": 8,
+    "selection": "Sum the bits for adjacent wall cells. Place dock overlays on water. Connections are 48 pixels wide."
+  }
+}

@@ -1,0 +1,9 @@
+Add_Dynamic_Module Audio Test
+Add_Dynamic_Module Graphics Test
+Add_Dynamic_Module Input Test
+Add_Dynamic_Module Network Test
+Run Test/Audio
+Run Test/Graphics
+Run Test/Input
+Run Test/Network
+Done

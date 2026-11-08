@@ -45,3 +45,7 @@ appeal /home/user/Documents/AppealApps/Test.Appeal
 ```
 
 If no script path is provided, Appeal runs `Main.Appeal` from its resource folder. Source builds use the local `Resources` folder when run from the project folder. Installed Windows builds use `Documents\Appeal\Resources`. Installed Linux packages launch through the `appeal` wrapper, which creates `~/Documents/Appeal/Resources` from the packaged resource templates on first run.
+
+## Documentation
+
+Open [Appeal HTML documentation](Docs/index.html) for the language reference, module API standard, and module functions and globals.

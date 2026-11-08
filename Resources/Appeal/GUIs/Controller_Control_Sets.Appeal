@@ -1,0 +1,325 @@
+// Internal persistence and binding helpers. Loaded by CONFIG_Controller.
+Define_Function CONFIG_Controller_Apply
+    Input Set_Controller_Button_Down B Var CONFIG_Value_A
+    Input Set_Controller_Button_Up B Var CONFIG_Value_A_Up
+    Input Set_Controller_Button_Repeat B 0
+    Input Set_Controller_Button_Down A Var CONFIG_Value_B
+    Input Set_Controller_Button_Up A Var CONFIG_Value_B_Up
+    Input Set_Controller_Button_Repeat A 0
+    Input Set_Controller_Button_Down Y Var CONFIG_Value_X
+    Input Set_Controller_Button_Up Y Var CONFIG_Value_X_Up
+    Input Set_Controller_Button_Repeat Y 0
+    Input Set_Controller_Button_Down X Var CONFIG_Value_Y
+    Input Set_Controller_Button_Up X Var CONFIG_Value_Y_Up
+    Input Set_Controller_Button_Repeat X 0
+    Input Set_Controller_Button_Down DPad_Up Var CONFIG_Value_DPad_Up
+    Input Set_Controller_Button_Up DPad_Up Var CONFIG_Value_DPad_Up_Up
+    Input Set_Controller_Button_Repeat DPad_Up 0
+    Input Set_Controller_Button_Down DPad_Down Var CONFIG_Value_DPad_Down
+    Input Set_Controller_Button_Up DPad_Down Var CONFIG_Value_DPad_Down_Up
+    Input Set_Controller_Button_Repeat DPad_Down 0
+    Input Set_Controller_Button_Down DPad_Left Var CONFIG_Value_DPad_Left
+    Input Set_Controller_Button_Up DPad_Left Var CONFIG_Value_DPad_Left_Up
+    Input Set_Controller_Button_Repeat DPad_Left 0
+    Input Set_Controller_Button_Down DPad_Right Var CONFIG_Value_DPad_Right
+    Input Set_Controller_Button_Up DPad_Right Var CONFIG_Value_DPad_Right_Up
+    Input Set_Controller_Button_Repeat DPad_Right 0
+    Input Set_Controller_Button_Down Left_Shoulder Var CONFIG_Value_L
+    Input Set_Controller_Button_Up Left_Shoulder Var CONFIG_Value_L_Up
+    Input Set_Controller_Button_Repeat Left_Shoulder 0
+    Input Set_Controller_Button_Down Right_Shoulder Var CONFIG_Value_R
+    Input Set_Controller_Button_Up Right_Shoulder Var CONFIG_Value_R_Up
+    Input Set_Controller_Button_Repeat Right_Shoulder 0
+    Input Set_Controller_Button_Down Left_Trigger Var CONFIG_Value_ZL
+    Input Set_Controller_Button_Up Left_Trigger Var CONFIG_Value_ZL_Up
+    Input Set_Controller_Button_Repeat Left_Trigger 0
+    Input Set_Controller_Button_Down Right_Trigger Var CONFIG_Value_ZR
+    Input Set_Controller_Button_Up Right_Trigger Var CONFIG_Value_ZR_Up
+    Input Set_Controller_Button_Repeat Right_Trigger 0
+    Input Set_Controller_Button_Down Left_Stick Var CONFIG_Value_Left_Stick
+    Input Set_Controller_Button_Up Left_Stick Var CONFIG_Value_Left_Stick_Up
+    Input Set_Controller_Button_Repeat Left_Stick 0
+    Input Set_Controller_Button_Down Right_Stick Var CONFIG_Value_Right_Stick
+    Input Set_Controller_Button_Up Right_Stick Var CONFIG_Value_Right_Stick_Up
+    Input Set_Controller_Button_Repeat Right_Stick 0
+    Input Set_Controller_Button_Down Back Var CONFIG_Value_Minus
+    Input Set_Controller_Button_Up Back Var CONFIG_Value_Minus_Up
+    Input Set_Controller_Button_Repeat Back 0
+    Input Set_Controller_Button_Down Start Var CONFIG_Value_Plus
+    Input Set_Controller_Button_Up Start Var CONFIG_Value_Plus_Up
+    Input Set_Controller_Button_Repeat Start 0
+    Input Set_Controller_Button_Down Guide Var CONFIG_Value_Home
+    Input Set_Controller_Button_Up Guide Var CONFIG_Value_Home_Up
+    Input Set_Controller_Button_Repeat Guide 0
+    Input Set_Controller_Button_Down Touchpad Var CONFIG_Value_Touchpad
+    Input Set_Controller_Button_Up Touchpad Var CONFIG_Value_Touchpad_Up
+    Input Set_Controller_Button_Repeat Touchpad 0
+    Input Set_Controller_Button_Down Paddle1 Var CONFIG_Value_Paddle1
+    Input Set_Controller_Button_Up Paddle1 Var CONFIG_Value_Paddle1_Up
+    Input Set_Controller_Button_Repeat Paddle1 0
+    Input Set_Controller_Button_Down Paddle2 Var CONFIG_Value_Paddle2
+    Input Set_Controller_Button_Up Paddle2 Var CONFIG_Value_Paddle2_Up
+    Input Set_Controller_Button_Repeat Paddle2 0
+    Input Set_Controller_Button_Down Paddle3 Var CONFIG_Value_Paddle3
+    Input Set_Controller_Button_Up Paddle3 Var CONFIG_Value_Paddle3_Up
+    Input Set_Controller_Button_Repeat Paddle3 0
+    Input Set_Controller_Button_Down Paddle4 Var CONFIG_Value_Paddle4
+    Input Set_Controller_Button_Up Paddle4 Var CONFIG_Value_Paddle4_Up
+    Input Set_Controller_Button_Repeat Paddle4 0
+End_Function
+Define_Function CONFIG_Controller_Load_Existing
+    Set_Var CONFIG_Controller_Name Var CONFIG_Controller_Wanted
+    Set_Var CONFIG_Value_A (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name A)
+    Graphics GUI_Set_Text_Value CONFIG_A Var CONFIG_Value_A
+    Set_Var CONFIG_Value_A_Up (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name A_Up)
+    Graphics GUI_Set_Text_Value CONFIG_A_Up Var CONFIG_Value_A_Up
+    Set_Var CONFIG_Value_B (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name B)
+    Graphics GUI_Set_Text_Value CONFIG_B Var CONFIG_Value_B
+    Set_Var CONFIG_Value_B_Up (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name B_Up)
+    Graphics GUI_Set_Text_Value CONFIG_B_Up Var CONFIG_Value_B_Up
+    Set_Var CONFIG_Value_X (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name X)
+    Graphics GUI_Set_Text_Value CONFIG_X Var CONFIG_Value_X
+    Set_Var CONFIG_Value_X_Up (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name X_Up)
+    Graphics GUI_Set_Text_Value CONFIG_X_Up Var CONFIG_Value_X_Up
+    Set_Var CONFIG_Value_Y (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name Y)
+    Graphics GUI_Set_Text_Value CONFIG_Y Var CONFIG_Value_Y
+    Set_Var CONFIG_Value_Y_Up (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name Y_Up)
+    Graphics GUI_Set_Text_Value CONFIG_Y_Up Var CONFIG_Value_Y_Up
+    Set_Var CONFIG_Value_DPad_Up (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name DPad_Up)
+    Graphics GUI_Set_Text_Value CONFIG_DPad_Up Var CONFIG_Value_DPad_Up
+    Set_Var CONFIG_Value_DPad_Up_Up (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name DPad_Up_Up)
+    Graphics GUI_Set_Text_Value CONFIG_DPad_Up_Up Var CONFIG_Value_DPad_Up_Up
+    Set_Var CONFIG_Value_DPad_Down (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name DPad_Down)
+    Graphics GUI_Set_Text_Value CONFIG_DPad_Down Var CONFIG_Value_DPad_Down
+    Set_Var CONFIG_Value_DPad_Down_Up (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name DPad_Down_Up)
+    Graphics GUI_Set_Text_Value CONFIG_DPad_Down_Up Var CONFIG_Value_DPad_Down_Up
+    Set_Var CONFIG_Value_DPad_Left (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name DPad_Left)
+    Graphics GUI_Set_Text_Value CONFIG_DPad_Left Var CONFIG_Value_DPad_Left
+    Set_Var CONFIG_Value_DPad_Left_Up (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name DPad_Left_Up)
+    Graphics GUI_Set_Text_Value CONFIG_DPad_Left_Up Var CONFIG_Value_DPad_Left_Up
+    Set_Var CONFIG_Value_DPad_Right (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name DPad_Right)
+    Graphics GUI_Set_Text_Value CONFIG_DPad_Right Var CONFIG_Value_DPad_Right
+    Set_Var CONFIG_Value_DPad_Right_Up (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name DPad_Right_Up)
+    Graphics GUI_Set_Text_Value CONFIG_DPad_Right_Up Var CONFIG_Value_DPad_Right_Up
+    Set_Var CONFIG_Value_L (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name L)
+    Graphics GUI_Set_Text_Value CONFIG_L Var CONFIG_Value_L
+    Set_Var CONFIG_Value_L_Up (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name L_Up)
+    Graphics GUI_Set_Text_Value CONFIG_L_Up Var CONFIG_Value_L_Up
+    Set_Var CONFIG_Value_R (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name R)
+    Graphics GUI_Set_Text_Value CONFIG_R Var CONFIG_Value_R
+    Set_Var CONFIG_Value_R_Up (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name R_Up)
+    Graphics GUI_Set_Text_Value CONFIG_R_Up Var CONFIG_Value_R_Up
+    Set_Var CONFIG_Value_ZL (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name ZL)
+    Graphics GUI_Set_Text_Value CONFIG_ZL Var CONFIG_Value_ZL
+    Set_Var CONFIG_Value_ZL_Up (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name ZL_Up)
+    Graphics GUI_Set_Text_Value CONFIG_ZL_Up Var CONFIG_Value_ZL_Up
+    Set_Var CONFIG_Value_ZR (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name ZR)
+    Graphics GUI_Set_Text_Value CONFIG_ZR Var CONFIG_Value_ZR
+    Set_Var CONFIG_Value_ZR_Up (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name ZR_Up)
+    Graphics GUI_Set_Text_Value CONFIG_ZR_Up Var CONFIG_Value_ZR_Up
+    Set_Var CONFIG_Value_Left_Stick (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name Left_Stick)
+    Graphics GUI_Set_Text_Value CONFIG_Left_Stick Var CONFIG_Value_Left_Stick
+    Set_Var CONFIG_Value_Left_Stick_Up (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name Left_Stick_Up)
+    Graphics GUI_Set_Text_Value CONFIG_Left_Stick_Up Var CONFIG_Value_Left_Stick_Up
+    Set_Var CONFIG_Value_Right_Stick (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name Right_Stick)
+    Graphics GUI_Set_Text_Value CONFIG_Right_Stick Var CONFIG_Value_Right_Stick
+    Set_Var CONFIG_Value_Right_Stick_Up (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name Right_Stick_Up)
+    Graphics GUI_Set_Text_Value CONFIG_Right_Stick_Up Var CONFIG_Value_Right_Stick_Up
+    Set_Var CONFIG_Value_Minus (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name Minus)
+    Graphics GUI_Set_Text_Value CONFIG_Minus Var CONFIG_Value_Minus
+    Set_Var CONFIG_Value_Minus_Up (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name Minus_Up)
+    Graphics GUI_Set_Text_Value CONFIG_Minus_Up Var CONFIG_Value_Minus_Up
+    Set_Var CONFIG_Value_Plus (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name Plus)
+    Graphics GUI_Set_Text_Value CONFIG_Plus Var CONFIG_Value_Plus
+    Set_Var CONFIG_Value_Plus_Up (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name Plus_Up)
+    Graphics GUI_Set_Text_Value CONFIG_Plus_Up Var CONFIG_Value_Plus_Up
+    Set_Var CONFIG_Value_Home (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name Home)
+    Graphics GUI_Set_Text_Value CONFIG_Home Var CONFIG_Value_Home
+    Set_Var CONFIG_Value_Home_Up (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name Home_Up)
+    Graphics GUI_Set_Text_Value CONFIG_Home_Up Var CONFIG_Value_Home_Up
+    Set_Var CONFIG_Value_Touchpad (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name Touchpad)
+    Graphics GUI_Set_Text_Value CONFIG_Touchpad Var CONFIG_Value_Touchpad
+    Set_Var CONFIG_Value_Touchpad_Up (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name Touchpad_Up)
+    Graphics GUI_Set_Text_Value CONFIG_Touchpad_Up Var CONFIG_Value_Touchpad_Up
+    Set_Var CONFIG_Value_Paddle1 (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name Paddle1)
+    Graphics GUI_Set_Text_Value CONFIG_Paddle1 Var CONFIG_Value_Paddle1
+    Set_Var CONFIG_Value_Paddle1_Up (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name Paddle1_Up)
+    Graphics GUI_Set_Text_Value CONFIG_Paddle1_Up Var CONFIG_Value_Paddle1_Up
+    Set_Var CONFIG_Value_Paddle2 (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name Paddle2)
+    Graphics GUI_Set_Text_Value CONFIG_Paddle2 Var CONFIG_Value_Paddle2
+    Set_Var CONFIG_Value_Paddle2_Up (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name Paddle2_Up)
+    Graphics GUI_Set_Text_Value CONFIG_Paddle2_Up Var CONFIG_Value_Paddle2_Up
+    Set_Var CONFIG_Value_Paddle3 (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name Paddle3)
+    Graphics GUI_Set_Text_Value CONFIG_Paddle3 Var CONFIG_Value_Paddle3
+    Set_Var CONFIG_Value_Paddle3_Up (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name Paddle3_Up)
+    Graphics GUI_Set_Text_Value CONFIG_Paddle3_Up Var CONFIG_Value_Paddle3_Up
+    Set_Var CONFIG_Value_Paddle4 (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name Paddle4)
+    Graphics GUI_Set_Text_Value CONFIG_Paddle4 Var CONFIG_Value_Paddle4
+    Set_Var CONFIG_Value_Paddle4_Up (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Name Paddle4_Up)
+    Graphics GUI_Set_Text_Value CONFIG_Paddle4_Up Var CONFIG_Value_Paddle4_Up
+    Storage Set_Field User_Settings Key Controller.Active_Control_Set Value Var CONFIG_Controller_Name
+    Call CONFIG_Controller_Apply
+    Set_Var CONFIG_Controller_Status "Loaded and applied control set."
+End_Function
+Define_Function CONFIG_Controller_Load
+    Graphics GUI_Text_Value CONFIG_Control_Set_Name
+    Set_Var_Global CONFIG_Controller_Wanted Graphics.GUI.CONFIG_Control_Set_Name.Value
+    Storage Use User_Setings
+    Set_Var CONFIG_Controller_Found (Storage Get_Field Control_Sets Name Var CONFIG_Controller_Wanted Name)
+    Set_Var CONFIG_Controller_Status "Control set not found. Use Save and Apply to create it."
+    If Var CONFIG_Controller_Found != ""
+    {
+        Call CONFIG_Controller_Load_Existing
+    }
+End_Function
+Define_Function CONFIG_Controller_Save_Existing
+    Storage Use User_Setings
+    Storage Begin
+    Graphics GUI_Text_Value CONFIG_A
+    Set_Var_Global CONFIG_Value_A Graphics.GUI.CONFIG_A.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted A Var CONFIG_Value_A
+    Graphics GUI_Text_Value CONFIG_A_Up
+    Set_Var_Global CONFIG_Value_A_Up Graphics.GUI.CONFIG_A_Up.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted A_Up Var CONFIG_Value_A_Up
+    Graphics GUI_Text_Value CONFIG_B
+    Set_Var_Global CONFIG_Value_B Graphics.GUI.CONFIG_B.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted B Var CONFIG_Value_B
+    Graphics GUI_Text_Value CONFIG_B_Up
+    Set_Var_Global CONFIG_Value_B_Up Graphics.GUI.CONFIG_B_Up.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted B_Up Var CONFIG_Value_B_Up
+    Graphics GUI_Text_Value CONFIG_X
+    Set_Var_Global CONFIG_Value_X Graphics.GUI.CONFIG_X.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted X Var CONFIG_Value_X
+    Graphics GUI_Text_Value CONFIG_X_Up
+    Set_Var_Global CONFIG_Value_X_Up Graphics.GUI.CONFIG_X_Up.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted X_Up Var CONFIG_Value_X_Up
+    Graphics GUI_Text_Value CONFIG_Y
+    Set_Var_Global CONFIG_Value_Y Graphics.GUI.CONFIG_Y.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted Y Var CONFIG_Value_Y
+    Graphics GUI_Text_Value CONFIG_Y_Up
+    Set_Var_Global CONFIG_Value_Y_Up Graphics.GUI.CONFIG_Y_Up.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted Y_Up Var CONFIG_Value_Y_Up
+    Graphics GUI_Text_Value CONFIG_DPad_Up
+    Set_Var_Global CONFIG_Value_DPad_Up Graphics.GUI.CONFIG_DPad_Up.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted DPad_Up Var CONFIG_Value_DPad_Up
+    Graphics GUI_Text_Value CONFIG_DPad_Up_Up
+    Set_Var_Global CONFIG_Value_DPad_Up_Up Graphics.GUI.CONFIG_DPad_Up_Up.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted DPad_Up_Up Var CONFIG_Value_DPad_Up_Up
+    Graphics GUI_Text_Value CONFIG_DPad_Down
+    Set_Var_Global CONFIG_Value_DPad_Down Graphics.GUI.CONFIG_DPad_Down.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted DPad_Down Var CONFIG_Value_DPad_Down
+    Graphics GUI_Text_Value CONFIG_DPad_Down_Up
+    Set_Var_Global CONFIG_Value_DPad_Down_Up Graphics.GUI.CONFIG_DPad_Down_Up.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted DPad_Down_Up Var CONFIG_Value_DPad_Down_Up
+    Graphics GUI_Text_Value CONFIG_DPad_Left
+    Set_Var_Global CONFIG_Value_DPad_Left Graphics.GUI.CONFIG_DPad_Left.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted DPad_Left Var CONFIG_Value_DPad_Left
+    Graphics GUI_Text_Value CONFIG_DPad_Left_Up
+    Set_Var_Global CONFIG_Value_DPad_Left_Up Graphics.GUI.CONFIG_DPad_Left_Up.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted DPad_Left_Up Var CONFIG_Value_DPad_Left_Up
+    Graphics GUI_Text_Value CONFIG_DPad_Right
+    Set_Var_Global CONFIG_Value_DPad_Right Graphics.GUI.CONFIG_DPad_Right.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted DPad_Right Var CONFIG_Value_DPad_Right
+    Graphics GUI_Text_Value CONFIG_DPad_Right_Up
+    Set_Var_Global CONFIG_Value_DPad_Right_Up Graphics.GUI.CONFIG_DPad_Right_Up.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted DPad_Right_Up Var CONFIG_Value_DPad_Right_Up
+    Graphics GUI_Text_Value CONFIG_L
+    Set_Var_Global CONFIG_Value_L Graphics.GUI.CONFIG_L.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted L Var CONFIG_Value_L
+    Graphics GUI_Text_Value CONFIG_L_Up
+    Set_Var_Global CONFIG_Value_L_Up Graphics.GUI.CONFIG_L_Up.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted L_Up Var CONFIG_Value_L_Up
+    Graphics GUI_Text_Value CONFIG_R
+    Set_Var_Global CONFIG_Value_R Graphics.GUI.CONFIG_R.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted R Var CONFIG_Value_R
+    Graphics GUI_Text_Value CONFIG_R_Up
+    Set_Var_Global CONFIG_Value_R_Up Graphics.GUI.CONFIG_R_Up.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted R_Up Var CONFIG_Value_R_Up
+    Graphics GUI_Text_Value CONFIG_ZL
+    Set_Var_Global CONFIG_Value_ZL Graphics.GUI.CONFIG_ZL.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted ZL Var CONFIG_Value_ZL
+    Graphics GUI_Text_Value CONFIG_ZL_Up
+    Set_Var_Global CONFIG_Value_ZL_Up Graphics.GUI.CONFIG_ZL_Up.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted ZL_Up Var CONFIG_Value_ZL_Up
+    Graphics GUI_Text_Value CONFIG_ZR
+    Set_Var_Global CONFIG_Value_ZR Graphics.GUI.CONFIG_ZR.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted ZR Var CONFIG_Value_ZR
+    Graphics GUI_Text_Value CONFIG_ZR_Up
+    Set_Var_Global CONFIG_Value_ZR_Up Graphics.GUI.CONFIG_ZR_Up.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted ZR_Up Var CONFIG_Value_ZR_Up
+    Graphics GUI_Text_Value CONFIG_Left_Stick
+    Set_Var_Global CONFIG_Value_Left_Stick Graphics.GUI.CONFIG_Left_Stick.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted Left_Stick Var CONFIG_Value_Left_Stick
+    Graphics GUI_Text_Value CONFIG_Left_Stick_Up
+    Set_Var_Global CONFIG_Value_Left_Stick_Up Graphics.GUI.CONFIG_Left_Stick_Up.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted Left_Stick_Up Var CONFIG_Value_Left_Stick_Up
+    Graphics GUI_Text_Value CONFIG_Right_Stick
+    Set_Var_Global CONFIG_Value_Right_Stick Graphics.GUI.CONFIG_Right_Stick.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted Right_Stick Var CONFIG_Value_Right_Stick
+    Graphics GUI_Text_Value CONFIG_Right_Stick_Up
+    Set_Var_Global CONFIG_Value_Right_Stick_Up Graphics.GUI.CONFIG_Right_Stick_Up.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted Right_Stick_Up Var CONFIG_Value_Right_Stick_Up
+    Graphics GUI_Text_Value CONFIG_Minus
+    Set_Var_Global CONFIG_Value_Minus Graphics.GUI.CONFIG_Minus.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted Minus Var CONFIG_Value_Minus
+    Graphics GUI_Text_Value CONFIG_Minus_Up
+    Set_Var_Global CONFIG_Value_Minus_Up Graphics.GUI.CONFIG_Minus_Up.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted Minus_Up Var CONFIG_Value_Minus_Up
+    Graphics GUI_Text_Value CONFIG_Plus
+    Set_Var_Global CONFIG_Value_Plus Graphics.GUI.CONFIG_Plus.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted Plus Var CONFIG_Value_Plus
+    Graphics GUI_Text_Value CONFIG_Plus_Up
+    Set_Var_Global CONFIG_Value_Plus_Up Graphics.GUI.CONFIG_Plus_Up.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted Plus_Up Var CONFIG_Value_Plus_Up
+    Graphics GUI_Text_Value CONFIG_Home
+    Set_Var_Global CONFIG_Value_Home Graphics.GUI.CONFIG_Home.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted Home Var CONFIG_Value_Home
+    Graphics GUI_Text_Value CONFIG_Home_Up
+    Set_Var_Global CONFIG_Value_Home_Up Graphics.GUI.CONFIG_Home_Up.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted Home_Up Var CONFIG_Value_Home_Up
+    Graphics GUI_Text_Value CONFIG_Touchpad
+    Set_Var_Global CONFIG_Value_Touchpad Graphics.GUI.CONFIG_Touchpad.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted Touchpad Var CONFIG_Value_Touchpad
+    Graphics GUI_Text_Value CONFIG_Touchpad_Up
+    Set_Var_Global CONFIG_Value_Touchpad_Up Graphics.GUI.CONFIG_Touchpad_Up.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted Touchpad_Up Var CONFIG_Value_Touchpad_Up
+    Graphics GUI_Text_Value CONFIG_Paddle1
+    Set_Var_Global CONFIG_Value_Paddle1 Graphics.GUI.CONFIG_Paddle1.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted Paddle1 Var CONFIG_Value_Paddle1
+    Graphics GUI_Text_Value CONFIG_Paddle1_Up
+    Set_Var_Global CONFIG_Value_Paddle1_Up Graphics.GUI.CONFIG_Paddle1_Up.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted Paddle1_Up Var CONFIG_Value_Paddle1_Up
+    Graphics GUI_Text_Value CONFIG_Paddle2
+    Set_Var_Global CONFIG_Value_Paddle2 Graphics.GUI.CONFIG_Paddle2.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted Paddle2 Var CONFIG_Value_Paddle2
+    Graphics GUI_Text_Value CONFIG_Paddle2_Up
+    Set_Var_Global CONFIG_Value_Paddle2_Up Graphics.GUI.CONFIG_Paddle2_Up.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted Paddle2_Up Var CONFIG_Value_Paddle2_Up
+    Graphics GUI_Text_Value CONFIG_Paddle3
+    Set_Var_Global CONFIG_Value_Paddle3 Graphics.GUI.CONFIG_Paddle3.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted Paddle3 Var CONFIG_Value_Paddle3
+    Graphics GUI_Text_Value CONFIG_Paddle3_Up
+    Set_Var_Global CONFIG_Value_Paddle3_Up Graphics.GUI.CONFIG_Paddle3_Up.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted Paddle3_Up Var CONFIG_Value_Paddle3_Up
+    Graphics GUI_Text_Value CONFIG_Paddle4
+    Set_Var_Global CONFIG_Value_Paddle4 Graphics.GUI.CONFIG_Paddle4.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted Paddle4 Var CONFIG_Value_Paddle4
+    Graphics GUI_Text_Value CONFIG_Paddle4_Up
+    Set_Var_Global CONFIG_Value_Paddle4_Up Graphics.GUI.CONFIG_Paddle4_Up.Value
+    Storage Set_Field Control_Sets Name Var CONFIG_Controller_Wanted Paddle4_Up Var CONFIG_Value_Paddle4_Up
+    Storage Set_Field User_Settings Key Controller.Active_Control_Set Value Var CONFIG_Controller_Wanted
+    Storage Commit
+    Set_Var CONFIG_Controller_Name Var CONFIG_Controller_Wanted
+    Call CONFIG_Controller_Apply
+    Set_Var CONFIG_Controller_Status "Saved and applied control set."
+End_Function
+Define_Function CONFIG_Controller_Save
+    Graphics GUI_Text_Value CONFIG_Control_Set_Name
+    Set_Var_Global CONFIG_Controller_Wanted Graphics.GUI.CONFIG_Control_Set_Name.Value
+    Set_Var CONFIG_Controller_Status "Enter a control set name before saving."
+    If Var CONFIG_Controller_Wanted != ""
+    {
+        Call CONFIG_Controller_Save_Existing
+    }
+End_Function
+Return

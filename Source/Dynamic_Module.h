@@ -18,6 +18,9 @@
         void (*Set_Function_Runner)(void (*Run_Function)(std::string), void (*Run_Analog_Function)(std::string, int)) = nullptr;
         void (*Interpreter)(Data_Source *Data) = nullptr;
         void (*Shutdown)() = nullptr;
+        Dynamic_Module() = default;
+        Dynamic_Module(const Dynamic_Module&) = delete;
+        Dynamic_Module &operator=(const Dynamic_Module&) = delete;
         void Load(std::string Module_Name);
         void Unload();
         template<typename T>void Assign(std::string Key, T &func);
@@ -27,6 +30,9 @@
 
     template<typename T>void Dynamic_Module::Assign(std::string Key, T &func)
     {
+        func = nullptr;
+        if(!handle) return;
+        dlerror();
         void *Value = dlsym(handle, Key.c_str());
         if ((error = dlerror()) != NULL)  
         {
@@ -34,7 +40,7 @@
         } 
         else
         {
-            func = reinterpret_cast<decltype(func)>(Value);
+            func = reinterpret_cast<T>(Value);
         }
     }
 #endif
@@ -52,6 +58,9 @@
         void (*Set_Function_Runner)(void (*Run_Function)(std::string), void (*Run_Analog_Function)(std::string, int)) = nullptr;
         void (*Interpreter)(Data_Source *Data) = nullptr;
         void (*Shutdown)() = nullptr;
+        Dynamic_Module() = default;
+        Dynamic_Module(const Dynamic_Module&) = delete;
+        Dynamic_Module &operator=(const Dynamic_Module&) = delete;
         void Load(std::string Module_Name);
         void Unload();
         template<typename T>void Assign(std::string Key, T &func);

@@ -1,0 +1,335 @@
+// Embeddable character definitions; caller selects the shared game database.
+Storage Execute_SQL "CREATE TABLE IF NOT EXISTS Editor_Games (Name TEXT PRIMARY KEY);"
+Storage Execute_SQL "CREATE TABLE IF NOT EXISTS Editor_Characters (ID TEXT PRIMARY KEY,Game_Name TEXT NOT NULL,Default_Name TEXT NOT NULL);"
+Storage Execute_SQL "CREATE TABLE IF NOT EXISTS Editor_Character_Stats (Game_Name TEXT NOT NULL,Name TEXT NOT NULL,Default_Value REAL NOT NULL DEFAULT 0,PRIMARY KEY(Game_Name,Name));"
+Storage Execute_SQL "CREATE TABLE IF NOT EXISTS Editor_Character_Stat_Values (Character_ID TEXT NOT NULL,Stat_Name TEXT NOT NULL,Value REAL NOT NULL,PRIMARY KEY(Character_ID,Stat_Name));"
+Storage Execute_SQL "CREATE TEMP TABLE IF NOT EXISTS CE_Context (Name TEXT PRIMARY KEY,Value TEXT);"
+Storage Execute_SQL "CREATE TEMP TABLE IF NOT EXISTS CE_Draft (Name TEXT PRIMARY KEY,Value REAL NOT NULL);"
+Storage Execute_SQL "CREATE TEMP VIEW IF NOT EXISTS CE_Characters AS SELECT CAST(row_number() OVER (ORDER BY Default_Name,ID)-1 AS TEXT) AS Number,ID,Default_Name FROM Editor_Characters WHERE Game_Name=(SELECT Value FROM CE_Context WHERE Name='Game');"
+Storage Execute_SQL "CREATE TEMP VIEW IF NOT EXISTS CE_Character_Catalog AS SELECT 'All' AS Name,count(*) AS Count,group_concat(replace(Default_Name,'|','/'),'|') AS Items FROM (SELECT * FROM CE_Characters ORDER BY CAST(Number AS INTEGER));"
+Storage Execute_SQL "CREATE TEMP VIEW IF NOT EXISTS CE_Stats AS SELECT CAST(row_number() OVER (ORDER BY Name)-1 AS TEXT) AS Number,Name,Default_Value FROM Editor_Character_Stats WHERE Game_Name=(SELECT Value FROM CE_Context WHERE Name='Game');"
+Storage Execute_SQL "CREATE TEMP VIEW IF NOT EXISTS CE_Stat_Catalog AS SELECT 'All' AS Name,count(*) AS Count,group_concat(replace(Name,'|','/'),'|') AS Items FROM (SELECT * FROM CE_Stats ORDER BY CAST(Number AS INTEGER));"
+Storage Execute_SQL "CREATE TEMP VIEW IF NOT EXISTS CE_Games AS SELECT CAST(row_number() OVER (ORDER BY Name)-1 AS TEXT) AS Number,Name FROM Editor_Games;"
+Storage Execute_SQL "CREATE TEMP VIEW IF NOT EXISTS CE_Game_Catalog AS SELECT 'All' AS Name,count(*) AS Count,group_concat(replace(Name,'|','/'),'|') AS Items FROM (SELECT * FROM CE_Games ORDER BY CAST(Number AS INTEGER));"
+Storage Execute_SQL "CREATE TEMP VIEW IF NOT EXISTS CE_Number AS SELECT 'All' AS Name,CASE WHEN json_valid(Value) THEN CASE WHEN json_type(Value) IN ('integer','real') THEN abs(CAST(Value AS REAL))<=1.7976931348623157e308 ELSE 0 END ELSE 0 END AS Valid FROM CE_Context WHERE Name='Number';"
+Storage Execute_SQL "CREATE TEMP VIEW IF NOT EXISTS CE_New_ID AS SELECT 'All' AS Name,lower(hex(randomblob(16))) AS Value;"
+Set_Var CE_Ready 1
+Set_Var CE_Game ""
+Set_Var CE_Next_Game ""
+Set_Var CE_ID ""
+Set_Var CE_Name New_Character
+Set_Var CE_Dirty 0
+Set_Var CE_Pending 0
+Set_Var CE_Discard 0
+Set_Var CE_GUI_Ready 0
+Set_Var CE_Stat ""
+Set_Var CE_Value 0
+Set_Var CE_Show_Add 0
+Set_Var CE_New_Stat ""
+Set_Var CE_New_Default 0
+Set_Var CE_New_Game My_Game
+Set_Var CE_Status "Open a game, then create or select a character."
+Define_Function CE_Refresh
+    Set_Var CE_Items (Storage Get_Field CE_Character_Catalog Name All Items)
+    Set_Var CE_Count (Storage Get_Field CE_Character_Catalog Name All Count)
+    Set_Var CE_Index (Storage Get_Field CE_Characters ID Var CE_ID Number)
+    If Var CE_Index == "" { Set_Var CE_Index -1 }
+    If Var CE_Count == 0 { Set_Var CE_Items "No saved characters" }
+    Set_Var CE_Stat_Items (Storage Get_Field CE_Stat_Catalog Name All Items)
+    Set_Var CE_Stat_Count (Storage Get_Field CE_Stat_Catalog Name All Count)
+    Set_Var CE_Stat_Index (Storage Get_Field CE_Stats Name Var CE_Stat Number)
+    If Var CE_Stat_Index == "" { Set_Var CE_Stat_Index -1 }
+    If Var CE_Stat_Count == 0 { Set_Var CE_Stat_Items "No stats defined" }
+End_Function
+Define_Function CE_Check_Draft
+    Set_Var CE_Allowed 1
+    If Var CE_Dirty == 1
+    {
+        If Var CE_Discard == 0
+        {
+            Set_Var CE_Allowed 0
+            Set_Var CE_Status "Save the character or check Discard character changes before switching."
+        }
+    }
+End_Function
+Define_Function CE_Select_Stat
+    Set_Var CE_Value (Storage Get_Field CE_Draft Name Var CE_Stat Value)
+    Set_Var CE_Pending 0
+    If Var CE_GUI_Ready == 1 { Graphics GUI_Set_Text_Value CE_Value_Control Var CE_Value }
+End_Function
+Define_Function CE_New_Internal
+    Set_Var CE_ID (Storage Get_Field CE_New_ID Name All Value)
+    Set_Var CE_Name New_Character
+    Storage Execute_SQL "DELETE FROM CE_Draft; INSERT INTO CE_Draft SELECT Name,Default_Value FROM CE_Stats;"
+    Set_Var CE_Stat (Storage Get_Field CE_Stats Number 0 Name)
+    Call CE_Select_Stat
+    Set_Var CE_Dirty 0
+    Set_Var CE_Discard 0
+    If Var CE_GUI_Ready == 1 { Graphics GUI_Set_Text_Value CE_Name_Control Var CE_Name }
+    Call CE_Refresh
+End_Function
+Define_Function CE_Load_Internal
+    Set_Var CE_Name (Storage Get_Field Editor_Characters ID Var CE_ID Default_Name)
+    Storage Set_Field CE_Context Name Character Value Var CE_ID
+    Storage Execute_SQL "DELETE FROM CE_Draft; INSERT INTO CE_Draft SELECT s.Name,coalesce(v.Value,s.Default_Value) FROM CE_Stats s LEFT JOIN Editor_Character_Stat_Values v ON v.Stat_Name=s.Name AND v.Character_ID=(SELECT Value FROM CE_Context WHERE Name='Character');"
+    Set_Var CE_Stat (Storage Get_Field CE_Stats Number 0 Name)
+    Call CE_Select_Stat
+    Set_Var CE_Dirty 0
+    Set_Var CE_Discard 0
+    If Var CE_GUI_Ready == 1 { Graphics GUI_Set_Text_Value CE_Name_Control Var CE_Name }
+    Call CE_Refresh
+End_Function
+Define_Function CE_Use_Game
+    Call CE_Check_Draft
+    If Var CE_Allowed == 1
+    {
+        If (Storage Get_Field Editor_Games Name Var CE_Next_Game Name) != ""
+        {
+            Set_Var CE_Game Var CE_Next_Game
+            Storage Set_Field CE_Context Name Game Value Var CE_Game
+            Call CE_Refresh
+            If Var CE_Count > 0
+            {
+                Set_Var CE_ID (Storage Get_Field CE_Characters Number 0 ID)
+                Call CE_Load_Internal
+            }
+            If Var CE_Count == 0 { Call CE_New_Internal }
+            Set_Var CE_Show_Add 0
+            Set_Var CE_Status "Character Editor ready. Stat definitions belong to this game; values belong to each character."
+        }
+    }
+End_Function
+Define_Function CE_New
+    Call CE_Check_Draft
+    If Var CE_Allowed == 1
+    {
+        If Var CE_Game != ""
+        {
+            Call CE_New_Internal
+            Set_Var CE_Dirty 1
+            Set_Var CE_Status "New character draft. Set its default name and stats, then Save character."
+        }
+    }
+End_Function
+Define_Function CE_Character_Changed
+    Call CE_Check_Draft
+    If Var CE_Allowed == 1
+    {
+        Set_Var CE_Target (Storage Get_Field CE_Characters Number Var Callback_Value ID)
+        If Var CE_Target != ""
+        {
+            Set_Var CE_ID Var CE_Target
+            Call CE_Load_Internal
+            Set_Var CE_Status "Character loaded."
+        }
+    }
+End_Function
+Define_Function CE_Name_Changed
+    Set_Var CE_Dirty 1
+End_Function
+Define_Function CE_Value_Changed
+    Set_Var CE_Dirty 1
+    Set_Var CE_Pending 1
+End_Function
+Define_Function CE_Stage
+    Set_Var CE_Error ""
+    If Var CE_Pending == 1
+    {
+        If Var CE_GUI_Ready == 1
+        {
+            Graphics GUI_Text_Value CE_Value_Control
+            Set_Var_Global CE_Value Graphics.GUI.CE_Value_Control.Value
+        }
+        Storage Set_Field CE_Context Name Number Value Var CE_Value
+        If (Storage Get_Field CE_Number Name All Valid) != 1
+        {
+            Set_Var CE_Error "Enter a finite numeric stat value, for example 100, -5 or 2.5."
+            Set_Var CE_Status Var CE_Error
+        }
+        If Var CE_Error == ""
+        {
+            Storage Set_Field CE_Context Name Stat Value Var CE_Stat
+            Storage Execute_SQL "UPDATE CE_Draft SET Value=CAST((SELECT Value FROM CE_Context WHERE Name='Number') AS REAL) WHERE Name=(SELECT Value FROM CE_Context WHERE Name='Stat');"
+            Set_Var CE_Pending 0
+            Set_Var CE_Dirty 1
+        }
+    }
+End_Function
+Define_Function CE_Stat_Changed
+    Set_Var CE_Next_Stat (Storage Get_Field CE_Stats Number Var Callback_Value Name)
+    Call CE_Stage
+    If Var CE_Error == ""
+    {
+        If Var CE_Next_Stat != ""
+        {
+            Set_Var CE_Stat Var CE_Next_Stat
+            Call CE_Select_Stat
+        }
+    }
+End_Function
+Define_Function CE_Save
+    If Var CE_Game != ""
+    {
+        Call CE_Stage
+        If Var CE_GUI_Ready == 1
+        {
+            Graphics GUI_Text_Value CE_Name_Control
+            Set_Var_Global CE_Name Graphics.GUI.CE_Name_Control.Value
+        }
+        Storage Set_Field CE_Context Name Default_Name Value Var CE_Name
+        Storage Execute_SQL "INSERT OR REPLACE INTO CE_Context SELECT 'Valid_Name',CAST(length(trim(Value))>0 AS TEXT) FROM CE_Context WHERE Name='Default_Name';"
+        If (Storage Get_Field CE_Context Name Valid_Name Value) != 1
+        {
+            Set_Var CE_Error "Enter a default name for the character."
+            Set_Var CE_Status Var CE_Error
+        }
+        If Var CE_Error == ""
+        {
+            Storage Set_Field CE_Context Name Character Value Var CE_ID
+            Storage Begin
+            Storage Execute_SQL "INSERT INTO Editor_Characters SELECT (SELECT Value FROM CE_Context WHERE Name='Character'),(SELECT Value FROM CE_Context WHERE Name='Game'),(SELECT Value FROM CE_Context WHERE Name='Default_Name') WHERE 1 ON CONFLICT(ID) DO UPDATE SET Default_Name=excluded.Default_Name;"
+            Storage Execute_SQL "INSERT INTO Editor_Character_Stat_Values SELECT (SELECT Value FROM CE_Context WHERE Name='Character'),Name,Value FROM CE_Draft WHERE 1 ON CONFLICT(Character_ID,Stat_Name) DO UPDATE SET Value=excluded.Value;"
+            Storage Commit
+            Set_Var CE_Dirty 0
+            Set_Var CE_Discard 0
+            Call CE_Refresh
+            Set_Var CE_Status "Character saved."
+        }
+    }
+End_Function
+Define_Function CE_Discard_Changed
+    Set_Var CE_Discard Var Callback_Value
+End_Function
+Define_Function CE_Open_Add
+    If Var CE_Game != ""
+    {
+        Set_Var CE_Show_Add 1
+        Graphics GUI_Set_Window_Open "Create character stat" True
+    }
+End_Function
+Define_Function CE_Close_Add
+    Set_Var CE_Show_Add 0
+End_Function
+Define_Function CE_Add_Stat
+    If Var CE_Game != ""
+    {
+        If Var CE_GUI_Ready == 1
+        {
+            Graphics GUI_Text_Value CE_New_Stat_Control
+            Set_Var_Global CE_New_Stat Graphics.GUI.CE_New_Stat_Control.Value
+            Graphics GUI_Text_Value CE_New_Default_Control
+            Set_Var_Global CE_New_Default Graphics.GUI.CE_New_Default_Control.Value
+        }
+        Storage Set_Field CE_Context Name New_Stat Value Var CE_New_Stat
+        Storage Set_Field CE_Context Name Number Value Var CE_New_Default
+        Storage Execute_SQL "UPDATE CE_Context SET Value=trim(Value) WHERE Name='New_Stat';"
+        Set_Var CE_New_Stat (Storage Get_Field CE_Context Name New_Stat Value)
+        Set_Var CE_Error ""
+        If Var CE_New_Stat == "" { Set_Var CE_Error "Enter a stat name." }
+        If (Storage Get_Field CE_Stats Name Var CE_New_Stat Name) != "" { Set_Var CE_Error "That stat already exists in this game." }
+        If (Storage Get_Field CE_Number Name All Valid) != 1 { Set_Var CE_Error "Enter a finite numeric default value for the stat." }
+        If Var CE_Error == ""
+        {
+            // Preserve an edited current field before changing the stat selection.
+            Call CE_Stage
+            Storage Set_Field CE_Context Name Number Value Var CE_New_Default
+        }
+        If Var CE_Error == ""
+        {
+            Storage Execute_SQL "INSERT INTO Editor_Character_Stats SELECT (SELECT Value FROM CE_Context WHERE Name='Game'),(SELECT Value FROM CE_Context WHERE Name='New_Stat'),CAST((SELECT Value FROM CE_Context WHERE Name='Number') AS REAL);"
+            Storage Execute_SQL "INSERT INTO CE_Draft SELECT Name,Default_Value FROM CE_Stats WHERE Name=(SELECT Value FROM CE_Context WHERE Name='New_Stat');"
+            Set_Var CE_Stat Var CE_New_Stat
+            Call CE_Select_Stat
+            Call CE_Refresh
+            Set_Var CE_Show_Add 0
+            Set_Var CE_Status "Stat added to this game's definitions. Each character can have its own numeric value."
+        }
+        If Var CE_Error != "" { Set_Var CE_Status Var CE_Error }
+    }
+End_Function
+Define_Function CE_Game_Changed
+    Set_Var CE_Next_Game (Storage Get_Field CE_Games Number Var Callback_Value Name)
+    Call CE_Use_Game
+End_Function
+Define_Function CE_Create_Game
+    Call CE_Check_Draft
+    If Var CE_GUI_Ready == 1
+    {
+        Graphics GUI_Text_Value CE_New_Game_Control
+        Set_Var_Global CE_New_Game Graphics.GUI.CE_New_Game_Control.Value
+    }
+    If Var CE_New_Game == "" { Set_Var CE_Allowed 0 }
+    If Var CE_Allowed == 1
+    {
+        Storage Set_Field Editor_Games Name Var CE_New_Game Name Var CE_New_Game
+        Set_Var CE_Next_Game Var CE_New_Game
+        Call CE_Use_Game
+    }
+End_Function
+Define_Function CE_GUI
+    Set_Var CE_GUI_Ready 1
+    Call CE_Refresh
+    Graphics GUI_Begin_Window "Editor Controls"
+    Graphics GUI_Text CE_Heading "Character Editor"
+    Graphics GUI_Text CE_Status_Label Var CE_Status
+    Graphics GUI_Text CE_Game_Label "Game:"
+    Graphics GUI_Text CE_Game_Name Var CE_Game
+    If Var GE_Host != 1
+    {
+        Set_Var CE_Game_Items (Storage Get_Field CE_Game_Catalog Name All Items)
+        If Var CE_Game_Items == "" { Set_Var CE_Game_Items "No games" }
+        Set_Var CE_Game_Index (Storage Get_Field CE_Games Name Var CE_Game Number)
+        If Var CE_Game_Index == "" { Set_Var CE_Game_Index -1 }
+        Graphics GUI_Set_Selection_Value CE_Game_Menu Var CE_Game_Index
+        Graphics GUI_Combo CE_Game_Menu Game Var CE_Game_Items Var CE_Game_Index CE_Game_Changed
+        Graphics GUI_Input_Text CE_New_Game_Control "Game name" Var CE_New_Game None
+        Graphics GUI_Button CE_Create_Game_Button "Create / open game" CE_Create_Game
+    }
+    If Var CE_Game == "" { Graphics GUI_Text CE_No_Game "Create or open a game to edit its characters." }
+    If Var CE_Game != ""
+    {
+        Graphics GUI_Set_Selection_Value CE_Character_Menu Var CE_Index
+        Graphics GUI_Combo CE_Character_Menu Character Var CE_Items Var CE_Index CE_Character_Changed
+        Graphics GUI_Button CE_New_Button "New character" CE_New
+        Graphics GUI_Input_Text CE_Name_Control "Default name" Var CE_Name CE_Name_Changed
+        Graphics GUI_Button CE_Save_Button "Save character" CE_Save
+        Graphics GUI_Checkbox CE_Discard_Control "Discard character changes when switching" Var CE_Discard CE_Discard_Changed
+        Graphics GUI_Button CE_Add_Button "Create numeric stat..." CE_Open_Add
+        Graphics GUI_Text CE_Dirty_Label "Unsaved character changes:"
+        Graphics GUI_Text CE_Dirty_Value Var CE_Dirty
+    }
+    Graphics GUI_End_Window
+    If Var CE_Show_Add == 1
+    {
+        Graphics GUI_Begin_Window "Create character stat"
+        Graphics GUI_Text CE_Add_Help "Define a numeric stat for this game's characters."
+        Graphics GUI_Input_Text CE_New_Stat_Control "Stat name" Var CE_New_Stat None
+        Graphics GUI_Input_Text CE_New_Default_Control "Default numeric value" Var CE_New_Default None
+        Graphics GUI_Button CE_Add_Confirm "Create stat" CE_Add_Stat
+        Graphics GUI_Button CE_Add_Cancel Cancel CE_Close_Add
+        Graphics GUI_End_Window
+    }
+End_Function
+Define_Function CE_View
+    Graphics GUI_Text CE_View_Name Var CE_Name
+    Graphics GUI_Text CE_Stats_Help "Game-defined numeric stats, with values for this character."
+    If Var CE_Stat_Count > 0
+    {
+        Graphics GUI_Set_Selection_Value CE_Stat_Menu Var CE_Stat_Index
+        Graphics GUI_Combo CE_Stat_Menu Stat Var CE_Stat_Items Var CE_Stat_Index CE_Stat_Changed
+        Graphics GUI_Input_Text CE_Value_Control "Character value" Var CE_Value CE_Value_Changed
+        Graphics GUI_Button CE_Stage_Button "Apply stat value to draft" CE_Stage
+        Set_Var CE_Row 0
+        Loop While Var CE_Row < Var CE_Stat_Count
+        {
+            Set_Var CE_Row_Name (Storage Get_Field CE_Stats Number Var CE_Row Name)
+            Graphics GUI_Text (Add 900000 Var CE_Row) Var CE_Row_Name
+            Graphics GUI_Text (Add 910000 Var CE_Row) (Storage Get_Field CE_Draft Name Var CE_Row_Name Value)
+            Set_Var CE_Row (Add Var CE_Row 1)
+        }
+    }
+    If Var CE_Stat_Count == 0 { Graphics GUI_Text CE_Empty "Use Create numeric stat to define stats such as Health, Strength or Speed."
+    }
+End_Function
+Call CE_Refresh
+Return

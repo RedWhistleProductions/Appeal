@@ -1,0 +1,66 @@
+// Exercise every Test plugin function.
+World Debug 1
+World Set_Paths Sample
+World Create Sample
+World Open_Scene Sample
+World Load Sample
+World Load_Scene Sample
+World Save Sample
+World Save_Scene Sample
+World Switch Sample
+World Use_Scene Sample
+World Close_Scene Sample
+World Clear_Scene Sample
+World Update Sample
+World Draw Sample
+World Entity_Create Sample
+World Create_Entity Sample
+World Entity_Destroy Sample
+World Delete_Entity Sample
+World Clone_Entity Sample Sample
+World Entity_Set_Active Sample 1
+World Set_Active_Entity Sample
+World Entity_Set_Tag Sample Sample
+World Set_Position Sample 1 1 1
+World Set_Location Sample 1 1 1
+World Set_Rotation Sample 1 1 1
+World Set_Orientation Sample 1 1 1
+World Set_Scale Sample 1 1 1
+World Move Sample 1 1 1
+World Rotate Sample 1 1 1
+World Add_Component Sample Sample
+World Remove_Component Sample Sample
+World Has_Component Sample Sample
+World List_Components Sample
+World Set Sample Sample Sample
+World Get Sample Sample
+World List_Entities
+World Query Sample
+World Pause
+World Resume
+World Set_Time_Scale 1
+World Emit_Event Sample
+World Clear_Events
+World Create_Typed_Entity Sample Tree 7 1
+World Entity_Type Sample
+World Entity_ID Sample
+World Create_Section Sample 2 2
+World Set_Tile Sample 0 0 Sample
+World Clear_Tile Sample 0 0
+World Get_Tile Sample 0 0 Name
+World Connect_Sections Sample Right Other
+World Disconnect_Section Sample Right
+World Get_Neighbor Sample Right
+World Use_Section Sample
+World Set_Section_Position Sample 0 0 0
+World Set_Tile_Size Sample 1 1 1
+World Set_Section_Orientation Sample Side_Scrolling
+World Get_Section Sample Columns
+World Save_Section Sample
+World Load_Section Sample
+World Set_Door_Destination Sample Sample 0 0 0
+World Get_Door_Destination Sample
+World Delete_Section Sample
+World Export_Level
+World Import_Level Sample
+Return

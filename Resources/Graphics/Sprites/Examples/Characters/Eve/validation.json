@@ -1,0 +1,42 @@
+[
+  {
+    "sheet": "Female_Hero_Movement.png",
+    "size": [
+      512,
+      320
+    ],
+    "frames": 40,
+    "rgba8": true,
+    "transparent_margins": true
+  },
+  {
+    "sheet": "Female_Hero_Combat.png",
+    "size": [
+      512,
+      256
+    ],
+    "frames": 32,
+    "rgba8": true,
+    "transparent_margins": true
+  },
+  {
+    "sheet": "Female_Hero_Actions.png",
+    "size": [
+      512,
+      384
+    ],
+    "frames": 48,
+    "rgba8": true,
+    "transparent_margins": true
+  },
+  {
+    "sheet": "Female_Hero_Extras.png",
+    "size": [
+      512,
+      256
+    ],
+    "frames": 32,
+    "rgba8": true,
+    "transparent_margins": true
+  }
+]

@@ -1,6 +1,6 @@
 {
   "schema": "bananas.sprite-atlas.v1",
-  "image": "ui_panels.png",
+  "image": "UI_Panels.png",
   "format": "RGBA8",
   "size": {
     "w": 512,

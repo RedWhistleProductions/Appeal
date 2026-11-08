@@ -1,0 +1,147 @@
+// Per-layer brush folders and actual source-alpha classification.
+Set_Var TE_Show_Folders 0
+Set_Var TE_Folders_Drawn 0
+Set_Var TE_Last_Filter_Section ""
+Define_Function TE_Init_Layer_Palettes
+    Storage Execute_SQL "INSERT OR IGNORE INTO Editor_Layer_Search (Section) SELECT Section FROM Editor_Layers UNION SELECT 'Map';"
+    Storage Execute_SQL "INSERT OR IGNORE INTO Editor_Layer_Palettes (Section) SELECT Section FROM Editor_Layers UNION SELECT 'Map';"
+    Storage Execute_SQL "INSERT OR IGNORE INTO Editor_Layer_Folders (Key,Section,Folder) SELECT p.Section || char(31) || f.Folder, p.Section, f.Folder FROM Editor_Layer_Palettes p CROSS JOIN Editor_Folder_List f;"
+End_Function
+Define_Function TE_Discover_Tiles
+    Storage Begin
+    Call TE_Import_Files
+    Storage Execute_SQL "DELETE FROM Editor_Sprite_Info;"
+    Set_Var TE_Scan_Count (Storage Get_Field Editor_Catalog Name All Count)
+    Set_Var TE_Scan_Index 0
+    Loop While Var TE_Scan_Index < Var TE_Scan_Count
+    {
+        Set_Var TE_Scan_Name (Storage Get_Field Editor_Sprite_List Number Var TE_Scan_Index Name)
+        Set_Var TE_Scan_File (Storage Get_Field Sprites Name Var TE_Scan_Name File)
+        Set_Var TE_Scan_W (Storage Get_Field Sprites Name Var TE_Scan_Name Frame_Width)
+        Set_Var TE_Scan_H (Storage Get_Field Sprites Name Var TE_Scan_Name Frame_Height)
+        Set_Var TE_Scan_Frame (Storage Get_Field Sprites Name Var TE_Scan_Name Frame)
+        Set_Var TE_Scan_Span 1
+        If (Storage Get_Field Sprite_Extras Name Var TE_Scan_Name Second_Frame) != ""
+        {
+            Set_Var TE_Scan_Span 2
+        }
+        Set_Var TE_Scan_Folder (Graphics Sprite_Info Var TE_Scan_File Var TE_Scan_W Var TE_Scan_H Var TE_Scan_Frame Var TE_Scan_Span Folder)
+        If Var TE_Scan_Folder != ""
+        {
+            Set_Var TE_Scan_Opaque (Graphics Sprite_Info Var TE_Scan_File Var TE_Scan_W Var TE_Scan_H Var TE_Scan_Frame Var TE_Scan_Span Opaque)
+            If Var TE_Scan_Opaque >= 0
+            {
+                Storage Set_Field Editor_Sprite_Info Name Var TE_Scan_Name Folder Var TE_Scan_Folder
+                Storage Set_Field Editor_Sprite_Info Name Var TE_Scan_Name Opaque Var TE_Scan_Opaque
+                Storage Set_Field Tile_Attributes Name Var TE_Scan_Name Folder Var TE_Scan_Folder
+                Storage Set_Field Tile_Attributes Name Var TE_Scan_Name Source_Sheet Var TE_Scan_File
+                Storage Set_Field Tile_Attributes Name Var TE_Scan_Name Opaque Var TE_Scan_Opaque
+            }
+        }
+        Set_Var TE_Scan_Index (Add Var TE_Scan_Index 1)
+    }
+    Call TE_Init_Layer_Palettes
+    Call TE_Update_Palette
+    Storage Commit
+End_Function
+Define_Function TE_Update_Palette
+    Storage Set_Field Editor_Context Name Active_Section Value Var TE_Section
+    Set_Var TE_Items (Storage Get_Field Editor_Brush_Catalog Name All Items)
+    Set_Var TE_Palette_Count (Storage Get_Field Editor_Brush_Catalog Name All Count)
+    If Var TE_Palette_Count > 0
+    {
+        If (Storage Get_Field Editor_Brush_List Name Var TE_Brush Number) == ""
+        {
+            Set_Var TE_Brush (Storage Get_Field Editor_Brush_List Number 0 Name)
+        }
+        If (Storage Get_Field Editor_Brush_List Name Var TE_Default Number) == ""
+        {
+            Set_Var TE_Default (Storage Get_Field Editor_Brush_List Number 0 Name)
+        }
+    }
+End_Function
+Define_Function TE_Open_Folders
+    Graphics GUI_Set_Window_Open "Tile filters" True
+    Set_Var TE_Show_Folders 1
+End_Function
+Define_Function TE_Close_Folders
+    Graphics GUI_Set_Window_Open "Tile filters" False
+    Set_Var TE_Show_Folders 0
+End_Function
+Define_Function TE_Rescan_Folders
+    Call TE_Discover_Tiles
+    Set_Var TE_Status "Tile catalog and source attributes refreshed from disk."
+End_Function
+Graphics GUI_Set_Window_Functions "Tile filters" TE_Close_Folders TE_Open_Folders
+Define_Function TE_Folders_GUI
+    Set_Var TE_Folders_Drawn 1
+    Set_Var TE_Filter_Section Var TE_Section
+    Storage Set_Field Editor_Context Name Filter_Section Value Var TE_Filter_Section
+    Graphics GUI_Begin_Window "Tile filters"
+    Graphics GUI_Text TE_Folder_Help "Brush choices for the selected layer. Painted tiles are preserved."
+    Graphics GUI_Text TE_Folder_Layer_Label "Layer"
+    Graphics GUI_Text TE_Folder_Layer Var TE_Layer
+    Graphics GUI_Checkbox TE_Include_Opaque "Opaque tiles" (Storage Get_Field Editor_Layer_Palettes Section Var TE_Filter_Section Opaque) None
+    Graphics GUI_Checkbox TE_Include_Transparent "Tiles with transparency" (Storage Get_Field Editor_Layer_Palettes Section Var TE_Filter_Section Transparent) None
+    If Var TE_Last_Filter_Section != Var TE_Filter_Section
+    {
+        Graphics GUI_Set_Text_Value TE_Tile_Search (Storage Get_Field Editor_Layer_Search Section Var TE_Filter_Section Search)
+        Set_Var TE_Last_Filter_Section Var TE_Filter_Section
+    }
+    Graphics GUI_Input_Text TE_Tile_Search "Name / sheet / category / tags" (Storage Get_Field Editor_Layer_Search Section Var TE_Filter_Section Search) None
+    Graphics GUI_Separator
+    Set_Var TE_Folder_Total (Storage Get_Field Editor_Folder_Count Name All Count)
+    Set_Var TE_Folder_Row 0
+    Loop While Var TE_Folder_Row < Var TE_Folder_Total
+    {
+        Set_Var TE_Folder_Name (Storage Get_Field Editor_Filter_Folders Number Var TE_Folder_Row Folder)
+        Set_Var TE_Folder_Enabled (Storage Get_Field Editor_Filter_Folders Number Var TE_Folder_Row Enabled)
+        Graphics GUI_Checkbox (Add 400000 Var TE_Folder_Row) Var TE_Folder_Name Var TE_Folder_Enabled None
+        Set_Var TE_Folder_Row (Add Var TE_Folder_Row 1)
+    }
+    Graphics GUI_Button TE_Rescan_Button "Scan for new tiles" TE_Rescan_Folders
+    Graphics GUI_End_Window
+End_Function
+Define_Function TE_Poll_Folders
+    If Var TE_Folders_Drawn == 1
+    {
+        Set_Var TE_Filter_Changed 0
+        Graphics GUI_Text_Changed TE_Tile_Search
+        Set_Var_Global TE_Search_Changed Graphics.GUI.TE_Tile_Search.Changed
+        If Var TE_Search_Changed == 1
+        {
+            Set_Var_Global TE_Search_Value Graphics.GUI.TE_Tile_Search.Value
+            Storage Set_Field Editor_Layer_Search Section Var TE_Filter_Section Search Var TE_Search_Value
+            Set_Var TE_Filter_Changed 1
+        }
+        Storage Set_Field Editor_Context Name Filter_Section Value Var TE_Filter_Section
+        If (Graphics GUI_Checkbox_Changed TE_Include_Opaque) == 1
+        {
+            Storage Set_Field Editor_Layer_Palettes Section Var TE_Filter_Section Opaque (Graphics GUI_Checkbox_Value TE_Include_Opaque)
+            Set_Var TE_Filter_Changed 1
+        }
+        If (Graphics GUI_Checkbox_Changed TE_Include_Transparent) == 1
+        {
+            Storage Set_Field Editor_Layer_Palettes Section Var TE_Filter_Section Transparent (Graphics GUI_Checkbox_Value TE_Include_Transparent)
+            Set_Var TE_Filter_Changed 1
+        }
+        Set_Var TE_Folder_Row 0
+        Loop While Var TE_Folder_Row < Var TE_Folder_Total
+        {
+            Set_Var TE_Folder_Control (Add 400000 Var TE_Folder_Row)
+            If (Graphics GUI_Checkbox_Changed Var TE_Folder_Control) == 1
+            {
+                Set_Var TE_Folder_Key (Storage Get_Field Editor_Filter_Folders Number Var TE_Folder_Row Key)
+                Storage Set_Field Editor_Layer_Folders Key Var TE_Folder_Key Enabled (Graphics GUI_Checkbox_Value Var TE_Folder_Control)
+                Set_Var TE_Filter_Changed 1
+            }
+            Set_Var TE_Folder_Row (Add Var TE_Folder_Row 1)
+        }
+        If Var TE_Filter_Changed == 1
+        {
+            Set_Var TE_Dirty 1
+            Call TE_Update_Palette
+        }
+    }
+End_Function
+Return

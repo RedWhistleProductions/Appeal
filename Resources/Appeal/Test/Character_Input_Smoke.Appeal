@@ -1,0 +1,10 @@
+Run Setup/Config
+Run Examples/Graphics/Setup_Character_Mechanics
+Run Examples/Graphics/Character_Animation_Controls
+Run Examples/Graphics/Setup_Character_Input
+Call Adam_Read_Input
+Call Eve_Read_Input
+Call Character_Mechanics_Update
+Print INPUT_BINDINGS_PASSED
+Input Close_Controller -1
+Done

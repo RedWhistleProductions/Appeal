@@ -1,0 +1,30 @@
+Run Setup/Config
+Run Examples/Graphics/Setup_Character_Mechanics
+Run Examples/Graphics/Character_Animation_Controls
+Run Examples/Graphics/Setup_Character_Input
+Print (Input Focus)
+Set_Var Adam_Direction 100
+Set_Var Adam_Axis 100
+Set_Var Adam_Stick 100
+Set_Var Adam_Pad_Right 1
+Call Character_Mechanics_Update
+Print_Global Mechanics.Adam.Position_X
+Input Set_Focus GUI
+Call Character_Check_Focus
+Call Adam_Read_Input
+Call Eve_Read_Input
+Call Character_Mechanics_Update
+Print (Input Focus)
+Print_Global Mechanics.Adam.Position_X
+Print_Global Mechanics.Adam.Velocity_X
+Print Var Adam_Direction
+Print Var Adam_Stick
+Print Var Adam_Pad_Right
+Input Toggle_Focus
+Call Character_Check_Focus
+Call Adam_Read_Input
+Call Character_Mechanics_Update
+Print (Input Focus)
+Print_Global Mechanics.Adam.Position_X
+Input Close_Controller -1
+Done

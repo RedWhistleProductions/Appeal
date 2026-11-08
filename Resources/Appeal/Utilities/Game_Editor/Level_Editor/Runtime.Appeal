@@ -1,0 +1,128 @@
+// Caller loads Storage/World and opens the Tile_Editor database; no GUI/window.
+Storage Execute_SQL "CREATE TEMP TABLE IF NOT EXISTS Runtime_Level_Context (Name TEXT PRIMARY KEY, Value TEXT);"
+Storage Execute_SQL "CREATE TABLE IF NOT EXISTS Editor_Game_Level_Links (Level_Name TEXT, Cell TEXT, Direction TEXT, Destination_Cell TEXT, PRIMARY KEY(Level_Name,Cell,Direction));"
+Storage Execute_SQL "CREATE VIEW IF NOT EXISTS Editor_Game_Neighbors AS SELECT a.Level_Name,a.Cell,CASE WHEN CAST(a.Cell AS INTEGER)/l.Columns=CAST(b.Cell AS INTEGER)/l.Columns AND CAST(b.Cell AS INTEGER)=CAST(a.Cell AS INTEGER)+1 THEN 'Right' WHEN CAST(a.Cell AS INTEGER)/l.Columns=CAST(b.Cell AS INTEGER)/l.Columns AND CAST(b.Cell AS INTEGER)=CAST(a.Cell AS INTEGER)-1 THEN 'Left' WHEN CAST(b.Cell AS INTEGER)>CAST(a.Cell AS INTEGER) THEN 'Below' ELSE 'Above' END AS Direction,b.Cell AS Destination_Cell FROM Editor_Game_Level_Cells a JOIN Editor_Game_Levels l ON l.Name=a.Level_Name JOIN Editor_Game_Level_Cells b ON b.Level_Name=a.Level_Name WHERE a.Map_Name!='' AND b.Map_Name!='' AND ((CAST(a.Cell AS INTEGER)/l.Columns=CAST(b.Cell AS INTEGER)/l.Columns AND abs(CAST(a.Cell AS INTEGER)-CAST(b.Cell AS INTEGER))=1) OR abs(CAST(a.Cell AS INTEGER)-CAST(b.Cell AS INTEGER))=l.Columns);"
+Storage Execute_SQL "CREATE TEMP TABLE IF NOT EXISTS Runtime_Preview_Cells (Cell TEXT PRIMARY KEY,Map_Name TEXT);"
+Storage Execute_SQL "CREATE TEMP TABLE IF NOT EXISTS Runtime_Preview_Links (Cell TEXT,Direction TEXT,Destination_Cell TEXT,PRIMARY KEY(Cell,Direction));"
+Storage Execute_SQL "CREATE TEMP VIEW IF NOT EXISTS Runtime_Level_Cells AS SELECT Cell,Map_Name FROM Editor_Game_Level_Cells WHERE Level_Name=(SELECT Value FROM Runtime_Level_Context WHERE Name='Level') AND coalesce((SELECT Value FROM Runtime_Level_Context WHERE Name='Preview'),'0')!='1' UNION ALL SELECT Cell,Map_Name FROM Runtime_Preview_Cells WHERE (SELECT Value FROM Runtime_Level_Context WHERE Name='Preview')='1';"
+Storage Execute_SQL "CREATE TEMP VIEW IF NOT EXISTS Runtime_Level_Neighbors AS SELECT Cell,Direction,Destination_Cell FROM Editor_Game_Level_Links WHERE Level_Name=(SELECT Value FROM Runtime_Level_Context WHERE Name='Level') AND Cell=(SELECT Value FROM Runtime_Level_Context WHERE Name='Cell') AND coalesce((SELECT Value FROM Runtime_Level_Context WHERE Name='Preview'),'0')!='1' UNION ALL SELECT Cell,Direction,Destination_Cell FROM Runtime_Preview_Links WHERE Cell=(SELECT Value FROM Runtime_Level_Context WHERE Name='Cell') AND (SELECT Value FROM Runtime_Level_Context WHERE Name='Preview')='1';"
+Storage Execute_SQL "CREATE TEMP VIEW IF NOT EXISTS Runtime_Map_Layers AS SELECT * FROM Editor_Level_Layers WHERE Level_Name=(SELECT Value FROM Runtime_Level_Context WHERE Name='Map');"
+Set_Var Runtime_Use_Preview 0
+Set_Var Runtime_On_Map_Loaded ""
+Set_Var Runtime_Loaded 0
+Set_Var Runtime_Transitioned 0
+Define_Function Runtime_Level_Load
+    Set_Var Runtime_Loaded 0
+    Storage Set_Field Runtime_Level_Context Name Level Value Var Runtime_Level_Name
+    Storage Set_Field Runtime_Level_Context Name Preview Value Var Runtime_Use_Preview
+    If Var Runtime_Use_Preview != 1
+    {
+        Storage Execute_SQL "DELETE FROM Editor_Game_Level_Links WHERE Level_Name=(SELECT Value FROM Runtime_Level_Context WHERE Name='Level');"
+        Storage Execute_SQL "INSERT INTO Editor_Game_Level_Links SELECT * FROM Editor_Game_Neighbors WHERE Level_Name=(SELECT Value FROM Runtime_Level_Context WHERE Name='Level');"
+    }
+    Call Runtime_Level_Enter_Cell
+    If Var Runtime_Loaded == 1
+    {
+        Call Runtime_Level_Clamp
+        Call Runtime_Level_Notify
+    }
+End_Function
+Define_Function Runtime_Level_Enter_Cell
+    Set_Var Runtime_Map_Name (Storage Get_Field Runtime_Level_Cells Cell Var Runtime_Cell Map_Name)
+    If Var Runtime_Map_Name != ""
+    {
+        Storage Set_Field Runtime_Level_Context Name Cell Value Var Runtime_Cell
+        Storage Set_Field Runtime_Level_Context Name Map Value Var Runtime_Map_Name
+        World Import_Level (Storage Load_Level Var Runtime_Map_Name)
+        Set_Var Runtime_Section (Storage Get_Field Runtime_Map_Layers Number 0 Section)
+        If Var Runtime_Section == ""
+        {
+            Set_Var Runtime_Section Map
+        }
+        World Use_Section Var Runtime_Section
+        Set_Var Runtime_Width (Multiply (World Get_Section Var Runtime_Section Columns) 64)
+        Set_Var Runtime_Height (Multiply (World Get_Section Var Runtime_Section Rows) 64)
+        Set_Var Runtime_Loaded 1
+    }
+End_Function
+Define_Function Runtime_Level_Clamp
+    If Var Runtime_Player_X < 0
+    {
+        Set_Var Runtime_Player_X 0
+    }
+    If Var Runtime_Player_Y < 0
+    {
+        Set_Var Runtime_Player_Y 0
+    }
+    If Var Runtime_Player_X >= Var Runtime_Width
+    {
+        Set_Var Runtime_Player_X (Subtract Var Runtime_Width 1)
+    }
+    If Var Runtime_Player_Y >= Var Runtime_Height
+    {
+        Set_Var Runtime_Player_Y (Subtract Var Runtime_Height 1)
+    }
+End_Function
+Define_Function Runtime_Level_Notify
+    If Var Runtime_On_Map_Loaded != ""
+    {
+        Call Var Runtime_On_Map_Loaded
+    }
+End_Function
+Define_Function Runtime_Level_Update
+    Set_Var Runtime_Transitioned 0
+    If Var Runtime_Loaded == 1
+    {
+        Set_Var Runtime_Direction ""
+        If Var Runtime_Player_X >= Var Runtime_Width
+        {
+            Set_Var Runtime_Direction Right
+        }
+        If Var Runtime_Player_X < 0
+        {
+            Set_Var Runtime_Direction Left
+        }
+        If Var Runtime_Player_Y >= Var Runtime_Height
+        {
+            Set_Var Runtime_Direction Below
+        }
+        If Var Runtime_Player_Y < 0
+        {
+            Set_Var Runtime_Direction Above
+        }
+        If Var Runtime_Direction != ""
+        {
+            Set_Var Runtime_Destination (Storage Get_Field Runtime_Level_Neighbors Direction Var Runtime_Direction Destination_Cell)
+            If Var Runtime_Destination != ""
+            {
+                Set_Var Runtime_Old_Width Var Runtime_Width
+                Set_Var Runtime_Old_Height Var Runtime_Height
+                Set_Var Runtime_Cell Var Runtime_Destination
+                Call Runtime_Level_Enter_Cell
+                If Var Runtime_Direction == Right
+                {
+                    Set_Var Runtime_Player_X (Subtract Var Runtime_Player_X Var Runtime_Old_Width)
+                }
+                If Var Runtime_Direction == Left
+                {
+                    Set_Var Runtime_Player_X (Add Var Runtime_Player_X Var Runtime_Width)
+                }
+                If Var Runtime_Direction == Below
+                {
+                    Set_Var Runtime_Player_Y (Subtract Var Runtime_Player_Y Var Runtime_Old_Height)
+                }
+                If Var Runtime_Direction == Above
+                {
+                    Set_Var Runtime_Player_Y (Add Var Runtime_Player_Y Var Runtime_Height)
+                }
+                Set_Var Runtime_Transitioned 1
+            }
+            Call Runtime_Level_Clamp
+            If Var Runtime_Transitioned == 1
+            {
+                Call Runtime_Level_Notify
+            }
+        }
+    }
+End_Function
+Return

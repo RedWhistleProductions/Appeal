@@ -1,6 +1,6 @@
 {
   "schema": "bananas.sprite-atlas.v1",
-  "image": "effects.png",
+  "image": "Effects.png",
   "format": "RGBA8",
   "size": {
     "w": 512,

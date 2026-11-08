@@ -1,0 +1,669 @@
+// Physics positions use +Y up and the same pixel scale as Mechanics.
+Physics Set_Units_Per_Meter 64
+Physics Set_Gravity 0 -1800 0
+Set_Var Scene_Physics_Active 1
+Mechanics Set Adam External_Physics 1
+Physics Use Adam Default
+Physics Set Adam Category 2
+Physics Set Adam Mask 1
+Physics Set Adam Friction 0
+Physics Set_Capsule Adam 24 150
+Mechanics Set Eve External_Physics 1
+Physics Use Eve Default
+Physics Set Eve Category 2
+Physics Set Eve Mask 1
+Physics Set Eve Friction 0
+Physics Set_Capsule Eve 24 150
+Define_Function Scene_Physics_Rebuild
+    Physics Release Ground_0
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Left 0 0 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_0 Default
+        Physics Set_Body_Type Ground_0 Static
+        Physics Set_Box Ground_0 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Left 0 0 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Left 0 0 Y))
+        Physics Set_Position Ground_0 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_1
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Left 1 0 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_1 Default
+        Physics Set_Body_Type Ground_1 Static
+        Physics Set_Box Ground_1 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Left 1 0 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Left 1 0 Y))
+        Physics Set_Position Ground_1 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_2
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Left 2 0 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_2 Default
+        Physics Set_Body_Type Ground_2 Static
+        Physics Set_Box Ground_2 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Left 2 0 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Left 2 0 Y))
+        Physics Set_Position Ground_2 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_3
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Left 3 0 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_3 Default
+        Physics Set_Body_Type Ground_3 Static
+        Physics Set_Box Ground_3 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Left 3 0 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Left 3 0 Y))
+        Physics Set_Position Ground_3 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_4
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Left 4 0 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_4 Default
+        Physics Set_Body_Type Ground_4 Static
+        Physics Set_Box Ground_4 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Left 4 0 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Left 4 0 Y))
+        Physics Set_Position Ground_4 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_5
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Left 5 0 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_5 Default
+        Physics Set_Body_Type Ground_5 Static
+        Physics Set_Box Ground_5 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Left 5 0 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Left 5 0 Y))
+        Physics Set_Position Ground_5 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_6
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Left 6 0 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_6 Default
+        Physics Set_Body_Type Ground_6 Static
+        Physics Set_Box Ground_6 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Left 6 0 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Left 6 0 Y))
+        Physics Set_Position Ground_6 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_7
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Left 7 0 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_7 Default
+        Physics Set_Body_Type Ground_7 Static
+        Physics Set_Box Ground_7 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Left 7 0 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Left 7 0 Y))
+        Physics Set_Position Ground_7 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_8
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Left 0 1 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_8 Default
+        Physics Set_Body_Type Ground_8 Static
+        Physics Set_Box Ground_8 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Left 0 1 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Left 0 1 Y))
+        Physics Set_Position Ground_8 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_9
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Left 1 1 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_9 Default
+        Physics Set_Body_Type Ground_9 Static
+        Physics Set_Box Ground_9 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Left 1 1 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Left 1 1 Y))
+        Physics Set_Position Ground_9 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_10
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Left 2 1 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_10 Default
+        Physics Set_Body_Type Ground_10 Static
+        Physics Set_Box Ground_10 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Left 2 1 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Left 2 1 Y))
+        Physics Set_Position Ground_10 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_11
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Left 3 1 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_11 Default
+        Physics Set_Body_Type Ground_11 Static
+        Physics Set_Box Ground_11 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Left 3 1 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Left 3 1 Y))
+        Physics Set_Position Ground_11 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_12
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Left 4 1 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_12 Default
+        Physics Set_Body_Type Ground_12 Static
+        Physics Set_Box Ground_12 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Left 4 1 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Left 4 1 Y))
+        Physics Set_Position Ground_12 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_13
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Left 5 1 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_13 Default
+        Physics Set_Body_Type Ground_13 Static
+        Physics Set_Box Ground_13 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Left 5 1 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Left 5 1 Y))
+        Physics Set_Position Ground_13 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_14
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Left 6 1 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_14 Default
+        Physics Set_Body_Type Ground_14 Static
+        Physics Set_Box Ground_14 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Left 6 1 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Left 6 1 Y))
+        Physics Set_Position Ground_14 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_15
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Left 7 1 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_15 Default
+        Physics Set_Body_Type Ground_15 Static
+        Physics Set_Box Ground_15 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Left 7 1 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Left 7 1 Y))
+        Physics Set_Position Ground_15 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_16
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Left 0 2 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_16 Default
+        Physics Set_Body_Type Ground_16 Static
+        Physics Set_Box Ground_16 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Left 0 2 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Left 0 2 Y))
+        Physics Set_Position Ground_16 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_17
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Left 1 2 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_17 Default
+        Physics Set_Body_Type Ground_17 Static
+        Physics Set_Box Ground_17 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Left 1 2 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Left 1 2 Y))
+        Physics Set_Position Ground_17 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_18
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Left 2 2 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_18 Default
+        Physics Set_Body_Type Ground_18 Static
+        Physics Set_Box Ground_18 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Left 2 2 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Left 2 2 Y))
+        Physics Set_Position Ground_18 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_19
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Left 3 2 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_19 Default
+        Physics Set_Body_Type Ground_19 Static
+        Physics Set_Box Ground_19 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Left 3 2 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Left 3 2 Y))
+        Physics Set_Position Ground_19 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_20
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Left 4 2 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_20 Default
+        Physics Set_Body_Type Ground_20 Static
+        Physics Set_Box Ground_20 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Left 4 2 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Left 4 2 Y))
+        Physics Set_Position Ground_20 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_21
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Left 5 2 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_21 Default
+        Physics Set_Body_Type Ground_21 Static
+        Physics Set_Box Ground_21 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Left 5 2 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Left 5 2 Y))
+        Physics Set_Position Ground_21 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_22
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Left 6 2 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_22 Default
+        Physics Set_Body_Type Ground_22 Static
+        Physics Set_Box Ground_22 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Left 6 2 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Left 6 2 Y))
+        Physics Set_Position Ground_22 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_23
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Left 7 2 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_23 Default
+        Physics Set_Body_Type Ground_23 Static
+        Physics Set_Box Ground_23 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Left 7 2 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Left 7 2 Y))
+        Physics Set_Position Ground_23 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_24
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Right 0 0 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_24 Default
+        Physics Set_Body_Type Ground_24 Static
+        Physics Set_Box Ground_24 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Right 0 0 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Right 0 0 Y))
+        Physics Set_Position Ground_24 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_25
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Right 1 0 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_25 Default
+        Physics Set_Body_Type Ground_25 Static
+        Physics Set_Box Ground_25 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Right 1 0 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Right 1 0 Y))
+        Physics Set_Position Ground_25 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_26
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Right 2 0 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_26 Default
+        Physics Set_Body_Type Ground_26 Static
+        Physics Set_Box Ground_26 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Right 2 0 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Right 2 0 Y))
+        Physics Set_Position Ground_26 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_27
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Right 3 0 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_27 Default
+        Physics Set_Body_Type Ground_27 Static
+        Physics Set_Box Ground_27 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Right 3 0 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Right 3 0 Y))
+        Physics Set_Position Ground_27 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_28
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Right 4 0 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_28 Default
+        Physics Set_Body_Type Ground_28 Static
+        Physics Set_Box Ground_28 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Right 4 0 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Right 4 0 Y))
+        Physics Set_Position Ground_28 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_29
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Right 5 0 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_29 Default
+        Physics Set_Body_Type Ground_29 Static
+        Physics Set_Box Ground_29 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Right 5 0 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Right 5 0 Y))
+        Physics Set_Position Ground_29 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_30
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Right 6 0 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_30 Default
+        Physics Set_Body_Type Ground_30 Static
+        Physics Set_Box Ground_30 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Right 6 0 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Right 6 0 Y))
+        Physics Set_Position Ground_30 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_31
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Right 7 0 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_31 Default
+        Physics Set_Body_Type Ground_31 Static
+        Physics Set_Box Ground_31 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Right 7 0 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Right 7 0 Y))
+        Physics Set_Position Ground_31 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_32
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Right 0 1 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_32 Default
+        Physics Set_Body_Type Ground_32 Static
+        Physics Set_Box Ground_32 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Right 0 1 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Right 0 1 Y))
+        Physics Set_Position Ground_32 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_33
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Right 1 1 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_33 Default
+        Physics Set_Body_Type Ground_33 Static
+        Physics Set_Box Ground_33 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Right 1 1 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Right 1 1 Y))
+        Physics Set_Position Ground_33 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_34
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Right 2 1 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_34 Default
+        Physics Set_Body_Type Ground_34 Static
+        Physics Set_Box Ground_34 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Right 2 1 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Right 2 1 Y))
+        Physics Set_Position Ground_34 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_35
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Right 3 1 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_35 Default
+        Physics Set_Body_Type Ground_35 Static
+        Physics Set_Box Ground_35 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Right 3 1 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Right 3 1 Y))
+        Physics Set_Position Ground_35 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_36
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Right 4 1 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_36 Default
+        Physics Set_Body_Type Ground_36 Static
+        Physics Set_Box Ground_36 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Right 4 1 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Right 4 1 Y))
+        Physics Set_Position Ground_36 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_37
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Right 5 1 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_37 Default
+        Physics Set_Body_Type Ground_37 Static
+        Physics Set_Box Ground_37 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Right 5 1 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Right 5 1 Y))
+        Physics Set_Position Ground_37 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_38
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Right 6 1 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_38 Default
+        Physics Set_Body_Type Ground_38 Static
+        Physics Set_Box Ground_38 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Right 6 1 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Right 6 1 Y))
+        Physics Set_Position Ground_38 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_39
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Right 7 1 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_39 Default
+        Physics Set_Body_Type Ground_39 Static
+        Physics Set_Box Ground_39 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Right 7 1 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Right 7 1 Y))
+        Physics Set_Position Ground_39 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_40
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Right 0 2 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_40 Default
+        Physics Set_Body_Type Ground_40 Static
+        Physics Set_Box Ground_40 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Right 0 2 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Right 0 2 Y))
+        Physics Set_Position Ground_40 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_41
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Right 1 2 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_41 Default
+        Physics Set_Body_Type Ground_41 Static
+        Physics Set_Box Ground_41 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Right 1 2 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Right 1 2 Y))
+        Physics Set_Position Ground_41 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_42
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Right 2 2 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_42 Default
+        Physics Set_Body_Type Ground_42 Static
+        Physics Set_Box Ground_42 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Right 2 2 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Right 2 2 Y))
+        Physics Set_Position Ground_42 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_43
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Right 3 2 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_43 Default
+        Physics Set_Body_Type Ground_43 Static
+        Physics Set_Box Ground_43 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Right 3 2 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Right 3 2 Y))
+        Physics Set_Position Ground_43 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_44
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Right 4 2 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_44 Default
+        Physics Set_Body_Type Ground_44 Static
+        Physics Set_Box Ground_44 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Right 4 2 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Right 4 2 Y))
+        Physics Set_Position Ground_44 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_45
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Right 5 2 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_45 Default
+        Physics Set_Body_Type Ground_45 Static
+        Physics Set_Box Ground_45 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Right 5 2 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Right 5 2 Y))
+        Physics Set_Position Ground_45 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_46
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Right 6 2 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_46 Default
+        Physics Set_Body_Type Ground_46 Static
+        Physics Set_Box Ground_46 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Right 6 2 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Right 6 2 Y))
+        Physics Set_Position Ground_46 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Ground_47
+    Set_Var Collision_Tile (World Get_Tile Var Scene_Right 7 2 Name)
+    If Var Collision_Tile != ""
+    {
+        Physics Use Ground_47 Default
+        Physics Set_Body_Type Ground_47 Static
+        Physics Set_Box Ground_47 64 64
+        Set_Var Collision_X (Subtract (World Get_Tile Var Scene_Right 7 2 X) Var Scene_Camera_X)
+        Set_Var Collision_Y (Subtract 480 (World Get_Tile Var Scene_Right 7 2 Y))
+        Physics Set_Position Ground_47 (Add Var Collision_X 32) Var Collision_Y 0
+    }
+    Physics Release Scene_Door_Left
+    Physics Use Scene_Door_Left Default
+    Physics Set_Body_Type Scene_Door_Left Static
+    Physics Set Scene_Door_Left Sensor 1
+    Physics Set Scene_Door_Left Tag Door
+    Physics Set_Box Scene_Door_Left 8 2048
+    Physics Set_Position Scene_Door_Left 100 512 0
+    Physics Release Scene_Door_Right
+    Physics Use Scene_Door_Right Default
+    Physics Set_Body_Type Scene_Door_Right Static
+    Physics Set Scene_Door_Right Sensor 1
+    Physics Set Scene_Door_Right Tag Door
+    Physics Set_Box Scene_Door_Right 8 2048
+    Physics Set_Position Scene_Door_Right 924 512 0
+    Physics Release Scene_Crate
+    Physics Use Scene_Crate Default
+    Physics Set_Body_Type Scene_Crate Static
+    Physics Set_Box Scene_Crate 64 64
+    Physics Set_Position Scene_Crate 800 32 0
+    Physics Set_Position Adam (Add (Mechanics Get Adam Position_X) 96) (Add (Mechanics Get Adam Position_Y) 75) 0
+    Physics Set_Velocity Adam (Mechanics Get Adam Velocity_X) (Mechanics Get Adam Velocity_Y) 0
+    Physics Set_Position Eve (Add (Mechanics Get Eve Position_X) 96) (Add (Mechanics Get Eve Position_Y) 75) 0
+    Physics Set_Velocity Eve (Mechanics Get Eve Velocity_X) (Mechanics Get Eve Velocity_Y) 0
+End_Function
+Define_Function Scene_Physics_Update
+    Call Adam_Apply_Mechanics
+    Call Eve_Apply_Mechanics
+    Physics Set_Velocity Adam (Mechanics Get Adam Velocity_X) (Mechanics Get Adam Velocity_Y) 0
+    Physics Set_Velocity Eve (Mechanics Get Eve Velocity_X) (Mechanics Get Eve Velocity_Y) 0
+    Physics Step 0.016666667
+    Mechanics Set Adam Position_X (Subtract (Physics Get Adam Position_X) 96)
+    Mechanics Set Adam Position_Y (Subtract (Physics Get Adam Position_Y) 75)
+    Mechanics Set Adam Velocity_X (Physics Get Adam Velocity_X)
+    Mechanics Set Adam Velocity_Y (Physics Get Adam Velocity_Y)
+    Mechanics Set Adam Grounded (Physics Get Adam Grounded)
+    Mechanics Update Adam
+    Mechanics Set Eve Position_X (Subtract (Physics Get Eve Position_X) 96)
+    Mechanics Set Eve Position_Y (Subtract (Physics Get Eve Position_Y) 75)
+    Mechanics Set Eve Velocity_X (Physics Get Eve Velocity_X)
+    Mechanics Set Eve Velocity_Y (Physics Get Eve Velocity_Y)
+    Mechanics Set Eve Grounded (Physics Get Eve Grounded)
+    Mechanics Update Eve
+End_Function
+Define_Function Scene_Physics_Check_Advance
+    Set_Var Scene_Advance 0
+    If (Physics Touching Adam Scene_Door_Left) == 1
+    {
+        Set_Var Scene_Advance -1
+    }
+    If (Physics Touching Eve Scene_Door_Left) == 1
+    {
+        Set_Var Scene_Advance -1
+    }
+    If (Physics Touching Adam Scene_Door_Right) == 1
+    {
+        Set_Var Scene_Advance 1
+    }
+    If (Physics Touching Eve Scene_Door_Right) == 1
+    {
+        Set_Var Scene_Advance 1
+    }
+    If Var Scene_Advance != 0
+    {
+        Call Scene_Switch_Page
+    }
+End_Function
+Define_Function Scene_Physics_Close
+    Physics Release Scene_Door_Left
+    Physics Release Scene_Door_Right
+    Physics Release Adam
+    Physics Release Eve
+    Physics Release Scene_Crate
+    Physics Release Ground_0
+    Physics Release Ground_1
+    Physics Release Ground_2
+    Physics Release Ground_3
+    Physics Release Ground_4
+    Physics Release Ground_5
+    Physics Release Ground_6
+    Physics Release Ground_7
+    Physics Release Ground_8
+    Physics Release Ground_9
+    Physics Release Ground_10
+    Physics Release Ground_11
+    Physics Release Ground_12
+    Physics Release Ground_13
+    Physics Release Ground_14
+    Physics Release Ground_15
+    Physics Release Ground_16
+    Physics Release Ground_17
+    Physics Release Ground_18
+    Physics Release Ground_19
+    Physics Release Ground_20
+    Physics Release Ground_21
+    Physics Release Ground_22
+    Physics Release Ground_23
+    Physics Release Ground_24
+    Physics Release Ground_25
+    Physics Release Ground_26
+    Physics Release Ground_27
+    Physics Release Ground_28
+    Physics Release Ground_29
+    Physics Release Ground_30
+    Physics Release Ground_31
+    Physics Release Ground_32
+    Physics Release Ground_33
+    Physics Release Ground_34
+    Physics Release Ground_35
+    Physics Release Ground_36
+    Physics Release Ground_37
+    Physics Release Ground_38
+    Physics Release Ground_39
+    Physics Release Ground_40
+    Physics Release Ground_41
+    Physics Release Ground_42
+    Physics Release Ground_43
+    Physics Release Ground_44
+    Physics Release Ground_45
+    Physics Release Ground_46
+    Physics Release Ground_47
+    Set_Var Scene_Physics_Active 0
+End_Function
+Call Scene_Physics_Rebuild
+Return

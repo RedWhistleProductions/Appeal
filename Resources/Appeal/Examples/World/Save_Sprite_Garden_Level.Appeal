@@ -1,0 +1,5 @@
+// Save the current World scene's design to Test_Game, without changing its runtime state.
+// Requires Setup/Config and an active World scene.
+Run Setup/Test_Game
+Storage Save_Level Sprite_Garden (World Export_Level)
+Return

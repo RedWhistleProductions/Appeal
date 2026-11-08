@@ -1,0 +1,90 @@
+// Requires loaded Graphics/Input/Storage modules and an existing graphics window.
+// Embed CONFIG_Controller_Controls inside an existing GUI window; it owns no loop.
+Run Setup/User_Setings
+Run GUIs/Controller_Control_Sets
+Define_Function CONFIG_Controller_Controls
+    Graphics GUI_Text CONFIG_Controller_Help "Enter exact Appeal function names. Blank means unassigned."
+    Graphics GUI_Text CONFIG_Controller_Triggers "Press and release are digital callbacks, including ZL/ZR. F1 always switches focus."
+    Graphics GUI_Input_Text CONFIG_Control_Set_Name "Control set name" Var CONFIG_Controller_Name None
+    Graphics GUI_Button CONFIG_Load "Load and Apply" CONFIG_Controller_Load
+    Graphics GUI_Same_Line
+    Graphics GUI_Button CONFIG_Save "Save and Apply" CONFIG_Controller_Save
+    Graphics GUI_Text CONFIG_Status Var CONFIG_Controller_Status
+    Graphics GUI_Separator_Text "Nintendo A / Xbox B (east)"
+    Graphics GUI_Input_Text CONFIG_A "Press function##A" Var CONFIG_Value_A None
+    Graphics GUI_Input_Text CONFIG_A_Up "Release function##A" Var CONFIG_Value_A_Up None
+    Graphics GUI_Separator_Text "Nintendo B / Xbox A (south)"
+    Graphics GUI_Input_Text CONFIG_B "Press function##B" Var CONFIG_Value_B None
+    Graphics GUI_Input_Text CONFIG_B_Up "Release function##B" Var CONFIG_Value_B_Up None
+    Graphics GUI_Separator_Text "Nintendo X / Xbox Y (north)"
+    Graphics GUI_Input_Text CONFIG_X "Press function##X" Var CONFIG_Value_X None
+    Graphics GUI_Input_Text CONFIG_X_Up "Release function##X" Var CONFIG_Value_X_Up None
+    Graphics GUI_Separator_Text "Nintendo Y / Xbox X (west)"
+    Graphics GUI_Input_Text CONFIG_Y "Press function##Y" Var CONFIG_Value_Y None
+    Graphics GUI_Input_Text CONFIG_Y_Up "Release function##Y" Var CONFIG_Value_Y_Up None
+    Graphics GUI_Separator_Text "D-pad Up"
+    Graphics GUI_Input_Text CONFIG_DPad_Up "Press function##DPad_Up" Var CONFIG_Value_DPad_Up None
+    Graphics GUI_Input_Text CONFIG_DPad_Up_Up "Release function##DPad_Up" Var CONFIG_Value_DPad_Up_Up None
+    Graphics GUI_Separator_Text "D-pad Down"
+    Graphics GUI_Input_Text CONFIG_DPad_Down "Press function##DPad_Down" Var CONFIG_Value_DPad_Down None
+    Graphics GUI_Input_Text CONFIG_DPad_Down_Up "Release function##DPad_Down" Var CONFIG_Value_DPad_Down_Up None
+    Graphics GUI_Separator_Text "D-pad Left"
+    Graphics GUI_Input_Text CONFIG_DPad_Left "Press function##DPad_Left" Var CONFIG_Value_DPad_Left None
+    Graphics GUI_Input_Text CONFIG_DPad_Left_Up "Release function##DPad_Left" Var CONFIG_Value_DPad_Left_Up None
+    Graphics GUI_Separator_Text "D-pad Right"
+    Graphics GUI_Input_Text CONFIG_DPad_Right "Press function##DPad_Right" Var CONFIG_Value_DPad_Right None
+    Graphics GUI_Input_Text CONFIG_DPad_Right_Up "Release function##DPad_Right" Var CONFIG_Value_DPad_Right_Up None
+    Graphics GUI_Separator_Text "L / LB"
+    Graphics GUI_Input_Text CONFIG_L "Press function##L" Var CONFIG_Value_L None
+    Graphics GUI_Input_Text CONFIG_L_Up "Release function##L" Var CONFIG_Value_L_Up None
+    Graphics GUI_Separator_Text "R / RB"
+    Graphics GUI_Input_Text CONFIG_R "Press function##R" Var CONFIG_Value_R None
+    Graphics GUI_Input_Text CONFIG_R_Up "Release function##R" Var CONFIG_Value_R_Up None
+    Graphics GUI_Separator_Text "ZL / LT"
+    Graphics GUI_Input_Text CONFIG_ZL "Press function##ZL" Var CONFIG_Value_ZL None
+    Graphics GUI_Input_Text CONFIG_ZL_Up "Release function##ZL" Var CONFIG_Value_ZL_Up None
+    Graphics GUI_Separator_Text "ZR / RT"
+    Graphics GUI_Input_Text CONFIG_ZR "Press function##ZR" Var CONFIG_Value_ZR None
+    Graphics GUI_Input_Text CONFIG_ZR_Up "Release function##ZR" Var CONFIG_Value_ZR_Up None
+    Graphics GUI_Separator_Text "Left stick click / L3"
+    Graphics GUI_Input_Text CONFIG_Left_Stick "Press function##Left_Stick" Var CONFIG_Value_Left_Stick None
+    Graphics GUI_Input_Text CONFIG_Left_Stick_Up "Release function##Left_Stick" Var CONFIG_Value_Left_Stick_Up None
+    Graphics GUI_Separator_Text "Right stick click / R3"
+    Graphics GUI_Input_Text CONFIG_Right_Stick "Press function##Right_Stick" Var CONFIG_Value_Right_Stick None
+    Graphics GUI_Input_Text CONFIG_Right_Stick_Up "Release function##Right_Stick" Var CONFIG_Value_Right_Stick_Up None
+    Graphics GUI_Separator_Text "Minus / View"
+    Graphics GUI_Input_Text CONFIG_Minus "Press function##Minus" Var CONFIG_Value_Minus None
+    Graphics GUI_Input_Text CONFIG_Minus_Up "Release function##Minus" Var CONFIG_Value_Minus_Up None
+    Graphics GUI_Separator_Text "Plus / Menu"
+    Graphics GUI_Input_Text CONFIG_Plus "Press function##Plus" Var CONFIG_Value_Plus None
+    Graphics GUI_Input_Text CONFIG_Plus_Up "Release function##Plus" Var CONFIG_Value_Plus_Up None
+    Graphics GUI_Separator_Text "Home / Guide"
+    Graphics GUI_Input_Text CONFIG_Home "Press function##Home" Var CONFIG_Value_Home None
+    Graphics GUI_Input_Text CONFIG_Home_Up "Release function##Home" Var CONFIG_Value_Home_Up None
+    Graphics GUI_Separator_Text "Optional touchpad"
+    Graphics GUI_Input_Text CONFIG_Touchpad "Press function##Touchpad" Var CONFIG_Value_Touchpad None
+    Graphics GUI_Input_Text CONFIG_Touchpad_Up "Release function##Touchpad" Var CONFIG_Value_Touchpad_Up None
+    Graphics GUI_Separator_Text "Optional paddle 1"
+    Graphics GUI_Input_Text CONFIG_Paddle1 "Press function##Paddle1" Var CONFIG_Value_Paddle1 None
+    Graphics GUI_Input_Text CONFIG_Paddle1_Up "Release function##Paddle1" Var CONFIG_Value_Paddle1_Up None
+    Graphics GUI_Separator_Text "Optional paddle 2"
+    Graphics GUI_Input_Text CONFIG_Paddle2 "Press function##Paddle2" Var CONFIG_Value_Paddle2 None
+    Graphics GUI_Input_Text CONFIG_Paddle2_Up "Release function##Paddle2" Var CONFIG_Value_Paddle2_Up None
+    Graphics GUI_Separator_Text "Optional paddle 3"
+    Graphics GUI_Input_Text CONFIG_Paddle3 "Press function##Paddle3" Var CONFIG_Value_Paddle3 None
+    Graphics GUI_Input_Text CONFIG_Paddle3_Up "Release function##Paddle3" Var CONFIG_Value_Paddle3_Up None
+    Graphics GUI_Separator_Text "Optional paddle 4"
+    Graphics GUI_Input_Text CONFIG_Paddle4 "Press function##Paddle4" Var CONFIG_Value_Paddle4 None
+    Graphics GUI_Input_Text CONFIG_Paddle4_Up "Release function##Paddle4" Var CONFIG_Value_Paddle4_Up None
+End_Function
+Define_Function CONFIG_Controller_GUI
+    Graphics GUI_Begin "Controller Configuration"
+    Call CONFIG_Controller_Controls
+    Graphics GUI_End_Window
+End_Function
+Storage Use User_Setings
+Set_Var CONFIG_Controller_Name (Storage Get_Field User_Settings Key Controller.Active_Control_Set Value)
+Graphics GUI_Set_Text_Value CONFIG_Control_Set_Name Var CONFIG_Controller_Name
+Call CONFIG_Controller_Load
+Call CONFIG_Controller_GUI
+Return

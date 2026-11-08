@@ -1,0 +1,29 @@
+Add_Dynamic_Module Mechanics Appeal_Default_2D_Side_Scrolling_Mechanics
+Run Examples/Graphics/Setup_Character_Mechanics
+Call Adam_Move_Right
+Set_Var Adam_Axis Var Adam_Direction
+Call Character_Mechanics_Update
+Print_Global Mechanics.Adam.Position_X
+Print_Global Mechanics.Eve.Position_X
+Set_Var Adam_Running 1
+Call Character_Mechanics_Update
+Print_Global Mechanics.Adam.Position_X
+Print_Global Mechanics.Adam.Action
+Set_Var Adam_Ducking 1
+Call Character_Mechanics_Update
+Print_Global Mechanics.Adam.Position_X
+Print_Global Mechanics.Adam.Action
+Call Adam_Stop
+Set_Var Adam_Axis 0
+Call Character_Mechanics_Update
+Print_Global Mechanics.Adam.Action
+Call Adam_Jump
+Call Character_Mechanics_Update
+Print_Global Mechanics.Adam.Position_Y
+Print_Global Mechanics.Adam.Action
+Set_Var Eve_Axis -50
+Call Character_Mechanics_Update
+Print_Global Mechanics.Eve.Position_X
+Print_Global Mechanics.Eve.Velocity_X
+Print_Global Mechanics.Adam.Orientation
+Done

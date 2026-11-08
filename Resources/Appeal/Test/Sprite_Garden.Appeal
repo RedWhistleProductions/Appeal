@@ -1,0 +1,23 @@
+// Finite smoke check for the same scene and script renderer used by the example.
+Run Setup/Config
+Run Examples/World/Setup_Sprite_Garden
+Graphics Add_Window Main "Sprite Garden smoke check" 1024 704
+Graphics Set_GUI_Visible False
+Run Examples/World/Define_Sprite_Garden_Renderer
+Run Examples/World/Bind_Sprite_Garden
+Run Examples/Graphics/Setup_Characters
+Graphics Render
+Graphics Update
+Graphics Render
+Graphics Update
+Print (World Get_Tile Garden 0 0 Name)
+Print (World Get_Tile Orchard 7 0 Name)
+Print (World Get_Tile Scenery 0 6 ID)
+Print (World Get_Tile Scenery 8 6 ID)
+Print (World Get_Tile Scenery 12 7 Name)
+Print (World Get_Tile Orchard 0 0 X)
+Print (World Get_Tile Scenery 0 6 Y)
+Graphics Close_All
+World Close_Scene Sprite_Garden
+Print SPRITE_GARDEN_PASSED
+Done

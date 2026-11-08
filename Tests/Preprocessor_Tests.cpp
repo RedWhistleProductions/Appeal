@@ -97,6 +97,25 @@ int main(int argc, char **argv)
 {
     try
     {
+        Run_Tokens({"Set_Var", "I", "0", "Set_Var", "Total", "0",
+            "Loop", "While", "Var", "I", "<", "3", "{",
+              "Set_Var", "J", "0", "Loop", "While", "Var", "J", "<", "2", "{",
+                "If", "1", "==", "1", "{", "If", "1", "==", "1", "{",
+                  "Set_Var", "Total", "(Add", "Var", "Total", "1)", "}", "}",
+                "Set_Var", "J", "(Add", "Var", "J", "1)", "}",
+              "Set_Var", "I", "(Add", "Var", "I", "1)", "}",
+            "Print", "Var", "Total"}, "6\n");
+        Run_Tokens({"Define_Function", "F", "Print", "old", "End_Function",
+                    "Define_Function", "F", "Print", "new", "End_Function", "Call", "F"}, "new\n");
+        {
+            Appeal Memory_App;
+            Appeal_Function Body;
+            Body.Command_Vector = {"Set_Var", "I", "0", "Loop", "While", "Var", "I", "<", "10000", "{",
+                "If", "1", "==", "1", "{", "Set_Var", "I", "(Add", "Var", "I", "1)", "}", "}"};
+            Memory_App.Data_Manager.Add_Source("memory", &Body);
+            Memory_App.Run();
+            Check(Memory_App.Appeal_Functions.Nodes == 0, "Anonymous blocks leaked into function registry");
+        }
         Getter_Calls = 0;
         Run_Tokens({"Print(Test", "Mouse_X)", "Print", "after"}, "125\nafter\n");
         Check(Getter_Calls == 1, "Getter executed more than once");

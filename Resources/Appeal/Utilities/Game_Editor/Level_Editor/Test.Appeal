@@ -1,0 +1,212 @@
+// Nonblocking level play-test; runtime preview tables never save the layout.
+Run Utilities/Game_Editor/Level_Editor/Runtime
+Set_Var LT_Playing 0
+Set_Var LT_Total 0
+Define_Function LT_Clear
+    If Var LE_Render == 1
+    {
+        Set_Var LT_Clear_Index 0
+        Loop While Var LT_Clear_Index < Var LT_Total
+        {
+            Graphics Free_Asset (Add 1000000 (Multiply Var LT_Clear_Index 2))
+            Graphics Free_Asset (Add 1000001 (Multiply Var LT_Clear_Index 2))
+            Set_Var LT_Clear_Index (Add Var LT_Clear_Index 1)
+        }
+    }
+    Set_Var LT_Total 0
+End_Function
+Define_Function LT_Rebuild
+    Call LT_Clear
+    Set_Var LT_Columns (Divide Var Runtime_Width 64)
+    Set_Var LT_Rows (Divide Var Runtime_Height 64)
+    Set_Var LT_Cell (Divide 1056 Var LT_Columns)
+    If (Multiply Var LT_Cell Var LT_Rows) > 720 { Set_Var LT_Cell (Divide 720 Var LT_Rows) }
+    If Var LE_Render == 1
+    {
+        Set_Var TE_Columns Var LT_Columns
+        Set_Var TE_Rows Var LT_Rows
+        Set_Var TE_Cell Var LT_Cell
+        Set_Var TE_Draw_Gap 0
+        Set_Var TE_Draw_Offset 0
+        Set_Var TE_Draw_Scale_Y 1
+        Set_Var TE_Origin_X 20
+        Set_Var TE_Origin_Y 40
+        Set_Var LT_Layers 0
+        Loop While (Storage Get_Field Runtime_Map_Layers Number Var LT_Layers Section) != ""
+        {
+            Set_Var LT_Layers (Add Var LT_Layers 1)
+        }
+        If Var LT_Layers == 0 { Set_Var LT_Layers 1 }
+        Set_Var TE_Draw_Layer 0
+        Loop While Var TE_Draw_Layer < Var LT_Layers
+        {
+            Set_Var TE_Section (Storage Get_Field Runtime_Map_Layers Number Var TE_Draw_Layer Section)
+            If Var TE_Section == "" { Set_Var TE_Section Map }
+            Set_Var TE_Y 0
+            Loop While Var TE_Y < Var TE_Rows
+            {
+                Set_Var TE_X 0
+                Loop While Var TE_X < Var TE_Columns
+                {
+                    Call TE_Draw_Cell
+                    Set_Var TE_X (Add Var TE_X 1)
+                }
+                Set_Var TE_Y (Add Var TE_Y 1)
+            }
+            Set_Var TE_Draw_Layer (Add Var TE_Draw_Layer 1)
+        }
+        Set_Var LT_Total (Multiply Var LT_Layers (Multiply Var LT_Columns Var LT_Rows))
+    }
+End_Function
+Define_Function LT_Start
+    If Var LT_Playing == 0
+    {
+        Set_Var LT_Allowed 1
+        If (Storage Get_Field sqlite_master name Levels name) == ""
+        {
+            Set_Var LT_Allowed 0
+            Set_Var LE_Status "Save a tile map and assign it to the level before testing."
+        }
+        If Var LT_Allowed == 1
+        {
+            Storage Execute_SQL "CREATE TEMP VIEW IF NOT EXISTS LT_Validation AS SELECT 'All' AS Name,count(*) AS Count,sum(CASE WHEN l.Name IS NULL THEN 1 ELSE 0 END) AS Missing FROM LE_Cells c LEFT JOIN Levels l ON l.Name=c.Map_Name WHERE c.Map_Name!='';"
+            If (Storage Get_Field LT_Validation Name All Count) == 0
+            {
+                Set_Var LT_Allowed 0
+                Set_Var LE_Status "Assign at least one saved tile map before testing."
+            }
+            If (Storage Get_Field LT_Validation Name All Missing) > 0
+            {
+                Set_Var LT_Allowed 0
+                Set_Var LE_Status "A referenced tile map is missing. Reassign it before testing."
+            }
+        }
+        If Var LT_Allowed == 1
+        {
+            Call PE_Close
+            Call LE_Clear_Thumbnails
+            Set_Var LT_Draft (World Export_Level)
+            Set_Var LT_Old_Status Var TE_Status
+            Set_Var LT_Old_Columns Var TE_Columns
+            Set_Var LT_Old_Rows Var TE_Rows
+            Set_Var LT_Old_Section Var TE_Section
+            Set_Var LT_Old_Cell Var TE_Cell
+            Set_Var LT_Old_Draw_Layer Var TE_Draw_Layer
+            Set_Var LT_Old_Draw_Offset Var TE_Draw_Offset
+            Set_Var LT_Old_Draw_Gap Var TE_Draw_Gap
+            Set_Var LT_Old_Draw_Scale_Y Var TE_Draw_Scale_Y
+            Set_Var LT_Old_Origin_X Var TE_Origin_X
+            Set_Var LT_Old_Origin_Y Var TE_Origin_Y
+            Set_Var LT_Old_X Var TE_X
+            Set_Var LT_Old_Y Var TE_Y
+            Set_Var Runtime_Level_Name Var LE_Name
+            Set_Var Runtime_Use_Preview 1
+            Storage Execute_SQL "DELETE FROM Runtime_Preview_Cells; INSERT INTO Runtime_Preview_Cells SELECT Cell,Map_Name FROM LE_Cells WHERE Map_Name!=''; DELETE FROM Runtime_Preview_Links; INSERT INTO Runtime_Preview_Links SELECT a.Cell,CASE WHEN b.X=a.X+1 THEN 'Right' WHEN b.X=a.X-1 THEN 'Left' WHEN b.Y=a.Y+1 THEN 'Below' ELSE 'Above' END,b.Cell FROM LE_Cells a JOIN LE_Cells b ON (abs(a.X-b.X)=1 AND a.Y=b.Y) OR (abs(a.Y-b.Y)=1 AND a.X=b.X) WHERE a.Map_Name!='' AND b.Map_Name!='';"
+            Set_Var Runtime_Cell Var LE_Selected
+            If (Storage Get_Field Runtime_Preview_Cells Cell Var Runtime_Cell Map_Name) == ""
+            {
+                Storage Execute_SQL "CREATE TEMP VIEW IF NOT EXISTS LT_First AS SELECT 'All' AS Name,Cell FROM Runtime_Preview_Cells ORDER BY CAST(Cell AS INTEGER) LIMIT 1;"
+                Set_Var Runtime_Cell (Storage Get_Field LT_First Name All Cell)
+            }
+            Set_Var Runtime_On_Map_Loaded ""
+            Set_Var Runtime_Player_X 0
+            Set_Var Runtime_Player_Y 0
+            Call Runtime_Level_Load
+            Set_Var Runtime_Player_X (Divide Var Runtime_Width 2)
+            Set_Var Runtime_Player_Y (Divide Var Runtime_Height 2)
+            Set_Var Runtime_On_Map_Loaded LT_Rebuild
+            Set_Var LT_Playing 1
+            Set_Var GE_Mode Play
+            Set_Var LT_Last_Time 0
+            If Var LE_Render == 1
+            {
+                Input Bind_Key LT_Left A
+                Input Bind_Key LT_Right D
+                Input Bind_Key LT_Up W
+                Input Bind_Key LT_Down S
+                Input Bind_Key LT_Left_Arrow Left
+                Input Bind_Key LT_Right_Arrow Right
+                Input Bind_Key LT_Up_Arrow Up
+                Input Bind_Key LT_Down_Arrow Down
+                Input Bind_Key LT_Stop F6
+                Set_Var LT_Old_Focus (Input Focus)
+                Input Set_Focus Game
+                Set_Var LT_Last_Time (Graphics Milliseconds)
+            }
+            Call LT_Rebuild
+        }
+    }
+End_Function
+Define_Function LT_Stop
+    If Var LT_Playing == 1
+    {
+        Call LT_Clear
+        World Import_Level Var LT_Draft
+        Set_Var TE_Columns Var LT_Old_Columns
+        Set_Var TE_Rows Var LT_Old_Rows
+        Set_Var TE_Section Var LT_Old_Section
+        Set_Var TE_Cell Var LT_Old_Cell
+        Set_Var TE_Draw_Layer Var LT_Old_Draw_Layer
+        Set_Var TE_Draw_Offset Var LT_Old_Draw_Offset
+        Set_Var TE_Draw_Gap Var LT_Old_Draw_Gap
+        Set_Var TE_Draw_Scale_Y Var LT_Old_Draw_Scale_Y
+        Set_Var TE_Origin_X Var LT_Old_Origin_X
+        Set_Var TE_Origin_Y Var LT_Old_Origin_Y
+        Set_Var TE_X Var LT_Old_X
+        Set_Var TE_Y Var LT_Old_Y
+        Set_Var TE_Status Var LT_Old_Status
+        Set_Var Runtime_Use_Preview 0
+        Set_Var Runtime_On_Map_Loaded ""
+        Set_Var Runtime_Loaded 0
+        Set_Var LT_Playing 0
+        Set_Var GE_Mode Level
+        If Var LE_Render == 1 { Input Set_Focus Var LT_Old_Focus }
+        Call LE_Build_Thumbnails
+        Set_Var LE_Status "Returned from test. Level and tile-map drafts are unchanged."
+    }
+End_Function
+Define_Function LT_Step
+    Set_Var Runtime_Player_X (Add Var Runtime_Player_X (Multiply Var LT_Move_X Var LT_Distance))
+    Set_Var Runtime_Player_Y (Add Var Runtime_Player_Y (Multiply Var LT_Move_Y Var LT_Distance))
+    Call Runtime_Level_Update
+End_Function
+Define_Function LT_Update
+    Set_Var LT_Now (Graphics Milliseconds)
+    Set_Var LT_Delta (Subtract Var LT_Now Var LT_Last_Time)
+    Set_Var LT_Last_Time Var LT_Now
+    If Var LT_Delta > 100 { Set_Var LT_Delta 100 }
+    Set_Var LT_Distance (Multiply Var LT_Delta 0.256)
+    Set_Var LT_Move_X 0
+    Set_Var LT_Move_Y 0
+    If (Input Down LT_Left) == 1 { Set_Var LT_Move_X -1 }
+    If (Input Down LT_Left_Arrow) == 1 { Set_Var LT_Move_X -1 }
+    If (Input Down LT_Right) == 1 { Set_Var LT_Move_X 1 }
+    If (Input Down LT_Right_Arrow) == 1 { Set_Var LT_Move_X 1 }
+    If (Input Down LT_Up) == 1 { Set_Var LT_Move_Y -1 }
+    If (Input Down LT_Up_Arrow) == 1 { Set_Var LT_Move_Y -1 }
+    If (Input Down LT_Down) == 1 { Set_Var LT_Move_Y 1 }
+    If (Input Down LT_Down_Arrow) == 1 { Set_Var LT_Move_Y 1 }
+    If (Input Focus) != Game
+    {
+        Set_Var LT_Move_X 0
+        Set_Var LT_Move_Y 0
+    }
+    Call LT_Step
+    If (Input Pressed LT_Stop) == 1 { Call LT_Stop }
+    If Var LT_Playing == 1
+    {
+        Graphics Draw_Rect LT_Player (Subtract (Add 20 (Multiply Var Runtime_Player_X (Divide Var LT_Cell 64))) 6) (Subtract (Add 40 (Multiply Var Runtime_Player_Y (Divide Var LT_Cell 64))) 6) 12 12 255 220 40 255
+    }
+End_Function
+Define_Function LT_GUI
+    Graphics GUI_Begin_Window "Editor Controls"
+    Graphics GUI_Text LT_Heading "Level play test"
+    Graphics GUI_Text LT_Help "WASD or arrow keys: move. F6 or Stop test: return. F1: input focus."
+    Graphics GUI_Text LT_Map Var Runtime_Map_Name
+    Graphics GUI_Text LT_Cell_Label "Current map cell:"
+    Graphics GUI_Text LT_Cell_Value Var Runtime_Cell
+    Graphics GUI_Text LT_Limit "Exploration test: saved tile maps and current layout. Collision and character placement are not configured yet."
+    Graphics GUI_Button LT_Stop_Button "Stop test" LT_Stop
+    Graphics GUI_End_Window
+End_Function
+Return

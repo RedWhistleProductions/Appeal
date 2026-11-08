@@ -1,0 +1,21 @@
+// Basic cut-scene playback. Replace Sample.mp4 with a file under Video/Movies.
+Run Setup/Config
+Graphics Add_Window Main "Appeal Video" 960 640
+Graphics Set_GUI_Visible False
+Graphics Set_FPS 60
+Video Load Intro Sample.mp4
+Video Draw Intro 0 0 960 640
+Video Play
+Set_Var Video_Open 1
+Loop While Var Video_Open == 1
+{
+    Video Update
+    Graphics Render
+    Graphics Update
+    Graphics Window_Open Main
+    Set_Var_Global Video_Open Graphics.Window.Main.Open
+    If (Video Is_Playing) == 0 { Set_Var Video_Open 0 }
+}
+Video Close_All
+Graphics Close_All
+Done

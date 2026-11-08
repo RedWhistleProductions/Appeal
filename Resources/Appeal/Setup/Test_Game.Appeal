@@ -1,0 +1,20 @@
+// Call after Run Setup/Config. Does not require User_Setings setup.
+Storage Use Test_Game
+Storage Execute_SQL "PRAGMA foreign_keys = ON;"
+Storage Begin
+Storage Execute_SQL "CREATE TABLE IF NOT EXISTS Schema_Info (Name TEXT PRIMARY KEY, Version INTEGER NOT NULL);"
+Storage Execute_SQL "CREATE TABLE IF NOT EXISTS Game_Settings (Key TEXT PRIMARY KEY, Value TEXT NOT NULL);"
+Storage Execute_SQL "CREATE TABLE IF NOT EXISTS Scenes (Name TEXT PRIMARY KEY, Left_Section TEXT NOT NULL, Right_Section TEXT NOT NULL, Scenery_Section TEXT NOT NULL, Camera_X REAL NOT NULL);"
+Storage Execute_SQL "CREATE TABLE IF NOT EXISTS Save_Slots (ID INTEGER PRIMARY KEY, Name TEXT NOT NULL, Scene TEXT NOT NULL REFERENCES Scenes(Name), Updated_At TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);"
+Storage Execute_SQL "CREATE TABLE IF NOT EXISTS Entity_State (Save_ID INTEGER NOT NULL REFERENCES Save_Slots(ID) ON DELETE CASCADE, Entity_Name TEXT NOT NULL, Entity_Type TEXT NOT NULL, Entity_ID INTEGER NOT NULL, Position_X REAL NOT NULL, Position_Y REAL NOT NULL, Position_Z REAL NOT NULL DEFAULT 0, Mode TEXT NOT NULL DEFAULT 'Default', PRIMARY KEY(Save_ID, Entity_Name));"
+Storage Execute_SQL "INSERT OR IGNORE INTO Schema_Info VALUES ('Test_Game', 1);"
+Storage Execute_SQL "INSERT OR IGNORE INTO Game_Settings VALUES ('Player1.Entity', 'Adam'), ('Player2.Entity', 'Eve'), ('Start_Scene', 'Garden');"
+Storage Execute_SQL "INSERT OR IGNORE INTO Scenes VALUES ('Garden', 'Garden', 'Orchard', 'Scenery', 0), ('Trail', 'Trail', 'Ridge', 'Trail_Scenery', 1024), ('Camp', 'Camp', 'Bridge', 'Camp_Scenery', 2048);"
+Storage Create_Level Sprite_Garden
+Storage Execute_SQL "UPDATE Schema_Info SET Version = 2 WHERE Name = 'Test_Game' AND Version < 2;"
+Run Setup/Test_Game_Characters
+Storage Execute_SQL "UPDATE Schema_Info SET Version = 3 WHERE Name = 'Test_Game' AND Version < 3;"
+Run Setup/Playlists
+Storage Execute_SQL "UPDATE Schema_Info SET Version = 4 WHERE Name = 'Test_Game' AND Version < 4;"
+Storage Commit
+Return

@@ -1,11 +1,11 @@
-Add_Dynamic_Module Graphics Appeal_SDL2_Graphics
+Add_Dynamic_Module Graphics Appeal_SDL2_Legacy_OpenGL_Graphics
 Graphics Debug True
 Graphics Add_Window Animation_Check "Appeal animation check" 800 600
 Graphics Set_GUI_Visible False
 Graphics Set_FPS 60
-Print (Graphics Load_Animation Adam Standing Examples/Characters/Adam_Movement.png 64 64 0 8)
-Print (Graphics Load_Animation Adam Walking Examples/Characters/Adam_Movement.png 64 64 8 8)
-Print (Graphics Load_Animation Eve Standing Examples/Characters/Eve_Movement.png 64 64 0 8)
+Print (Graphics Load_Animation Adam Standing Examples/Characters/Adam/Adam_Movement.png 64 64 0 8)
+Print (Graphics Load_Animation Adam Walking Examples/Characters/Adam/Adam_Movement.png 64 64 8 8)
+Print (Graphics Load_Animation Eve Standing Examples/Characters/Eve/Eve_Movement.png 64 64 0 8)
 Graphics Set_Animation_FPS Adam Standing 1
 Graphics Set_Animation_FPS Eve Standing 2
 Graphics Set_Scale Adam 3 3 1
@@ -32,7 +32,7 @@ Print "RESET"
 Print (Graphics Current_Animation Adam)
 Print (Graphics Animation_Frame Adam)
 Print "INVALID"
-Print (Graphics Load_Animation Adam Bad Examples/Characters/Adam_Movement.png 64 64 39 2)
+Print (Graphics Load_Animation Adam Bad Examples/Characters/Adam/Adam_Movement.png 64 64 39 2)
 Print (Graphics Set_Animation Adam Missing)
 Print (Graphics Current_Animation Adam)
 Graphics Set_Animation_Mode Adam Standing Hold
@@ -57,7 +57,7 @@ Print (Graphics Animation_Frame Adam)
 Graphics Close_All
 Graphics Add_Window Animation_Check "Reload animation resources" 320 240
 Print "RELOADED"
-Print (Graphics Load_Animation Adam Standing Examples/Characters/Adam_Movement.png 64 64 0 8)
+Print (Graphics Load_Animation Adam Standing Examples/Characters/Adam/Adam_Movement.png 64 64 0 8)
 Graphics Paste Adam 32 32 0
 Graphics Render
 Graphics Close_All

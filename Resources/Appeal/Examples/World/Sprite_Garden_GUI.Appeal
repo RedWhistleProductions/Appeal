@@ -1,0 +1,10 @@
+// Graphics automatically hides this panel while Input has Game focus.
+Define_Function Scene_GUI
+    Graphics GUI_Begin "Sprite Garden Controls"
+    Graphics GUI_Text Scene_GUI_Help "F1: return to the game. Scenes loop in both directions."
+    Graphics GUI_Text Scene_GUI_Section Var Scene_Left
+    Call Character_Animation_GUI
+    Call CONFIG_Controller_Controls
+    Graphics GUI_End_Window
+End_Function
+Return

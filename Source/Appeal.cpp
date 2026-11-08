@@ -130,14 +130,15 @@ void Appeal::Set_Resource_Folder(std::string Folder)
 
 void Appeal::Add_Module(std::string Name, void (*Interpreter)(Data_Source *Data))
 {
-    Dictionary_List.Add_Node(Name, Interpreter);
+    if(Dictionary_List.Find(Name)) Dictionary_List.Current->Value = Interpreter;
+    else Dictionary_List.Add_Node(Name, Interpreter);
 }
 
 void Appeal::Add_Dynamic_Module(std::string Name, std::string Plugin_Name)
 {
     std::string Module_Path, Plugin_Path, Appeal_Prefix;
     Appeal_Prefix = "Appeal_Module_";
-    Dynamic_Modules.Add_Node(Name);
+    if(!Dynamic_Modules.Find(Name)) Dynamic_Modules.Add_Node(Name);
     #ifdef __linux__
         Module_Path = Modules_Folder + "/" + Appeal_Prefix + Name + "/" + Appeal_Prefix + Name + ".so";
     #endif
@@ -463,7 +464,9 @@ void Appeal::Run_Commands()
             {
                 std::string Function_Name;
                 *Preprocessor >> Function_Name;
-                Appeal_Functions.Add_Node(Function_Name);
+                if(Appeal_Functions.Find(Function_Name))
+                    Appeal_Functions.Current->Value = Appeal_Function();
+                else Appeal_Functions.Add_Node(Function_Name);
                 while( Command != "End_Function" and Command != "Done")
                 {
                     Command = Preprocessor->Get_Raw_Data();
@@ -535,10 +538,11 @@ void Appeal::Run_Commands()
                 };
 
                 bool Use_Function = false;
+                Appeal_Function Block;
                 if(Loop_Target == "{")
                 {
                     Use_Function = true;
-                    Capture_Block("Loop_Function");
+                    Block = Capture_Block();
                 }
 
                 if( Loop_Type == "While")
@@ -547,7 +551,7 @@ void Appeal::Run_Commands()
                     {
                         if(Use_Function)
                         {
-                            Run_Function("Loop_Function");
+                            Run_Definition(Block, "Loop_Block");
                         }
                         else
                         {
@@ -561,7 +565,7 @@ void Appeal::Run_Commands()
                     {
                         if(Use_Function)
                         {
-                            Run_Function("Loop_Function");
+                            Run_Definition(Block, "Loop_Block");
                         }
                         else
                         {
@@ -579,14 +583,12 @@ void Appeal::Run_Commands()
                 Value_2 = Read_Condition_Value();
                 *Preprocessor >> Command;
 
-                if(Command == "{")
-                {
-                    Capture_Block("If_Function");
-                }
+                if(Command != "{") throw std::runtime_error("If requires a block");
+                Appeal_Function Block = Capture_Block();
 
                 if(Evaluate(Value_1, Op, Value_2))
                 {
-                    Run_Function("If_Function");
+                    Run_Definition(Block, "If_Block");
                 }
             }
 
@@ -707,36 +709,30 @@ std::string Appeal::Resolve_Value(std::string Value)
     }
     return Value;
 }
-void Appeal::Run_Function(std::string Function)
+void Appeal::Run_Definition(const Appeal_Function &Definition, const std::string &Name)
 {
-    if(Appeal_Functions.Find(Function))
-    {
-        // Execute a fresh cursor over the definition. Repeated and recursive
-        // calls must not share Appeal_Function's mutable read position.
-        Appeal_Function Invocation;
-        Invocation.Command_Vector = Appeal_Functions.Current->Value.Command_Vector;
-        int Source_Count = Data_Manager.Data_Sources.Nodes;
-        Data_Manager.Add_Source(Function, &Invocation);
-        try { Run(); }
-        catch(...)
-        {
-            while(Data_Manager.Data_Sources.Nodes > Source_Count)
-            {
-                Data_Manager.Data_Sources.Last();
-                Data_Manager.Data_Sources.Remove();
-            }
-            throw;
-        }
-        while(Data_Manager.Data_Sources.Nodes > Source_Count)
-        {
+    Appeal_Function Invocation;
+    Invocation.Command_Vector = Definition.Command_Vector;
+    int Source_Count = Data_Manager.Data_Sources.Nodes;
+    Data_Manager.Add_Source(Name, &Invocation);
+    try { Run(); }
+    catch(...) {
+        while(Data_Manager.Data_Sources.Nodes > Source_Count) {
             Data_Manager.Data_Sources.Last();
             Data_Manager.Data_Sources.Remove();
         }
+        throw;
     }
-    else
-    {
-        if(Debug_Mode) std::cout << "Function not found: " << Function << std::endl;
+    while(Data_Manager.Data_Sources.Nodes > Source_Count) {
+        Data_Manager.Data_Sources.Last();
+        Data_Manager.Data_Sources.Remove();
     }
+}
+
+void Appeal::Run_Function(std::string Function)
+{
+    if(Appeal_Functions.Find(Function)) Run_Definition(Appeal_Functions.Current->Value, Function);
+    else if(Debug_Mode) std::cout << "Function not found: " << Function << std::endl;
 }
 
 void Appeal::Run_Callback(std::string Function)
@@ -794,12 +790,12 @@ void Appeal::Run_Module_Callback(std::string Module, std::string Command, bool H
 }
 
 //Reads { and }
-void Appeal::Capture_Block(std::string Function)
+Appeal_Function Appeal::Capture_Block()
 {
     std::string Command;
     int Brace_Depth = 1;
 
-    Appeal_Functions.Add_Node(Function);
+    Appeal_Function Block;
     while(Brace_Depth > 0)
     {
         Command = Preprocessor->Get_Raw_Data();
@@ -809,21 +805,22 @@ void Appeal::Capture_Block(std::string Function)
         if(Command == "{")
         {
             Brace_Depth++;
-            Appeal_Functions.Current->Value.Add_Command(Command);
+            Block.Add_Command(Command);
         }
         else if(Command == "}")
         {
             Brace_Depth--;
             if(Brace_Depth > 0)
             {
-                Appeal_Functions.Current->Value.Add_Command(Command);
+                Block.Add_Command(Command);
             }
         }
         else
         {
-            Appeal_Functions.Current->Value.Add_Command(Command);
+            Block.Add_Command(Command);
         }
     }
+    return Block;
 }
 
 bool Appeal::Find_Global(std::string Name)
@@ -844,5 +841,11 @@ std::string Appeal::Get_Global_Value(std::string Name)
 
 Appeal::~Appeal()
 {
-
+    // Input must release controllers before Graphics closes SDL video; callbacks
+    // must not re-enter an interpreter whose destruction has started.
+    if(Active_Appeal == this) Active_Appeal = nullptr;
+    while(Dynamic_Modules.Nodes > 0) {
+        Dynamic_Modules.Last();
+        Dynamic_Modules.Remove();
+    }
 }

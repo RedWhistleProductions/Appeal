@@ -1,0 +1,75 @@
+// Three screens form a script-controlled loop without moving their World sections.
+// Either character carries the shared camera and both players across an edge.
+Define_Function Scene_Switch_Page
+    Set_Var Scene_Page (Add Var Scene_Page Var Scene_Advance)
+    If Var Scene_Page > 2
+    {
+        Set_Var Scene_Page 0
+    }
+    If Var Scene_Page < 0
+    {
+        Set_Var Scene_Page 2
+    }
+    Set_Var Scene_Left Garden
+    If Var Scene_Page == 1
+    {
+        Set_Var Scene_Left Trail
+    }
+    If Var Scene_Page == 2
+    {
+        Set_Var Scene_Left Camp
+    }
+    Set_Var Scene_Right (World Get_Neighbor Var Scene_Left Right)
+    Set_Var Scene_Props (World Get_Neighbor Var Scene_Left Front)
+    Set_Var Scene_Camera_X (World Get_Tile Var Scene_Left 0 0 X)
+    World Use_Section Var Scene_Left
+    Run Examples/World/Bind_Sprite_Garden
+    // Spawn clear of both thresholds, preventing an immediate reverse transition.
+    Mechanics Set Adam Position_X 64
+    Mechanics Set Eve Position_X 256
+    If Var Scene_Advance == -1
+    {
+        Mechanics Set Adam Position_X 576
+        Mechanics Set Eve Position_X 768
+    }
+    If Var Scene_Physics_Active == 1
+    {
+        Call Scene_Physics_Rebuild
+    }
+    Graphics Set_Window_Title Main "Sprite Garden - looping scenes (F1 focus)"
+End_Function
+Define_Function Scene_Advance_Right
+    Set_Var Scene_Advance 1
+    Call Scene_Switch_Page
+End_Function
+Define_Function Scene_Advance_Left
+    Set_Var Scene_Advance -1
+    Call Scene_Switch_Page
+End_Function
+Define_Function Scene_Check_Advance
+    Set_Var_Global Scene_Adam_X Mechanics.Adam.Position_X
+    Set_Var_Global Scene_Eve_X Mechanics.Eve.Position_X
+    Set_Var Scene_Advance 0
+    If Var Scene_Adam_X < 32
+    {
+        Set_Var Scene_Advance -1
+    }
+    If Var Scene_Eve_X < 32
+    {
+        Set_Var Scene_Advance -1
+    }
+    // Right wins if players cross opposite edges in the same frame.
+    If Var Scene_Adam_X > 800
+    {
+        Set_Var Scene_Advance 1
+    }
+    If Var Scene_Eve_X > 800
+    {
+        Set_Var Scene_Advance 1
+    }
+    If Var Scene_Advance != 0
+    {
+        Call Scene_Switch_Page
+    }
+End_Function
+Return

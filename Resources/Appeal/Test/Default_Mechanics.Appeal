@@ -1,0 +1,76 @@
+Add_Dynamic_Module Mechanics Appeal_Default_2D_Side_Scrolling_Mechanics
+Mechanics Select Player
+Mechanics Set Player Speed 10
+Mechanics Walk
+Print_Global Mechanics.Player.Velocity_X
+Mechanics Walk_Analog -50
+Print_Global Mechanics.Player.Velocity_X
+Mechanics Walk_Analog 0
+Print_Global Mechanics.Player.Velocity_X
+Mechanics Run
+Print_Global Mechanics.Player.Velocity_X
+Mechanics Duck_Stand
+Print_Global Mechanics.Player.Duck_Amount
+Mechanics Duck_Walk_Analog 50
+Print_Global Mechanics.Player.Velocity_X
+Mechanics Select NPC
+Mechanics Set NPC Speed 2
+Mechanics Walk
+Print_Global Mechanics.NPC.Velocity_X
+Print_Global Mechanics.Player.Velocity_X
+Mechanics Digital Player Stand
+Print_Global Mechanics.Selected_Entity
+Mechanics Run
+Print_Global Mechanics.NPC.Velocity_X
+Mechanics Select Player
+Mechanics Jump_Analog 50
+Print_Global Mechanics.Player.Velocity_Y
+Print_Global Mechanics.Player.Action
+Print_Global Mechanics.Player.Mode
+Mechanics Update All
+Mechanics Release Player
+Print_Global Mechanics.Selected_Entity
+Mechanics Walk
+Mechanics Add_Plugin Diagnostic Resources/Modules/Appeal_Module_Mechanics/Test/Test.dll
+Mechanics Use Probe Diagnostic
+Mechanics Select NPC
+Mechanics Walk
+Mechanics Release Probe
+Print_Global Mechanics.NPC.Velocity_X
+Print_Global Mechanics.NPC.Orientation
+Mechanics Add_Plugin Top_Down Resources/Modules/Appeal_Module_Mechanics/Appeal_Default_2D_Top_Down_Mechanics/Appeal_Default_2D_Top_Down_Mechanics.dll
+Mechanics Use Navigator Top_Down
+Mechanics Walk
+Print_Global Mechanics.Navigator.Orientation
+Print_Global Mechanics.Navigator.Velocity_Y
+Mechanics Move_Right
+Print_Global Mechanics.Navigator.Velocity_X
+Print_Global Mechanics.Navigator.Velocity_Y
+Mechanics Stop
+Mechanics Move_Down_Analog 50
+Print_Global Mechanics.Navigator.Velocity_Y
+Mechanics Jump
+Print_Global Mechanics.Navigator.Velocity_Z
+Print_Global Mechanics.Navigator.Action
+Mechanics Add_Plugin Three_D Resources/Modules/Appeal_Module_Mechanics/Appeal_Default_3D_Mechanics/Appeal_Default_3D_Mechanics.dll
+Mechanics Use Avatar Three_D
+Mechanics Walk
+Print_Global Mechanics.Avatar.Orientation
+Print_Global Mechanics.Avatar.Velocity_Z
+Mechanics Turn_Right
+Print_Global Mechanics.Avatar.Yaw
+Mechanics Look_Up_Analog 50
+Print_Global Mechanics.Avatar.Pitch
+Mechanics Stop
+Mechanics Set Avatar Yaw 90
+Mechanics Move_Forward
+Print_Global Mechanics.Avatar.Velocity_X
+Mechanics Jump
+Print_Global Mechanics.Avatar.Velocity_Y
+Mechanics Select NPC
+Mechanics Move_Left
+Print_Global Mechanics.NPC.Velocity_X
+Print_Global Mechanics.Avatar.Mode
+Print_Global Mechanics.Navigator.Plugin
+Mechanics Update All
+Done

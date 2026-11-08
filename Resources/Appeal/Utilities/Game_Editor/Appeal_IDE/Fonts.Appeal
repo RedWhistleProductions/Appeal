@@ -1,0 +1,187 @@
+// Appearance controls are local to the IDE text pane; they do not edit source text.
+Set_Var IDE_Show_Fonts 0
+Set_Var IDE_Font_Family 0
+Set_Var IDE_Font_Size 13
+Set_Var IDE_Font_Bold 0
+Set_Var IDE_Font_Italic 0
+Set_Var IDE_Font_R 230
+Set_Var IDE_Font_G 230
+Set_Var IDE_Font_B 230
+Set_Var IDE_Font_Custom ""
+Set_Var IDE_Font_Browse 0
+Set_Var IDE_Font_Directory C:/Windows/Fonts
+Set_Var IDE_Font_Status "Apply changes to the code pane. Preset bold/italic options select real font faces."
+Define_Function IDE_Fonts_Open
+    Set_Var IDE_Show_Fonts 1
+    Graphics GUI_Set_Window_Open "IDE font settings" True
+End_Function
+Define_Function IDE_Fonts_Close
+    Set_Var IDE_Show_Fonts 0
+    Set_Var IDE_Font_Browse 0
+End_Function
+Define_Function IDE_Font_Family_Changed
+    Set_Var IDE_Font_Family Var Callback_Value
+End_Function
+Define_Function IDE_Font_Size_Changed
+    Set_Var IDE_Font_Size Var Callback_Value
+End_Function
+Define_Function IDE_Font_Bold_Changed
+    Set_Var IDE_Font_Bold Var Callback_Value
+End_Function
+Define_Function IDE_Font_Italic_Changed
+    Set_Var IDE_Font_Italic Var Callback_Value
+End_Function
+Define_Function IDE_Font_R_Changed
+    Set_Var IDE_Font_R Var Callback_Value
+End_Function
+Define_Function IDE_Font_G_Changed
+    Set_Var IDE_Font_G Var Callback_Value
+End_Function
+Define_Function IDE_Font_B_Changed
+    Set_Var IDE_Font_B Var Callback_Value
+End_Function
+Define_Function IDE_Font_Apply
+    Set_Var IDE_Font_File ""
+    Set_Var IDE_Font_Allowed 1
+    If Var IDE_Font_Family == 0
+    {
+        // The built-in bitmap face has no style variants; use real Consolas faces.
+        If Var IDE_Font_Bold == 1 { Set_Var IDE_Font_Family 1 }
+        If Var IDE_Font_Italic == 1 { Set_Var IDE_Font_Family 1 }
+    }
+    If Var IDE_Font_Family == 1
+    {
+        Set_Var IDE_Font_Face consola.ttf
+        If Var IDE_Font_Bold == 1 { Set_Var IDE_Font_Face consolab.ttf }
+        If Var IDE_Font_Italic == 1
+        {
+            Set_Var IDE_Font_Face consolai.ttf
+            If Var IDE_Font_Bold == 1 { Set_Var IDE_Font_Face consolaz.ttf }
+        }
+        Files Join Var IDE_Font_Directory Var IDE_Font_Face
+        Set_Var_Global IDE_Font_File Files.Last_Path
+    }
+    If Var IDE_Font_Family == 2
+    {
+        Set_Var IDE_Font_Face cour.ttf
+        If Var IDE_Font_Bold == 1 { Set_Var IDE_Font_Face courbd.ttf }
+        If Var IDE_Font_Italic == 1
+        {
+            Set_Var IDE_Font_Face couri.ttf
+            If Var IDE_Font_Bold == 1 { Set_Var IDE_Font_Face courbi.ttf }
+        }
+        Files Join Var IDE_Font_Directory Var IDE_Font_Face
+        Set_Var_Global IDE_Font_File Files.Last_Path
+    }
+    If Var IDE_Font_Family == 3
+    {
+        Set_Var IDE_Font_Face arial.ttf
+        If Var IDE_Font_Bold == 1 { Set_Var IDE_Font_Face arialbd.ttf }
+        If Var IDE_Font_Italic == 1
+        {
+            Set_Var IDE_Font_Face ariali.ttf
+            If Var IDE_Font_Bold == 1 { Set_Var IDE_Font_Face arialbi.ttf }
+        }
+        Files Join Var IDE_Font_Directory Var IDE_Font_Face
+        Set_Var_Global IDE_Font_File Files.Last_Path
+    }
+    If Var IDE_Font_Family == 4
+    {
+        Set_Var IDE_Font_Face segoeui.ttf
+        If Var IDE_Font_Bold == 1 { Set_Var IDE_Font_Face segoeuib.ttf }
+        If Var IDE_Font_Italic == 1
+        {
+            Set_Var IDE_Font_Face segoeuii.ttf
+            If Var IDE_Font_Bold == 1 { Set_Var IDE_Font_Face segoeuiz.ttf }
+        }
+        Files Join Var IDE_Font_Directory Var IDE_Font_Face
+        Set_Var_Global IDE_Font_File Files.Last_Path
+    }
+    If Var IDE_Font_Family == 5
+    {
+        If Var IDE_GUI_Ready == 1
+        {
+            Graphics GUI_Text_Value IDE_Font_Custom_Control
+            Set_Var_Global IDE_Font_Custom Graphics.GUI.IDE_Font_Custom_Control.Value
+        }
+        Set_Var IDE_Font_File Var IDE_Font_Custom
+        If Var IDE_Font_File == ""
+        {
+            Set_Var IDE_Font_Allowed 0
+            Set_Var IDE_Font_Status "Choose a custom font file first."
+        }
+    }
+    If Var IDE_Font_Allowed == 1
+    {
+        Set_Var IDE_Font_Applied (Graphics GUI_Text_Editor_Style IDE_Source Var IDE_Font_File Var IDE_Font_Size Var IDE_Font_R Var IDE_Font_G Var IDE_Font_B)
+        If Var IDE_Font_Applied == 1 { Set_Var IDE_Font_Status "Font appearance applied. Your script text is unchanged."
+        }
+        If Var IDE_Font_Applied == 0 { Set_Var IDE_Font_Status "Could not load that font. Check the font path; the current appearance is retained." }
+    }
+End_Function
+Define_Function IDE_Font_Reset
+    Set_Var IDE_Font_Family 0
+    Set_Var IDE_Font_Size 13
+    Set_Var IDE_Font_Bold 0
+    Set_Var IDE_Font_Italic 0
+    Set_Var IDE_Font_R 230
+    Set_Var IDE_Font_G 230
+    Set_Var IDE_Font_B 230
+    Call IDE_Font_Apply
+End_Function
+Define_Function IDE_Font_Browse_Open
+    Set_Var IDE_Font_Browse 1
+    Graphics GUI_Set_Window_Open "Choose IDE font" True
+End_Function
+Define_Function IDE_Font_Picked
+    Graphics GUI_File_Picker_Value IDE_Font_Picker
+    Set_Var_Global IDE_Font_Is_Directory Graphics.GUI.IDE_Font_Picker.Selected_Is_Directory
+    Set_Var_Global IDE_Font_Relative Graphics.GUI.IDE_Font_Picker.Selected_Relative
+    If Var IDE_Font_Is_Directory == 0
+    {
+        If Var IDE_Font_Relative != ""
+        {
+            Files Join Var IDE_Font_Directory Var IDE_Font_Relative
+            Set_Var_Global IDE_Font_Custom Files.Last_Path
+            Graphics GUI_Set_Text_Value IDE_Font_Custom_Control Var IDE_Font_Custom
+            Set_Var IDE_Font_Family 5
+            Set_Var IDE_Font_Browse 0
+        }
+    }
+End_Function
+Define_Function IDE_Font_Browse_Close
+    Set_Var IDE_Font_Browse 0
+End_Function
+Graphics GUI_Set_Window_Functions "IDE font settings" IDE_Fonts_Close None
+Graphics GUI_Set_Window_Functions "Choose IDE font" IDE_Font_Browse_Close None
+Define_Function IDE_Font_GUI
+    Graphics GUI_Begin_Window "IDE font settings"
+    Graphics GUI_Text IDE_Font_Status_Label Var IDE_Font_Status
+    Graphics GUI_Set_Selection_Value IDE_Font_Family_Menu Var IDE_Font_Family
+    Graphics GUI_Combo IDE_Font_Family_Menu Family "Built-in|Consolas|Courier New|Arial|Segoe UI|Custom file" Var IDE_Font_Family IDE_Font_Family_Changed
+    Graphics GUI_Set_Slider_Int_Value IDE_Font_Size_Control Var IDE_Font_Size
+    Graphics GUI_Slider_Int IDE_Font_Size_Control "Size (pixels)" Var IDE_Font_Size 8 72 IDE_Font_Size_Changed
+    Graphics GUI_Checkbox IDE_Font_Bold_Control Bold Var IDE_Font_Bold IDE_Font_Bold_Changed
+    Graphics GUI_Checkbox IDE_Font_Italic_Control Italic Var IDE_Font_Italic IDE_Font_Italic_Changed
+    Graphics GUI_Text IDE_Font_Custom_Help "For custom fonts, select a regular, bold, or italic face file directly."
+    Graphics GUI_Input_Text IDE_Font_Custom_Control "Custom font path" Var IDE_Font_Custom None
+    Graphics GUI_Button IDE_Font_Browse_Button "Browse font files..." IDE_Font_Browse_Open
+    Graphics GUI_Set_Slider_Int_Value IDE_Font_R_Control Var IDE_Font_R
+    Graphics GUI_Slider_Int IDE_Font_R_Control "Text red" Var IDE_Font_R 0 255 IDE_Font_R_Changed
+    Graphics GUI_Set_Slider_Int_Value IDE_Font_G_Control Var IDE_Font_G
+    Graphics GUI_Slider_Int IDE_Font_G_Control "Text green" Var IDE_Font_G 0 255 IDE_Font_G_Changed
+    Graphics GUI_Set_Slider_Int_Value IDE_Font_B_Control Var IDE_Font_B
+    Graphics GUI_Slider_Int IDE_Font_B_Control "Text blue" Var IDE_Font_B 0 255 IDE_Font_B_Changed
+    Graphics GUI_Button IDE_Font_Apply_Button Apply IDE_Font_Apply
+    Graphics GUI_Button IDE_Font_Reset_Button "Reset font" IDE_Font_Reset
+    Graphics GUI_Button IDE_Font_Close_Button Close IDE_Fonts_Close
+    Graphics GUI_End_Window
+    If Var IDE_Font_Browse == 1
+    {
+        Graphics GUI_Begin_Window "Choose IDE font"
+        Graphics GUI_File_Picker IDE_Font_Picker "Select a TrueType font face" Var IDE_Font_Directory . IDE_Font_Picked
+        Graphics GUI_Button IDE_Font_Picker_Cancel Cancel IDE_Font_Browse_Close
+        Graphics GUI_End_Window
+    }
+End_Function
+Return

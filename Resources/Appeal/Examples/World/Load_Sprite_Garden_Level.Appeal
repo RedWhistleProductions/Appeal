@@ -1,0 +1,19 @@
+// Restore the complete saved World scene, including shared entities and section links.
+// Requires Setup/Config. Rebuild the scene's Graphics placements after loading.
+Run Setup/Test_Game
+World Import_Level (Storage Load_Level Sprite_Garden)
+// Restore the demo renderer's current screen selection from the saved active section.
+Set_Var Scene_Left (Storage Get_Field Levels Name Sprite_Garden Active_Section)
+Set_Var Scene_Right (World Get_Neighbor Var Scene_Left Right)
+Set_Var Scene_Props (World Get_Neighbor Var Scene_Left Front)
+Set_Var Scene_Camera_X (World Get_Tile Var Scene_Left 0 0 X)
+Set_Var Scene_Page 0
+If Var Scene_Left == Trail
+{
+    Set_Var Scene_Page 1
+}
+If Var Scene_Left == Camp
+{
+    Set_Var Scene_Page 2
+}
+Return

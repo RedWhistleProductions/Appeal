@@ -39,7 +39,7 @@ try {
 } finally { if (Test-Path -LiteralPath $unit) { Remove-Item -LiteralPath $unit } }
 $test = Run-Appeal 'Test/Graphics_Test_Plugin'
 foreach ($line in @(
-    'Load_Animation Adam Standing Examples/Characters/Adam_Movement.png 64 64 0 8',
+    'Load_Animation Adam Standing Examples/Characters/Adam/Adam_Movement.png 64 64 0 8',
     'Set_Animation Adam Standing', 'Set_Animation_FPS Adam Standing 7',
     'Set_Animation_Mode Adam Standing Hold', 'Rotate Adam 10 20 30',
     'Paste Adam 176 204 0', 'Animation_Frame Adam', 'Current_Animation Adam',

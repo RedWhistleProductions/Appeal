@@ -1,0 +1,40 @@
+// Run: Appeal.exe "Utilities/Game_Editor/Level_Editor/Tile_Editor/Main"
+Add_Dynamic_Module Graphics Appeal_SDL2_Legacy_OpenGL_Graphics
+Add_Dynamic_Module Input Appeal_SDL2_Input
+Add_Dynamic_Module Storage Appeal_SQLite_Storage
+Add_Dynamic_Module World Appeal_Standard_World
+Add_Dynamic_Module Files Appeal_Standard_Files
+Run "Utilities/Game_Editor/Level_Editor/Tile_Editor/Catalog"
+Run "Utilities/Game_Editor/Level_Editor/Tile_Editor/Editor"
+Graphics Add_Full_Screen_Window Main 0
+Graphics Set_Window_Title Main "Tile Map Editor"
+Graphics Set_FPS 60
+Graphics Set_GUI_Docking True
+Graphics Set_GUI_Editor_Mode True
+Graphics Set_GUI_Visible True
+Set_Var TE_Render 1
+Call TE_New
+Input Set_Focus_Mouse_Button None
+Input Set_Focus GUI
+Set_Var TE_Open 1
+Set_Var TE_Running 1
+Loop While Var TE_Open == 1
+{
+    Input Update Default
+    Call TE_Grid
+    Call TE_Workspace
+    Graphics Render
+    Call TE_Poll_Folders
+    Call TE_Input
+    Graphics Update
+    Graphics Window_Open Main
+    Set_Var_Global TE_Open Graphics.Window.Main.Open
+    If Var TE_Running == 0
+    {
+        Set_Var TE_Open 0
+    }
+}
+World Close_Scene Tile_Editor
+Storage Close Tile_Editor
+Graphics Close_All
+Done

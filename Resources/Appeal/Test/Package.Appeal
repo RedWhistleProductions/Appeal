@@ -1,0 +1,22 @@
+// Exercise every Test plugin function.
+Package Debug 1
+Package Set_Paths Sample
+Package Add_Repo Sample Sample
+Package Remove_Repo Sample
+Package Update_Repos
+Package Search Sample
+Package Install Sample
+Package Remove Sample
+Package Upgrade
+Package List
+Package Info Sample
+Package Verify Sample
+Package Set_Format Sample
+Package Set_Level 1
+Package Create Sample Sample Sample
+Package Extract Sample Sample
+Package Load_Module Sample
+Package Unload_Module Sample
+Package Load_Plugin Sample Sample
+Package Unload_Plugin Sample
+Return

@@ -1,0 +1,35 @@
+{
+  "tile_size": [
+    64,
+    64
+  ],
+  "topdown_texture_frames": 120,
+  "gas_billboard_frames": 48,
+  "fog_of_war_frames": 256,
+  "static_visibility_masks": 16,
+  "fields": [
+    "clouds",
+    "fog",
+    "smoke",
+    "green_gas",
+    "brown_gas"
+  ],
+  "opacity_variants": [
+    0.25,
+    0.5,
+    0.75
+  ],
+  "field_spatial_repeat_checks": "passed",
+  "cross_phase_field_edges": "passed",
+  "compatible_fow_edge_pairs_across_phase_combinations": 16384,
+  "fow_edge_checks": "passed",
+  "temporal_cycle_closure": "passed",
+  "opaque_unknown_interiors": "passed",
+  "translucent_explored_interiors": "passed",
+  "grid_and_indices": "passed",
+  "engine_visibility_logic": "not_implemented",
+  "engine_runtime": "not_run",
+  "shaped_gas_area_frames": 256,
+  "compatible_gas_edge_comparisons": 16384,
+  "gas_area_edge_checks": "passed"
+}

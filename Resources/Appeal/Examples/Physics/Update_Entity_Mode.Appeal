@@ -1,0 +1,52 @@
+// Set Collision_Entity to any attached World/Mechanics/Physics entity, then call
+// Collision_Update_Mode after Physics Step. Overlapping volumes have explicit priority.
+Define_Function Collision_Update_Mode
+    Set_Var Collision_Mode Ground
+    Set_Var Collision_Priority 0
+    Set_Var Collision_Index 0
+    Set_Var Collision_Count (Physics Get Var Collision_Entity Contact_Count)
+    Loop While Var Collision_Index < Var Collision_Count
+    {
+        Set_Var Collision_Tag (Physics Contact Var Collision_Entity Var Collision_Index Tag)
+        Set_Var Collision_Sensor (Physics Contact Var Collision_Entity Var Collision_Index Sensor)
+        If Var Collision_Sensor == 1
+        {
+            If Var Collision_Tag == Water
+            {
+                If Var Collision_Priority < 1
+                {
+                    Set_Var Collision_Mode Swimming
+                    Set_Var Collision_Priority 1
+                }
+            }
+            If Var Collision_Tag == Ladder
+            {
+                If Var Collision_Priority < 2
+                {
+                    Set_Var Collision_Mode Ladder
+                    Set_Var Collision_Priority 2
+                }
+            }
+            If Var Collision_Tag == Climbable
+            {
+                If Var Collision_Priority < 3
+                {
+                    Set_Var Collision_Mode Climbing
+                    Set_Var Collision_Priority 3
+                }
+            }
+            If Var Collision_Tag == Vehicle
+            {
+                If Var Collision_Priority < 4
+                {
+                    Set_Var Collision_Mode Vehicle
+                    Set_Var Collision_Priority 4
+                }
+            }
+        }
+        Set_Var Collision_Index (Add Var Collision_Index 1)
+    }
+    Mechanics Set Var Collision_Entity Mode Var Collision_Mode
+    World Set Var Collision_Entity Mode Var Collision_Mode
+End_Function
+Return

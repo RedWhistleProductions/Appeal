@@ -1,0 +1,74 @@
+// Each placement has its own drawable, sharing cached atlas textures.
+Define_Function Scene_Bind_Tile
+    Set_Var Scene_Entity (World Get_Tile Var Scene_Section Var Scene_Column Var Scene_Row Name)
+    Set_Var Scene_File Examples/Terrain/Terrain_Tiles.png
+    Set_Var Scene_Width 64
+    Set_Var Scene_Height 64
+    Set_Var Scene_Frame 0
+    If Var Scene_Entity == Soil
+    {
+        Set_Var Scene_Frame 4
+    }
+    If Var Scene_Entity == Sand
+    {
+        Set_Var Scene_Frame 12
+    }
+    If Var Scene_Entity == Wood
+    {
+        Set_Var Scene_Frame 13
+    }
+    If Var Scene_Entity == Stone
+    {
+        Set_Var Scene_Frame 8
+    }
+    If Var Scene_Section == Var Scene_Props
+    {
+        Set_Var Scene_File Examples/Terrain/Terrain_Props.png
+    If Var Scene_Entity == Pine
+    {
+        Set_Var Scene_Height 128
+        Set_Var Scene_Frame 3
+    }
+    If Var Scene_Entity == Narrow_Tree
+    {
+        Set_Var Scene_Height 128
+        Set_Var Scene_Frame 0
+    }
+    If Var Scene_Entity == Bush
+    {
+        Set_Var Scene_Frame 16
+    }
+    If Var Scene_Entity == Boulder
+    {
+        Set_Var Scene_Frame 17
+    }
+    If (World Entity_Type Var Scene_Entity) == Crate
+    {
+        Set_Var Scene_Frame 18
+    }
+    If Var Scene_Entity == Barrel
+    {
+        Set_Var Scene_Frame 19
+    }
+    If Var Scene_Entity == Sign
+    {
+        Set_Var Scene_Frame 20
+    }
+    If Var Scene_Entity == Fence
+    {
+        Set_Var Scene_Width 128
+        Set_Var Scene_Frame 11
+    }
+}
+    Set_Var Scene_Loaded (Graphics Load_Animation Var Scene_Drawable Still Var Scene_File Var Scene_Width Var Scene_Height Var Scene_Frame 1)
+    If Var Scene_Loaded != 1
+    {
+        Print SPRITE_GARDEN_ASSET_FAILED
+        Print Var Scene_Drawable
+    }
+    Set_Var Scene_X (World Get_Tile Var Scene_Section Var Scene_Column Var Scene_Row X)
+    Set_Var Scene_Y (World Get_Tile Var Scene_Section Var Scene_Column Var Scene_Row Y)
+    Set_Var Scene_X (Subtract Var Scene_X Var Scene_Camera_X)
+    Graphics Paste Var Scene_Drawable Var Scene_X Var Scene_Y 0
+End_Function
+Return

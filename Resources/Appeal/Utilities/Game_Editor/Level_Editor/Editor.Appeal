@@ -1,0 +1,740 @@
+// Level layouts reference saved Tile Editor maps; components share one host.
+Run Utilities/Game_Editor/Playlist_Editor/Editor
+Storage Execute_SQL "CREATE TABLE IF NOT EXISTS Editor_Game_Levels (Name TEXT PRIMARY KEY, Columns INTEGER DEFAULT 4, Rows INTEGER DEFAULT 3);"
+Storage Execute_SQL "CREATE TABLE IF NOT EXISTS Editor_Game_Level_Cells (Level_Name TEXT, Cell TEXT, Map_Name TEXT, PRIMARY KEY(Level_Name,Cell));"
+Storage Execute_SQL "CREATE TEMP TABLE IF NOT EXISTS LE_Cells (Cell TEXT PRIMARY KEY, X INTEGER, Y INTEGER, Map_Name TEXT DEFAULT '');"
+Storage Execute_SQL "CREATE TEMP TABLE IF NOT EXISTS LE_Maps (Number TEXT PRIMARY KEY, Name TEXT);"
+Storage Execute_SQL "CREATE TEMP TABLE IF NOT EXISTS LE_Thumbnail_Layers (Number TEXT PRIMARY KEY, Section TEXT);"
+Storage Execute_SQL "CREATE TEMP VIEW IF NOT EXISTS LE_Map_Catalog AS SELECT 'All' AS Name,count(*) AS Count,group_concat(Name,'|') AS Items FROM (SELECT Name FROM LE_Maps ORDER BY CAST(Number AS INTEGER));"
+Storage Execute_SQL "CREATE TEMP VIEW IF NOT EXISTS LE_New_Map_Name AS SELECT 'All' AS Name,(SELECT Value FROM Editor_Context WHERE Name='LE_Name') || '_Map_' || (SELECT Value FROM Editor_Context WHERE Name='LE_Cell') AS Value;"
+Storage Execute_SQL "CREATE TABLE IF NOT EXISTS Editor_Game_Level_Links (Level_Name TEXT, Cell TEXT, Direction TEXT, Destination_Cell TEXT, PRIMARY KEY(Level_Name,Cell,Direction));"
+Storage Execute_SQL "CREATE TEMP VIEW IF NOT EXISTS LE_Saved_Levels AS SELECT CAST(row_number() OVER (ORDER BY Name)-1 AS TEXT) AS Number,Name FROM Editor_Game_Levels;"
+Storage Execute_SQL "CREATE TEMP VIEW IF NOT EXISTS LE_Level_Catalog AS SELECT 'All' AS Name,count(*) AS Count,group_concat(Name,'|') AS Items FROM (SELECT Name FROM LE_Saved_Levels ORDER BY Name);"
+Storage Execute_SQL "CREATE VIEW IF NOT EXISTS Editor_Game_Neighbors AS SELECT a.Level_Name,a.Cell,CASE WHEN CAST(a.Cell AS INTEGER)/l.Columns=CAST(b.Cell AS INTEGER)/l.Columns AND CAST(b.Cell AS INTEGER)=CAST(a.Cell AS INTEGER)+1 THEN 'Right' WHEN CAST(a.Cell AS INTEGER)/l.Columns=CAST(b.Cell AS INTEGER)/l.Columns AND CAST(b.Cell AS INTEGER)=CAST(a.Cell AS INTEGER)-1 THEN 'Left' WHEN CAST(b.Cell AS INTEGER)>CAST(a.Cell AS INTEGER) THEN 'Below' ELSE 'Above' END AS Direction,b.Cell AS Destination_Cell FROM Editor_Game_Level_Cells a JOIN Editor_Game_Levels l ON l.Name=a.Level_Name JOIN Editor_Game_Level_Cells b ON b.Level_Name=a.Level_Name WHERE a.Map_Name!='' AND b.Map_Name!='' AND ((CAST(a.Cell AS INTEGER)/l.Columns=CAST(b.Cell AS INTEGER)/l.Columns AND abs(CAST(a.Cell AS INTEGER)-CAST(b.Cell AS INTEGER))=1) OR abs(CAST(a.Cell AS INTEGER)-CAST(b.Cell AS INTEGER))=l.Columns);"
+Set_Var LE_Render 0
+Set_Var LE_GUI_Ready 0
+Set_Var GE_Mode Level
+Set_Var LE_Last_GUI_Mode ""
+Set_Var LE_Name My_Level
+Set_Var LE_Columns 4
+Set_Var LE_Rows 3
+Set_Var LE_New_Columns 4
+Set_Var LE_New_Rows 3
+Set_Var LE_Selected 0
+Set_Var LE_Dirty 0
+Set_Var LE_Confirm 0
+Set_Var LE_Mouse_Was_Down 0
+Set_Var LE_Preview_Ready 0
+Set_Var LE_Thumbnail_Total 0
+Set_Var LE_Editing_Cell -1
+Set_Var LE_Map_Ready 0
+Set_Var LE_Assign_Name ""
+Set_Var LE_Assign_Index 0
+Set_Var LE_Status "Select a grid cell, assign a saved map, or open an empty cell in Tile Map Editor."
+Define_Function LE_Refresh_Levels
+    Set_Var LE_Level_Count (Storage Get_Field LE_Level_Catalog Name All Count)
+    Set_Var LE_Level_Items (Storage Get_Field LE_Level_Catalog Name All Items)
+    Set_Var LE_Level_Index (Storage Get_Field LE_Saved_Levels Name Var LE_Name Number)
+    If Var LE_Level_Index == ""
+    {
+        Set_Var LE_Level_Index -1
+    }
+    If Var LE_Level_Count == 0
+    {
+        Set_Var LE_Level_Items "No saved levels"
+    }
+End_Function
+Define_Function LE_Level_Changed
+    If Var LE_Level_Count > 0
+    {
+        Set_Var LE_Name (Storage Get_Field LE_Saved_Levels Number Var Callback_Value Name)
+        If Var LE_Render == 1
+        {
+            Graphics GUI_Set_Text_Value LE_Name_Control Var LE_Name
+        }
+    }
+End_Function
+Define_Function LE_Refresh_Maps
+    Storage Execute_SQL "DELETE FROM LE_Maps;"
+    If (Storage Get_Field sqlite_master name Levels name) != ""
+    {
+        Storage Execute_SQL "INSERT INTO LE_Maps SELECT CAST(row_number() OVER (ORDER BY Name)-1 AS TEXT),Name FROM Levels WHERE World_Name!='';"
+    }
+    Set_Var LE_Map_Count (Storage Get_Field LE_Map_Catalog Name All Count)
+    Set_Var LE_Map_Items (Storage Get_Field LE_Map_Catalog Name All Items)
+    If Var LE_Map_Count == 0
+    {
+        Set_Var LE_Map_Items "No saved tile maps"
+        Set_Var LE_Assign_Name ""
+        Set_Var LE_Assign_Index 0
+    }
+    If Var LE_Map_Count > 0
+    {
+        Set_Var LE_Assign_Index (Storage Get_Field LE_Maps Name Var LE_Assign_Name Number)
+        If Var LE_Assign_Index == ""
+        {
+            Set_Var LE_Assign_Index 0
+            Set_Var LE_Assign_Name (Storage Get_Field LE_Maps Number 0 Name)
+        }
+    }
+End_Function
+Define_Function LE_Layout
+    Set_Var LE_Slot 180
+    Loop While (Multiply Var LE_Slot Var LE_Columns) > 1056
+    {
+        Set_Var LE_Slot (Subtract Var LE_Slot 1)
+    }
+    Loop While (Multiply Var LE_Slot Var LE_Rows) > 720
+    {
+        Set_Var LE_Slot (Subtract Var LE_Slot 1)
+    }
+End_Function
+Define_Function LE_New
+    Set_Var LE_Editing_Cell -1
+    Set_Var LE_Columns Var LE_New_Columns
+    Set_Var LE_Rows Var LE_New_Rows
+    Set_Var LE_Selected 0
+    Storage Set_Field Editor_Context Name LE_Columns Value Var LE_Columns
+    Storage Set_Field Editor_Context Name LE_Rows Value Var LE_Rows
+    Storage Execute_SQL "DELETE FROM LE_Cells;"
+    Storage Execute_SQL "WITH RECURSIVE n(i) AS (SELECT 0 UNION ALL SELECT i+1 FROM n WHERE i+1<CAST((SELECT Value FROM Editor_Context WHERE Name='LE_Columns') AS INTEGER)*CAST((SELECT Value FROM Editor_Context WHERE Name='LE_Rows') AS INTEGER)) INSERT INTO LE_Cells SELECT CAST(i AS TEXT),i%CAST((SELECT Value FROM Editor_Context WHERE Name='LE_Columns') AS INTEGER),i/CAST((SELECT Value FROM Editor_Context WHERE Name='LE_Columns') AS INTEGER),'' FROM n;"
+    Set_Var LE_Dirty 1
+    Set_Var LE_Confirm 0
+    Call LE_Layout
+    Call LE_Build_Thumbnails
+End_Function
+Define_Function LE_Read_Name
+    If Var LE_GUI_Ready == 1
+    {
+        Graphics GUI_Text_Value LE_Name_Control
+        Set_Var_Global LE_Name Graphics.GUI.LE_Name_Control.Value
+    }
+End_Function
+Define_Function LE_Request_New
+    Set_Var LE_Allowed 1
+    If Var LE_Dirty == 1
+    {
+        If Var LE_Confirm == 0
+        {
+            Set_Var LE_Allowed 0
+            Set_Var LE_Status "Save the level or check Discard level changes before making a new layout."
+        }
+    }
+    If Var LE_Allowed == 1
+    {
+        Call LE_Read_Name
+        Call LE_New
+    }
+End_Function
+Define_Function LE_Columns_Changed
+    Set_Var LE_New_Columns Var Callback_Value
+End_Function
+Define_Function LE_Rows_Changed
+    Set_Var LE_New_Rows Var Callback_Value
+End_Function
+Define_Function LE_Confirm_Changed
+    Set_Var LE_Confirm Var Callback_Value
+End_Function
+Define_Function LE_Cell_Changed
+    Set_Var LE_Selected Var Callback_Value
+End_Function
+Define_Function LE_Refresh
+    Call LE_Refresh_Maps
+    Call LE_Build_Thumbnails
+End_Function
+Define_Function LE_Map_Changed
+    If Var LE_Map_Count > 0
+    {
+        Set_Var LE_Assign_Index Var Callback_Value
+        Set_Var LE_Assign_Name (Storage Get_Field LE_Maps Number Var Callback_Value Name)
+        Call LE_Build_Thumbnails
+    }
+End_Function
+Define_Function LE_Assign
+    If Var LE_Map_Count > 0
+    {
+        Storage Set_Field LE_Cells Cell Var LE_Selected Map_Name Var LE_Assign_Name
+        Set_Var LE_Dirty 1
+        Call LE_Build_Thumbnails
+    }
+End_Function
+Define_Function LE_Clear_Cell
+    Storage Set_Field LE_Cells Cell Var LE_Selected Map_Name ""
+    Set_Var LE_Dirty 1
+    Call LE_Build_Thumbnails
+End_Function
+Define_Function LE_Save
+    Call LE_Read_Name
+    Call LE_Save_Level
+End_Function
+Define_Function LE_Save_Level
+    If Var LE_Name != ""
+    {
+        Storage Begin
+        Storage Set_Field Editor_Game_Levels Name Var LE_Name Columns Var LE_Columns
+        Storage Set_Field Editor_Game_Levels Name Var LE_Name Rows Var LE_Rows
+        Storage Set_Field Editor_Context Name LE_Name Value Var LE_Name
+        Storage Execute_SQL "DELETE FROM Editor_Game_Level_Cells WHERE Level_Name=(SELECT Value FROM Editor_Context WHERE Name='LE_Name');"
+        Storage Execute_SQL "INSERT INTO Editor_Game_Level_Cells SELECT (SELECT Value FROM Editor_Context WHERE Name='LE_Name'),Cell,Map_Name FROM LE_Cells WHERE Map_Name!='';"
+        Storage Execute_SQL "DELETE FROM Editor_Game_Level_Links WHERE Level_Name=(SELECT Value FROM Editor_Context WHERE Name='LE_Name');"
+        Storage Execute_SQL "INSERT INTO Editor_Game_Level_Links SELECT * FROM Editor_Game_Neighbors WHERE Level_Name=(SELECT Value FROM Editor_Context WHERE Name='LE_Name');"
+        Storage Commit
+        If Var GE_Host == 1
+        {
+            Call GE_Attach_Level
+        }
+        Call LE_Refresh_Levels
+        Set_Var LE_Dirty 0
+        Set_Var LE_Confirm 0
+        Set_Var LE_Status "Level layout saved. Tile maps remain reusable references."
+    }
+End_Function
+Define_Function LE_Load
+    Call LE_Read_Name
+    Set_Var LE_Allowed 1
+    If Var LE_Dirty == 1
+    {
+        If Var LE_Confirm == 0
+        {
+            Set_Var LE_Allowed 0
+            Set_Var LE_Status "Save the level or check Discard level changes before loading."
+        }
+    }
+    If Var LE_Allowed == 1
+    {
+        Call LE_Load_Level
+    }
+End_Function
+Define_Function LE_Load_Level
+    Set_Var LE_Found (Storage Get_Field Editor_Game_Levels Name Var LE_Name Name)
+    If Var LE_Found == ""
+    {
+        Set_Var LE_Status "No saved level layout with that name."
+    }
+    If Var LE_Found != ""
+    {
+        Set_Var LE_New_Columns (Storage Get_Field Editor_Game_Levels Name Var LE_Name Columns)
+        Set_Var LE_New_Rows (Storage Get_Field Editor_Game_Levels Name Var LE_Name Rows)
+        Call LE_New
+        Storage Set_Field Editor_Context Name LE_Name Value Var LE_Name
+        Storage Execute_SQL "UPDATE LE_Cells SET Map_Name=coalesce((SELECT Map_Name FROM Editor_Game_Level_Cells s WHERE s.Level_Name=(SELECT Value FROM Editor_Context WHERE Name='LE_Name') AND s.Cell=LE_Cells.Cell),'');"
+        Set_Var LE_Dirty 0
+        Call LE_Build_Thumbnails
+        Set_Var LE_Status "Level layout loaded."
+    }
+End_Function
+Define_Function LE_Clear_Thumbnails
+    Set_Var LE_Preview_Ready 0
+    If Var LE_Render == 1
+    {
+        Set_Var LE_Clear_Index 0
+        Loop While Var LE_Clear_Index < Var LE_Thumbnail_Total
+        {
+            Graphics Free_Asset (Add 1000000 (Multiply Var LE_Clear_Index 2))
+            Graphics Free_Asset (Add 1000001 (Multiply Var LE_Clear_Index 2))
+            Set_Var LE_Clear_Index (Add Var LE_Clear_Index 1)
+        }
+    }
+    Set_Var LE_Thumbnail_Total 0
+End_Function
+Define_Function LE_Build_Thumbnails
+    Call LE_Clear_Thumbnails
+    If Var LE_Render == 1
+    {
+        // Thumbnail imports must never replace the component's live draft.
+        Set_Var LE_Draft (World Export_Level)
+        Set_Var LE_Old_Columns Var TE_Columns
+        Set_Var LE_Old_Rows Var TE_Rows
+        Set_Var LE_Old_Section Var TE_Section
+        Set_Var LE_Old_Layer Var TE_Draw_Layer
+        Set_Var LE_Old_Cell Var TE_Cell
+        Set_Var LE_Old_Status Var TE_Status
+        Set_Var LE_Preview_Build 0
+        Set_Var LE_Thumb_Cell 0
+        Loop While Var LE_Thumb_Cell < (Multiply Var LE_Columns Var LE_Rows)
+        {
+            Set_Var LE_Thumb_Map (Storage Get_Field LE_Cells Cell Var LE_Thumb_Cell Map_Name)
+            If Var LE_Thumb_Map != ""
+            {
+                If (Storage Get_Field Levels Name Var LE_Thumb_Map Name) != ""
+                {
+                    Call LE_Draw_Thumbnail
+                }
+            }
+            Set_Var LE_Thumb_Cell (Add Var LE_Thumb_Cell 1)
+        }
+        If Var LE_Assign_Name != ""
+        {
+            If (Storage Get_Field Levels Name Var LE_Assign_Name Name) != ""
+            {
+                Set_Var LE_Preview_Build 1
+                Set_Var LE_Thumb_Map Var LE_Assign_Name
+                Set_Var LE_Thumb_Cell 0
+                Call LE_Draw_Thumbnail
+                Set_Var LE_Preview_Build 0
+                Set_Var LE_Preview_Ready 1
+            }
+        }
+        World Import_Level Var LE_Draft
+        Set_Var TE_Columns Var LE_Old_Columns
+        Set_Var TE_Rows Var LE_Old_Rows
+        Set_Var TE_Section Var LE_Old_Section
+        Set_Var TE_Draw_Layer Var LE_Old_Layer
+        Set_Var TE_Cell Var LE_Old_Cell
+        Set_Var TE_Status Var LE_Old_Status
+        Set_Var TE_Draw_Offset 0
+        Set_Var TE_Draw_Gap 1
+        Set_Var TE_Draw_Scale_Y 1
+        Set_Var TE_Origin_X 20
+        Set_Var TE_Origin_Y 40
+        Set_Var TE_Drawn 0
+    }
+End_Function
+Define_Function LE_Draw_Thumbnail
+    World Import_Level (Storage Load_Level Var LE_Thumb_Map)
+    Storage Set_Field Editor_Context Name LE_Thumb_Map Value Var LE_Thumb_Map
+    Storage Execute_SQL "DELETE FROM LE_Thumbnail_Layers;"
+    Storage Execute_SQL "INSERT INTO LE_Thumbnail_Layers SELECT Number,Section FROM Editor_Level_Layers WHERE Level_Name=(SELECT Value FROM Editor_Context WHERE Name='LE_Thumb_Map');"
+    If (Storage Get_Field LE_Thumbnail_Layers Number 0 Section) == ""
+    {
+        Storage Set_Field LE_Thumbnail_Layers Number 0 Section Map
+    }
+    Set_Var LE_Thumb_Layers 0
+    Loop While (Storage Get_Field LE_Thumbnail_Layers Number Var LE_Thumb_Layers Section) != ""
+    {
+        Set_Var LE_Thumb_Layers (Add Var LE_Thumb_Layers 1)
+    }
+    Set_Var TE_Section (Storage Get_Field LE_Thumbnail_Layers Number 0 Section)
+    Set_Var TE_Columns (World Get_Section Var TE_Section Columns)
+    Set_Var TE_Rows (World Get_Section Var TE_Section Rows)
+    Set_Var TE_Cell (Divide Var LE_Slot Var TE_Columns)
+    Set_Var TE_Draw_Scale_Y (Divide Var LE_Slot (Multiply Var TE_Cell Var TE_Rows))
+    Set_Var TE_Origin_X (Add 20 (Multiply (Storage Get_Field LE_Cells Cell Var LE_Thumb_Cell X) Var LE_Slot))
+    Set_Var TE_Origin_Y (Add 40 (Multiply (Storage Get_Field LE_Cells Cell Var LE_Thumb_Cell Y) Var LE_Slot))
+    If Var LE_Preview_Build == 1
+    {
+        Set_Var TE_Origin_X 1120
+        Set_Var TE_Origin_Y 40
+    }
+    Set_Var TE_Draw_Offset Var LE_Thumbnail_Total
+    Set_Var TE_Draw_Gap 0
+    Set_Var TE_Draw_Layer 0
+    Loop While Var TE_Draw_Layer < Var LE_Thumb_Layers
+    {
+        Set_Var TE_Section (Storage Get_Field LE_Thumbnail_Layers Number Var TE_Draw_Layer Section)
+        Set_Var TE_Y 0
+        Loop While Var TE_Y < Var TE_Rows
+        {
+            Set_Var TE_X 0
+            Loop While Var TE_X < Var TE_Columns
+            {
+                Call TE_Draw_Cell
+                Set_Var TE_X (Add Var TE_X 1)
+            }
+            Set_Var TE_Y (Add Var TE_Y 1)
+        }
+        Set_Var TE_Draw_Layer (Add Var TE_Draw_Layer 1)
+    }
+    Set_Var LE_Thumbnail_Total (Add Var LE_Thumbnail_Total (Multiply Var LE_Thumb_Layers (Multiply Var TE_Columns Var TE_Rows)))
+End_Function
+Define_Function LE_Show_Level
+    If Var LT_Playing == 1 { Call LT_Stop }
+    Graphics GUI_Set_Window_Open "Editor Controls" True
+    Graphics GUI_Set_Window_Open "Editing View" True
+    Call PE_Close
+    If Var GE_Mode == Tile
+    {
+        Call TE_Clear_Drawables
+        // A saved map is attached to the slot from which editing began.
+        If Var TE_Dirty == 0
+        {
+            If (Storage Get_Field Levels Name Var TE_Name Name) != ""
+            {
+                If Var LE_Editing_Cell >= 0
+                {
+                    If (Storage Get_Field LE_Cells Cell Var LE_Editing_Cell Cell) != ""
+                    {
+                        Storage Set_Field LE_Cells Cell Var LE_Editing_Cell Map_Name Var TE_Name
+                        Set_Var LE_Dirty 1
+                    }
+                }
+            }
+        }
+        Set_Var GE_Mode Level
+        Call LE_Refresh_Maps
+        Call LE_Build_Thumbnails
+        Set_Var LE_Status "Select a map thumbnail, then choose Tile Map Editor. Unsaved tile edits are retained."
+    }
+End_Function
+Define_Function LE_Show_Tile
+    Graphics GUI_Set_Window_Open "Editor Controls" True
+    Graphics GUI_Set_Window_Open "Editing View" True
+    Call PE_Close
+    If Var GE_Mode == Level
+    {
+        Call LE_Open_Selected
+    }
+End_Function
+Define_Function LE_Open_Selected
+    If Var LE_Render == 1
+    {
+        If Var GE_Mode == Level
+        {
+            Call LE_Read_Name
+        }
+    }
+    Set_Var LE_Target (Storage Get_Field LE_Cells Cell Var LE_Selected Map_Name)
+    // Reopen the live draft for this placement, even if its saved name differs.
+    If Var LE_Editing_Cell == Var LE_Selected
+    {
+        If Var LE_Map_Ready == 1
+        {
+            Set_Var LE_Target Var TE_Name
+        }
+    }
+    If Var LE_Target == ""
+    {
+        If Var LE_Editing_Cell == Var LE_Selected
+        {
+            If Var LE_Map_Ready == 1
+            {
+                Set_Var LE_Target Var TE_Name
+            }
+        }
+        If Var LE_Target == ""
+        {
+            Storage Set_Field Editor_Context Name LE_Name Value Var LE_Name
+            Storage Set_Field Editor_Context Name LE_Cell Value Var LE_Selected
+            Set_Var LE_Target (Storage Get_Field LE_New_Map_Name Name All Value)
+        }
+    }
+    Set_Var LE_Open_Allowed 1
+    If Var LE_Map_Ready == 1
+    {
+        If Var TE_Dirty == 1
+        {
+            If Var LE_Target != Var TE_Name
+            {
+                If Var TE_Confirm == 0
+                {
+                    Set_Var LE_Open_Allowed 0
+                    Set_Var LE_Status "Save the tile-map draft or check Discard tile-map changes before opening a different map."
+                }
+            }
+        }
+    }
+    If Var LE_Open_Allowed == 1
+    {
+        Set_Var LE_Reload 1
+        If Var LE_Map_Ready == 1
+        {
+            If Var LE_Target == Var TE_Name
+            {
+                Set_Var LE_Reload 0
+            }
+        }
+        Call LE_Clear_Thumbnails
+        Set_Var TE_Draw_Offset 0
+        Set_Var TE_Draw_Gap 1
+        Set_Var TE_Draw_Scale_Y 1
+        Set_Var TE_Origin_X 20
+        Set_Var TE_Origin_Y 40
+        Set_Var TE_Render Var LE_Render
+        If Var LE_Reload == 1
+        {
+            Set_Var TE_Name Var LE_Target
+            Set_Var LE_Stored ""
+            If (Storage Get_Field sqlite_master name Levels name) != ""
+            {
+                Set_Var LE_Stored (Storage Get_Field Levels Name Var LE_Target Name)
+            }
+            If Var LE_Stored != ""
+            {
+                Call TE_Do_Load
+            }
+            If Var LE_Stored == ""
+            {
+                Call TE_New
+            }
+        }
+        If Var LE_Reload == 0
+        {
+            Call TE_Rebuild
+        }
+        Set_Var LE_Editing_Cell Var LE_Selected
+        Set_Var LE_Map_Ready 1
+        Set_Var GE_Mode Tile
+        If Var LE_Render == 1
+        {
+            Graphics GUI_Set_Text_Value TE_Map_Name Var TE_Name
+        }
+    }
+End_Function
+// Existing placements swap on occupied drops; preview drops assign a reusable map.
+Define_Function LE_Drop
+    Set_Var LE_Drop_Name ""
+    If (Storage Get_Field LE_Cells Cell Var LE_Drop_Cell Cell) != ""
+    {
+        If Var LE_Drop_Source == -1
+        {
+            Set_Var LE_Drop_Name Var LE_Assign_Name
+            If Var LE_Drop_Name != ""
+            {
+                If Var LE_Editing_Cell == Var LE_Drop_Cell
+                {
+                    If Var LE_Drop_Name != (Storage Get_Field LE_Cells Cell Var LE_Drop_Cell Map_Name)
+                    {
+                        Set_Var LE_Editing_Cell -1
+                    }
+                }
+            }
+        }
+        If Var LE_Drop_Source >= 0
+        {
+            If Var LE_Drop_Source != Var LE_Drop_Cell
+            {
+                Set_Var LE_Drop_Name (Storage Get_Field LE_Cells Cell Var LE_Drop_Source Map_Name)
+                If Var LE_Drop_Name != ""
+                {
+                    Set_Var LE_Displaced (Storage Get_Field LE_Cells Cell Var LE_Drop_Cell Map_Name)
+                    Storage Set_Field LE_Cells Cell Var LE_Drop_Source Map_Name Var LE_Displaced
+                    // Keep a live Tile Editor draft attached to its moved placement.
+                    Set_Var LE_Old_Editing_Cell Var LE_Editing_Cell
+                    If Var LE_Old_Editing_Cell == Var LE_Drop_Source
+                    {
+                        Set_Var LE_Editing_Cell Var LE_Drop_Cell
+                    }
+                    If Var LE_Old_Editing_Cell == Var LE_Drop_Cell
+                    {
+                        Set_Var LE_Editing_Cell Var LE_Drop_Source
+                    }
+                }
+            }
+        }
+        If Var LE_Drop_Name != ""
+        {
+            Storage Set_Field LE_Cells Cell Var LE_Drop_Cell Map_Name Var LE_Drop_Name
+            Set_Var LE_Selected Var LE_Drop_Cell
+            Set_Var LE_Dirty 1
+            Set_Var LE_Status "Tile map placed. Save level to keep the layout."
+            Call LE_Build_Thumbnails
+        }
+    }
+End_Function
+Define_Function LE_Input
+    Set_Var LE_Drop_Cell (Graphics GUI_Viewport_Value TE_Canvas Drop_Cell)
+    If Var LE_Drop_Cell >= 0
+    {
+        Set_Var LE_Drop_Source (Graphics GUI_Viewport_Value TE_Canvas Drop_Source)
+        Call LE_Drop
+    }
+    Set_Var LE_Mouse (Graphics GUI_Viewport_Value TE_Canvas Left)
+    If Var LE_Mouse == 1
+    {
+        If Var LE_Mouse_Was_Down == 0
+        {
+            Set_Var LE_Hit_X (Graphics GUI_Viewport_Value TE_Canvas X)
+            Set_Var LE_Hit_Y (Graphics GUI_Viewport_Value TE_Canvas Y)
+            Set_Var LE_Hit_Column 0
+            Set_Var LE_Hit_Row 0
+            Loop While Var LE_Hit_X >= Var LE_Slot
+            {
+                Set_Var LE_Hit_X (Subtract Var LE_Hit_X Var LE_Slot)
+                Set_Var LE_Hit_Column (Add Var LE_Hit_Column 1)
+            }
+            Loop While Var LE_Hit_Y >= Var LE_Slot
+            {
+                Set_Var LE_Hit_Y (Subtract Var LE_Hit_Y Var LE_Slot)
+                Set_Var LE_Hit_Row (Add Var LE_Hit_Row 1)
+            }
+            Set_Var LE_Selected (Add (Multiply Var LE_Hit_Row Var LE_Columns) Var LE_Hit_Column)
+        }
+    }
+    Set_Var LE_Mouse_Was_Down Var LE_Mouse
+End_Function
+Define_Function LE_Grid
+    // Mark only the selected cell's corners, leaving map joins border-free.
+    Set_Var LE_Select_X (Add 20 (Multiply (Storage Get_Field LE_Cells Cell Var LE_Selected X) Var LE_Slot))
+    Set_Var LE_Select_Y (Add 40 (Multiply (Storage Get_Field LE_Cells Cell Var LE_Selected Y) Var LE_Slot))
+    Graphics Draw_Rect LE_Select_H Var LE_Select_X Var LE_Select_Y 10 2 255 190 50 255
+    Graphics Draw_Rect LE_Select_V Var LE_Select_X Var LE_Select_Y 2 10 255 190 50 255
+End_Function
+Define_Function LE_GUI
+    Set_Var LE_GUI_Ready 1
+    Graphics GUI_Begin_Window "Editor Controls"
+    Graphics GUI_Text LE_Component_Heading "Level Editor"
+    Graphics GUI_Text LE_Help "Drag maps to move or swap them. Drag the saved-map preview onto a cell to place it."
+    Graphics GUI_Text LE_Status_Label Var LE_Status
+    Graphics GUI_Button LE_Test_Button "Test level" LT_Start
+    Call LE_Refresh_Levels
+    Graphics GUI_Input_Text LE_Name_Control "Level name (type a new name)" Var LE_Name None
+    Graphics GUI_Set_Selection_Value LE_Level_Menu Var LE_Level_Index
+    Graphics GUI_Combo LE_Level_Menu "Existing levels" Var LE_Level_Items Var LE_Level_Index LE_Level_Changed
+    Graphics GUI_Text LE_Cell_Label "Selected cell"
+    Graphics GUI_Set_Slider_Int_Value LE_Cell_Number Var LE_Selected
+    Graphics GUI_Slider_Int LE_Cell_Number "Selected map cell" Var LE_Selected 0 (Subtract (Multiply Var LE_Columns Var LE_Rows) 1) LE_Cell_Changed
+    Set_Var LE_Selected_Name (Storage Get_Field LE_Cells Cell Var LE_Selected Map_Name)
+    If Var LE_Selected_Name == ""
+    {
+        Set_Var LE_Selected_Name "Empty - opens a new tile map"
+    }
+    Graphics GUI_Text LE_Map_Name_Label Var LE_Selected_Name
+    Graphics GUI_Set_Selection_Value LE_Map_Menu Var LE_Assign_Index
+    Graphics GUI_Combo LE_Map_Menu "Saved tile map" Var LE_Map_Items Var LE_Assign_Index LE_Map_Changed
+    If Var LE_Preview_Ready == 1
+    {
+        Graphics GUI_Text LE_Preview_Help "Drag this preview onto the level:"
+        Graphics GUI_Map_Preview LE_Map_Preview TE_Canvas 1120 40 Var LE_Slot Var LE_Slot 140
+    }
+    Graphics GUI_Button LE_Assign_Button "Assign map to cell" LE_Assign
+    Graphics GUI_Button LE_Clear_Button "Clear selected cell" LE_Clear_Cell
+    Graphics GUI_Button LE_Refresh_Button "Refresh saved maps" LE_Refresh
+    Graphics GUI_Text LE_Save_State Var LE_Dirty
+    Graphics GUI_Button LE_Save_Button "Save level" LE_Save
+    Graphics GUI_Button LE_Load_Button "Load level" LE_Load
+    Graphics GUI_Checkbox LE_Discard "Discard level changes for New / Load" Var LE_Confirm LE_Confirm_Changed
+    Graphics GUI_Checkbox LE_Discard_Map "Discard tile-map changes when changing maps" Var TE_Confirm TE_Confirm_Changed
+    Graphics GUI_Slider_Int LE_Column_Control "New level columns" Var LE_New_Columns 1 8 LE_Columns_Changed
+    Graphics GUI_Slider_Int LE_Row_Control "New level rows" Var LE_New_Rows 1 8 LE_Rows_Changed
+    Graphics GUI_Button LE_New_Button "New level layout" LE_Request_New
+    Graphics GUI_End_Window
+End_Function
+Define_Function LE_Toggle_Playlist
+    Call PE_Stop
+    Set_Var PE_Visible (Subtract 1 Var PE_Visible)
+    If Var PE_Visible == 0 { Call PE_Close }
+    If Var PE_Visible == 1
+    {
+        Call LE_Read_Name
+        Set_Var PE_Next_Level Var LE_Name
+        Call PE_Show
+    }
+End_Function
+Define_Function LE_Workspace
+    If Var LT_Playing == 1
+    {
+        If Var GE_Mode != Play { Call LT_Stop }
+    }
+    If Var SS_Ready == 1
+    {
+        If Var GE_Mode == Screens { Call SS_Update }
+        If Var GE_Mode != Screens { Call SS_Stop }
+    }
+    Set_Var TE_Folders_Drawn 0
+    If Var PE_Visible == 1
+    {
+        If Var GE_Mode == Level
+        {
+            Call LE_Read_Name
+        }
+        Set_Var PE_Next_Level Var LE_Name
+    }
+    Graphics GUI_Begin_Frame
+    Graphics GUI_Begin_Window Components
+    If Var GE_Host == 1
+    {
+        Call GE_Toolbar
+    }
+    If Var GE_Host != 1
+    {
+        Graphics GUI_Button LE_Component_Level "Level Editor" LE_Show_Level
+    }
+    If Var GE_Mode == Level
+    {
+        Graphics GUI_Button LE_Component_Tile "Tile Map Editor" LE_Show_Tile
+        Graphics GUI_Button LE_Component_Playlist "Playlist Editor" LE_Toggle_Playlist
+    }
+    If Var GE_Mode == Tile
+    {
+        Graphics GUI_Button LE_Component_Tile "Tile Map Editor" LE_Show_Tile
+        Graphics GUI_Button LE_Component_Playlist "Playlist Editor" LE_Toggle_Playlist
+    }
+    Graphics GUI_Separator
+    Graphics GUI_Button TE_Reset_Layout_Button "Reset layout" TE_Reset_Layout
+    If Var GE_Host == 1
+    {
+        Graphics GUI_Button TE_Exit_Button "Exit editor" GE_Request_Exit
+    }
+    If Var GE_Host != 1
+    {
+        Graphics GUI_Button TE_Exit_Button "Exit editor" TE_Exit
+    }
+    Graphics GUI_End_Window
+    If Var PE_Visible == 1
+    {
+        Call PE_GUI
+    }
+    Graphics GUI_Begin_Window "Editing View"
+    If Var GE_Mode == IDE { Call IDE_View }
+    If Var GE_Mode == Play
+    {
+        Call LT_Update
+        Graphics GUI_Viewport_Grid TE_Canvas 0 0
+        Graphics GUI_Editor_Viewport TE_Canvas 20 40 (Multiply Var LT_Columns Var LT_Cell) (Multiply Var LT_Rows Var LT_Cell)
+    }
+    If Var GE_Mode == Screens
+    {
+        Call SS_View
+    }
+    If Var GE_Mode == Character
+    {
+        Call CE_View
+    }
+    If Var GE_Mode == Database
+    {
+        Call DE_View
+    }
+    If Var GE_Mode == Level
+    {
+        Graphics GUI_Viewport_Grid TE_Canvas Var LE_Columns Var LE_Rows
+        Graphics GUI_Editor_Viewport TE_Canvas 20 40 (Multiply Var LE_Columns Var LE_Slot) (Multiply Var LE_Rows Var LE_Slot)
+    }
+    If Var GE_Mode == Tile
+    {
+        Graphics GUI_Viewport_Grid TE_Canvas 0 0
+        Graphics GUI_Editor_Viewport TE_Canvas 20 40 (Multiply Var TE_Columns Var TE_Cell) (Multiply Var TE_Rows Var TE_Cell)
+    }
+    Graphics GUI_End_Window
+    If Var LE_Last_GUI_Mode != Var GE_Mode
+    {
+        Graphics GUI_Set_Next_Window_Scroll 0
+        Set_Var LE_Last_GUI_Mode Var GE_Mode
+    }
+    If Var GE_Mode == IDE { Call IDE_GUI }
+    If Var GE_Mode == Play
+    {
+        Call LT_GUI
+    }
+    If Var GE_Mode == Screens
+    {
+        Call SS_GUI
+    }
+    If Var GE_Mode == Character
+    {
+        Call CE_GUI
+    }
+    If Var GE_Mode == Database
+    {
+        Call DE_GUI
+    }
+    If Var GE_Mode == Game
+    {
+        Call GE_GUI
+    }
+    If Var GE_Mode == Level
+    {
+        Call LE_GUI
+    }
+    If Var GE_Mode == Tile
+    {
+        Call TE_GUI
+        If Var TE_Show_Folders == 1
+        {
+            Call TE_Folders_GUI
+        }
+    }
+End_Function
+Run Utilities/Game_Editor/Level_Editor/Test
+Call LE_Refresh_Maps
+Call LE_Refresh_Levels
+Return

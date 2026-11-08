@@ -1,0 +1,13 @@
+{
+  "surfaces": 16,
+  "wall_tiles": 32,
+  "props": 16,
+  "grid": [
+    64,
+    64
+  ],
+  "bounds_and_nonoverlap": "passed",
+  "surface_edge_checks": 104,
+  "engine_runtime": "not_run",
+  "connected_wall_edge_checks": 256
+}

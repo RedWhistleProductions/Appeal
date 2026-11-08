@@ -1,0 +1,28 @@
+// F1 or controller Back/View switches Game and GUI focus.
+Input Set_Focus Game
+// Held keys are polled each frame; jump uses a press edge.
+Input Bind_Key Adam_Left A
+Input Bind_Key Adam_Right D
+Input Bind_Key Adam_Run "Left Shift"
+Input Bind_Key Adam_Duck "Left Ctrl"
+Input Set_Key_Down Space Adam_Jump
+Input Bind_Key Eve_Left Left
+Input Bind_Key Eve_Right Right
+Input Bind_Key Eve_Run "Right Shift"
+Input Bind_Key Eve_Duck "Right Ctrl"
+Input Set_Key_Down "Return" Eve_Jump
+Input Set_Key_Repeat Space 0
+Input Set_Key_Repeat "Return" 0
+Input Set_Controller_Deadzone Var Adam_Deadzone
+Input Set_Controller_Axis Left_Stick_X Adam_Stick_X
+Input Set_Controller_Button_Down A Adam_Jump
+Input Set_Controller_Button_Down DPad_Left Adam_Pad_Left_Down
+Input Set_Controller_Button_Up DPad_Left Adam_Pad_Left_Up
+Input Set_Controller_Button_Down DPad_Right Adam_Pad_Right_Down
+Input Set_Controller_Button_Up DPad_Right Adam_Pad_Right_Up
+Input Set_Controller_Button_Down X Adam_Pad_Run_Down
+Input Set_Controller_Button_Up X Adam_Pad_Run_Up
+Input Set_Controller_Button_Down B Adam_Pad_Duck_Down
+Input Set_Controller_Button_Up B Adam_Pad_Duck_Up
+Input Open_Controller -1
+Return

@@ -18,3 +18,6 @@ Resources/Extensions/*
 # Local runtime libraries and GUI layout.
 /*.dll
 /imgui.ini
+
+# Separate legacy Files module checkout.
+/Appeal_Module_Files/

@@ -1,0 +1,41 @@
+// Recursive file inventory and named-atlas import. Existing tile edits are preserved.
+Define_Function TE_Import_Files
+    Storage Set_Field Editor_Import_Scan Name All Data (Files Scan_Graphics Graphics/Sprites)
+    Storage Execute_SQL "UPDATE Tile_Files SET Present=0;"
+    Storage Execute_SQL "INSERT INTO Tile_Files (File,Folder,Kind,Data,Present) SELECT json_extract(value,'$.File'),json_extract(value,'$.Folder'),json_extract(value,'$.Kind'),json_extract(value,'$.Data'),1 FROM json_each((SELECT Data FROM Editor_Import_Scan WHERE Name='All')) WHERE 1 ON CONFLICT(File) DO UPDATE SET Folder=excluded.Folder,Kind=excluded.Kind,Data=excluded.Data,Present=1;"
+    Storage Execute_SQL "DROP TABLE IF EXISTS temp.Editor_Import_Docs;"
+    Storage Execute_SQL "CREATE TEMP TABLE Editor_Import_Docs AS SELECT File AS Metadata_File, CASE WHEN Folder='' THEN json_extract(J,'$.image') ELSE Folder || '/' || json_extract(J,'$.image') END AS Sheet_File, J FROM (SELECT *,CASE WHEN json_valid(Data) THEN Data ELSE '{}' END J FROM Tile_Files WHERE Kind='Metadata' AND Present=1);"
+    Storage Execute_SQL "DROP TABLE IF EXISTS temp.Editor_Import_Rects;"
+    Storage Execute_SQL "CREATE TEMP TABLE Editor_Import_Rects AS SELECT substr(d.Metadata_File,1,length(d.Metadata_File)-5) || '/' || e.key AS Name, d.Sheet_File AS File, CAST(json_extract(d.J,'$.size.w') AS INTEGER) SW, CAST(json_extract(d.J,'$.size.h') AS INTEGER) SH, CAST(json_extract(e.value,'$.rect.x') AS INTEGER) X, CAST(json_extract(e.value,'$.rect.y') AS INTEGER) Y, CAST(json_extract(e.value,'$.rect.w') AS INTEGER) W, CAST(json_extract(e.value,'$.rect.h') AS INTEGER) H, CAST(json_extract(d.J,'$.grid.cell_width') AS INTEGER) CW FROM Editor_Import_Docs d JOIN json_each(CASE WHEN json_extract(d.J,'$.schema')='bananas.sprite-atlas.v1' AND json_type(d.J,'$.sprites')='object' THEN json_extract(d.J,'$.sprites') ELSE '{}' END) e WHERE e.type='object';"
+    Storage Execute_SQL "DROP TABLE IF EXISTS temp.Editor_Import_Frames;"
+    Storage Execute_SQL "CREATE TEMP TABLE Editor_Import_Frames AS SELECT *, (Y/H)*(SW/FW)+X/FW AS Frame, W/FW AS Span FROM (SELECT *,CASE WHEN X%W=0 AND SW%W=0 THEN W ELSE CW END FW FROM Editor_Import_Rects WHERE W>0 AND H>0 AND X>=0 AND Y>=0 AND X+W<=SW AND Y+H<=SH AND Y%H=0 AND SH%H=0) WHERE FW>0 AND X%FW=0 AND W%FW=0 AND SW%FW=0 AND W/FW BETWEEN 1 AND 2 AND instr(Name,'|')=0;"
+    Storage Execute_SQL "INSERT OR IGNORE INTO Sprites SELECT c.Name,c.File,c.FW,c.H,c.Frame FROM Editor_Import_Frames c WHERE NOT EXISTS (SELECT 1 FROM Sprites s LEFT JOIN Sprite_Extras e ON e.Name=s.Name WHERE s.File=c.File AND s.Frame_Height=c.H AND s.Frame_Width*(CASE WHEN e.Name IS NULL THEN 1 ELSE 2 END)=c.W AND (s.Frame%(c.SW/s.Frame_Width))*s.Frame_Width=c.X AND (s.Frame/(c.SW/s.Frame_Width))*s.Frame_Height=c.Y);"
+    Storage Execute_SQL "INSERT OR IGNORE INTO Sprite_Extras SELECT c.Name,c.Frame+1 FROM Editor_Import_Frames c JOIN Sprites s ON s.Name=c.Name AND s.File=c.File WHERE c.Span=2;"
+    Storage Execute_SQL "DROP VIEW IF EXISTS temp.Editor_Loose_Images;"
+    Storage Execute_SQL "CREATE TEMP VIEW Editor_Loose_Images AS SELECT CAST(row_number() OVER (ORDER BY File)-1 AS TEXT) AS Number, File FROM Tile_Files f WHERE Kind='Image' AND Present=1 AND instr(File,'|')=0 AND NOT EXISTS (SELECT 1 FROM Sprites s WHERE s.File=f.File) AND NOT EXISTS (SELECT 1 FROM Editor_Import_Docs d WHERE d.Sheet_File=f.File);"
+    Storage Execute_SQL "DROP VIEW IF EXISTS temp.Editor_Loose_Count;"
+    Storage Execute_SQL "CREATE TEMP VIEW Editor_Loose_Count AS SELECT 'All' AS Name,count(*) AS Count FROM Editor_Loose_Images;"
+    Set_Var TE_Loose_Total (Storage Get_Field Editor_Loose_Count Name All Count)
+    Set_Var TE_Loose_Index 0
+    // Materialize the candidates because adding rows changes the view.
+    Storage Execute_SQL "DROP TABLE IF EXISTS temp.Editor_Loose_Copy;"
+    Storage Execute_SQL "CREATE TEMP TABLE Editor_Loose_Copy AS SELECT * FROM Editor_Loose_Images;"
+    Loop While Var TE_Loose_Index < Var TE_Loose_Total
+    {
+        Set_Var TE_Loose_File (Storage Get_Field Editor_Loose_Copy Number Var TE_Loose_Index File)
+        Set_Var TE_Loose_W (Graphics Sprite_Info Var TE_Loose_File 0 0 0 1 Width)
+        Set_Var TE_Loose_H (Graphics Sprite_Info Var TE_Loose_File 0 0 0 1 Height)
+        If Var TE_Loose_W > 0
+        {
+            If Var TE_Loose_H > 0
+            {
+                Storage Set_Field Editor_Context Name Loose_File Value Var TE_Loose_File
+                Storage Set_Field Editor_Context Name Loose_W Value Var TE_Loose_W
+                Storage Set_Field Editor_Context Name Loose_H Value Var TE_Loose_H
+                Storage Execute_SQL "INSERT OR IGNORE INTO Sprites SELECT 'Image/' || (SELECT Value FROM Editor_Context WHERE Name='Loose_File'), (SELECT Value FROM Editor_Context WHERE Name='Loose_File'), (SELECT Value FROM Editor_Context WHERE Name='Loose_W'), (SELECT Value FROM Editor_Context WHERE Name='Loose_H'),0;"
+            }
+        }
+        Set_Var TE_Loose_Index (Add Var TE_Loose_Index 1)
+    }
+End_Function
+Return

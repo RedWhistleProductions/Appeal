@@ -13,7 +13,7 @@ template<class T> T Function(HMODULE Plugin, const char* Name) {
     return reinterpret_cast<T>(Address);
 }
 int main(int argc, char** argv) {
-    auto Plugin = LoadLibraryA("Resources/Modules/Appeal_Module_Graphics/Appeal_SDL2_Graphics/Appeal_SDL2_Graphics.dll");
+    auto Plugin = LoadLibraryA("Resources/Modules/Appeal_Module_Graphics/Appeal_SDL2_Legacy_OpenGL_Graphics/Appeal_SDL2_Legacy_OpenGL_Graphics.dll");
     REQUIRE(Plugin);
     auto Add = Function<void(*)(std::string,std::string,int,int)>(Plugin,"Add_Window");
     auto Load = Function<bool(*)(std::string,std::string,std::string,int,int,int,int)>(Plugin,"Load_Animation");
@@ -25,9 +25,8 @@ int main(int argc, char** argv) {
     auto Read = []() {
         std::vector<unsigned char> Pixels(640*240*3);
         glFinish();
-        // This Windows SDL/OpenGL configuration preserves the rendered back
-        // buffer after swap; its front buffer may be unavailable remotely.
-        glReadBuffer(GL_BACK);
+        // Read the presented frame; the back buffer is undefined after swapping.
+        glReadBuffer(GL_FRONT);
         glPixelStorei(GL_PACK_ALIGNMENT,1);
         glReadPixels(0,0,640,240,GL_RGB,GL_UNSIGNED_BYTE,Pixels.data());
         REQUIRE(glGetError() == GL_NO_ERROR);
@@ -36,7 +35,7 @@ int main(int argc, char** argv) {
     Add("Check", "Animation rendering check", 640, 240);
     Function<void(*)(bool)>(Plugin,"Set_GUI_Visible")(false);
     for(auto Name : {"Adam", "Mirror", "Eve"}) {
-        const std::string File = std::string("Examples/Characters/") + (std::string(Name)=="Eve" ? "Eve" : "Adam") + "_Movement.png";
+        const std::string File = std::string("Examples/Characters/") + (std::string(Name)=="Eve" ? "Eve" : "Adam") + "/" + (std::string(Name)=="Eve" ? "Eve" : "Adam") + "_Movement.png";
         REQUIRE(Load(Name,"Standing",File,64,64,0,8));
         REQUIRE(FPS(Name,"Standing",.01f));
         Scale(Name, std::string(Name)=="Adam" ? 3 : -3,3,1);
@@ -59,7 +58,7 @@ int main(int argc, char** argv) {
         for(int Y=239;Y>=0;--Y) Image.write(reinterpret_cast<char*>(Pixels.data()+Y*640*3),640*3);
     }
     // A different atlas cell must produce different rendered pixels.
-    REQUIRE(Load("Adam","Second","Examples/Characters/Adam_Movement.png",64,64,1,1));
+    REQUIRE(Load("Adam","Second","Examples/Characters/Adam/Adam_Movement.png",64,64,1,1));
     REQUIRE(Select("Adam","Second"));
     Render();
     REQUIRE(Read() != Pixels);

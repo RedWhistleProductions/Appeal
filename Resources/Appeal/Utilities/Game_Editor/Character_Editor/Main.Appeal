@@ -1,0 +1,45 @@
+// Run: Appeal.exe "Utilities/Game_Editor/Character_Editor/Main"
+Add_Dynamic_Module Graphics Appeal_SDL2_Legacy_OpenGL_Graphics
+Add_Dynamic_Module Input Appeal_SDL2_Input
+Add_Dynamic_Module Storage Appeal_SQLite_Storage
+Add_Dynamic_Module Files Appeal_Standard_Files
+Storage Open Tile_Editor
+Storage Use Tile_Editor
+Run Utilities/Game_Editor/Character_Editor/Editor
+Graphics Add_Full_Screen_Window Main 0
+Graphics Set_Window_Title Main "Character Editor"
+Graphics Set_FPS 60
+Graphics Set_GUI_Docking True
+Graphics Set_GUI_Editor_Mode True
+Graphics Set_GUI_Visible True
+Input Set_Focus_Mouse_Button None
+Input Set_Focus GUI
+Set_Var CE_Running 1
+Define_Function CE_Exit
+    Set_Var CE_Running 0
+End_Function
+Define_Function CE_Reset_Layout
+    Graphics GUI_Reset_Editor_Layout
+End_Function
+Loop While Var CE_Running == 1
+{
+    Input Update Default
+    Graphics GUI_Begin_Frame
+    Graphics GUI_Begin_Window Components
+    Graphics GUI_Text CE_Component "Character Editor"
+    Graphics GUI_Button CE_Reset_Button "Reset layout" CE_Reset_Layout
+    Graphics GUI_Button CE_Exit_Button "Exit editor" CE_Exit
+    Graphics GUI_End_Window
+    Graphics GUI_Begin_Window "Editing View"
+    Call CE_View
+    Graphics GUI_End_Window
+    Call CE_GUI
+    Graphics Render
+    Graphics Update
+    Graphics Window_Open Main
+    Set_Var_Global CE_Window_Open Graphics.Window.Main.Open
+    If Var CE_Window_Open == 0 { Set_Var CE_Running 0 }
+}
+Storage Close Tile_Editor
+Graphics Close_All
+Done

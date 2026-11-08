@@ -1,0 +1,890 @@
+{
+  "schema": "bananas.sprite-atlas.v1",
+  "image": "village_transitions.png",
+  "format": "RGBA8",
+  "size": {
+    "w": 768,
+    "h": 256
+  },
+  "grid": {
+    "cell_width": 64,
+    "cell_height": 64,
+    "margin": 0,
+    "spacing": 0
+  },
+  "coordinate_origin": "top-left",
+  "projection": "top-down-oblique",
+  "sprites": {
+    "grass_earth_0": {
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 0,
+      "wang_family": "grass_earth"
+    },
+    "grass_earth_1": {
+      "rect": {
+        "x": 64,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 1,
+      "wang_family": "grass_earth"
+    },
+    "grass_earth_2": {
+      "rect": {
+        "x": 128,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 2,
+      "wang_family": "grass_earth"
+    },
+    "grass_earth_3": {
+      "rect": {
+        "x": 192,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 3,
+      "wang_family": "grass_earth"
+    },
+    "grass_earth_4": {
+      "rect": {
+        "x": 0,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 4,
+      "wang_family": "grass_earth"
+    },
+    "grass_earth_5": {
+      "rect": {
+        "x": 64,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 5,
+      "wang_family": "grass_earth"
+    },
+    "grass_earth_6": {
+      "rect": {
+        "x": 128,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 6,
+      "wang_family": "grass_earth"
+    },
+    "grass_earth_7": {
+      "rect": {
+        "x": 192,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 7,
+      "wang_family": "grass_earth"
+    },
+    "grass_earth_8": {
+      "rect": {
+        "x": 0,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 8,
+      "wang_family": "grass_earth"
+    },
+    "grass_earth_9": {
+      "rect": {
+        "x": 64,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 9,
+      "wang_family": "grass_earth"
+    },
+    "grass_earth_10": {
+      "rect": {
+        "x": 128,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 10,
+      "wang_family": "grass_earth"
+    },
+    "grass_earth_11": {
+      "rect": {
+        "x": 192,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 11,
+      "wang_family": "grass_earth"
+    },
+    "grass_earth_12": {
+      "rect": {
+        "x": 0,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 12,
+      "wang_family": "grass_earth"
+    },
+    "grass_earth_13": {
+      "rect": {
+        "x": 64,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 13,
+      "wang_family": "grass_earth"
+    },
+    "grass_earth_14": {
+      "rect": {
+        "x": 128,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 14,
+      "wang_family": "grass_earth"
+    },
+    "grass_earth_15": {
+      "rect": {
+        "x": 192,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 15,
+      "wang_family": "grass_earth"
+    },
+    "grass_cobble_0": {
+      "rect": {
+        "x": 256,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 0,
+      "wang_family": "grass_cobble"
+    },
+    "grass_cobble_1": {
+      "rect": {
+        "x": 320,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 1,
+      "wang_family": "grass_cobble"
+    },
+    "grass_cobble_2": {
+      "rect": {
+        "x": 384,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 2,
+      "wang_family": "grass_cobble"
+    },
+    "grass_cobble_3": {
+      "rect": {
+        "x": 448,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 3,
+      "wang_family": "grass_cobble"
+    },
+    "grass_cobble_4": {
+      "rect": {
+        "x": 256,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 4,
+      "wang_family": "grass_cobble"
+    },
+    "grass_cobble_5": {
+      "rect": {
+        "x": 320,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 5,
+      "wang_family": "grass_cobble"
+    },
+    "grass_cobble_6": {
+      "rect": {
+        "x": 384,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 6,
+      "wang_family": "grass_cobble"
+    },
+    "grass_cobble_7": {
+      "rect": {
+        "x": 448,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 7,
+      "wang_family": "grass_cobble"
+    },
+    "grass_cobble_8": {
+      "rect": {
+        "x": 256,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 8,
+      "wang_family": "grass_cobble"
+    },
+    "grass_cobble_9": {
+      "rect": {
+        "x": 320,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 9,
+      "wang_family": "grass_cobble"
+    },
+    "grass_cobble_10": {
+      "rect": {
+        "x": 384,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 10,
+      "wang_family": "grass_cobble"
+    },
+    "grass_cobble_11": {
+      "rect": {
+        "x": 448,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 11,
+      "wang_family": "grass_cobble"
+    },
+    "grass_cobble_12": {
+      "rect": {
+        "x": 256,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 12,
+      "wang_family": "grass_cobble"
+    },
+    "grass_cobble_13": {
+      "rect": {
+        "x": 320,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 13,
+      "wang_family": "grass_cobble"
+    },
+    "grass_cobble_14": {
+      "rect": {
+        "x": 384,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 14,
+      "wang_family": "grass_cobble"
+    },
+    "grass_cobble_15": {
+      "rect": {
+        "x": 448,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 15,
+      "wang_family": "grass_cobble"
+    },
+    "earth_cobble_0": {
+      "rect": {
+        "x": 512,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 0,
+      "wang_family": "earth_cobble"
+    },
+    "earth_cobble_1": {
+      "rect": {
+        "x": 576,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 1,
+      "wang_family": "earth_cobble"
+    },
+    "earth_cobble_2": {
+      "rect": {
+        "x": 640,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 2,
+      "wang_family": "earth_cobble"
+    },
+    "earth_cobble_3": {
+      "rect": {
+        "x": 704,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 3,
+      "wang_family": "earth_cobble"
+    },
+    "earth_cobble_4": {
+      "rect": {
+        "x": 512,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 4,
+      "wang_family": "earth_cobble"
+    },
+    "earth_cobble_5": {
+      "rect": {
+        "x": 576,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 5,
+      "wang_family": "earth_cobble"
+    },
+    "earth_cobble_6": {
+      "rect": {
+        "x": 640,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 6,
+      "wang_family": "earth_cobble"
+    },
+    "earth_cobble_7": {
+      "rect": {
+        "x": 704,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 7,
+      "wang_family": "earth_cobble"
+    },
+    "earth_cobble_8": {
+      "rect": {
+        "x": 512,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 8,
+      "wang_family": "earth_cobble"
+    },
+    "earth_cobble_9": {
+      "rect": {
+        "x": 576,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 9,
+      "wang_family": "earth_cobble"
+    },
+    "earth_cobble_10": {
+      "rect": {
+        "x": 640,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 10,
+      "wang_family": "earth_cobble"
+    },
+    "earth_cobble_11": {
+      "rect": {
+        "x": 704,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 11,
+      "wang_family": "earth_cobble"
+    },
+    "earth_cobble_12": {
+      "rect": {
+        "x": 512,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 12,
+      "wang_family": "earth_cobble"
+    },
+    "earth_cobble_13": {
+      "rect": {
+        "x": 576,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 13,
+      "wang_family": "earth_cobble"
+    },
+    "earth_cobble_14": {
+      "rect": {
+        "x": 640,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 14,
+      "wang_family": "earth_cobble"
+    },
+    "earth_cobble_15": {
+      "rect": {
+        "x": 704,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "corner_mask": 15,
+      "wang_family": "earth_cobble"
+    }
+  },
+  "wang_rules": {
+    "NW": 1,
+    "NE": 2,
+    "SE": 4,
+    "SW": 8,
+    "selection": "Set material bits on shared map vertices. Sum the four corner bits per cell. A set bit selects the first material in the family name."
+  }
+}

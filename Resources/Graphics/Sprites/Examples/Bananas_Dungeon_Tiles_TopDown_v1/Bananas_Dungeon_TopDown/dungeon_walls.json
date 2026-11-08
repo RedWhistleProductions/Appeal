@@ -1,0 +1,634 @@
+{
+  "schema": "bananas.sprite-atlas.v1",
+  "image": "dungeon_walls.png",
+  "format": "RGBA8",
+  "size": {
+    "w": 512,
+    "h": 256
+  },
+  "grid": {
+    "cell_width": 64,
+    "cell_height": 64,
+    "margin": 0,
+    "spacing": 0
+  },
+  "coordinate_origin": "top-left",
+  "projection": "top-down-oblique",
+  "sprites": {
+    "stone_0": {
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 0,
+      "collision_mask": "alpha",
+      "walkable": false
+    },
+    "stone_1": {
+      "rect": {
+        "x": 64,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 1,
+      "collision_mask": "alpha",
+      "walkable": false
+    },
+    "stone_2": {
+      "rect": {
+        "x": 128,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 2,
+      "collision_mask": "alpha",
+      "walkable": false
+    },
+    "stone_3": {
+      "rect": {
+        "x": 192,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 3,
+      "collision_mask": "alpha",
+      "walkable": false
+    },
+    "stone_4": {
+      "rect": {
+        "x": 256,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 4,
+      "collision_mask": "alpha",
+      "walkable": false
+    },
+    "stone_5": {
+      "rect": {
+        "x": 320,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 5,
+      "collision_mask": "alpha",
+      "walkable": false
+    },
+    "stone_6": {
+      "rect": {
+        "x": 384,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 6,
+      "collision_mask": "alpha",
+      "walkable": false
+    },
+    "stone_7": {
+      "rect": {
+        "x": 448,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 7,
+      "collision_mask": "alpha",
+      "walkable": false
+    },
+    "stone_8": {
+      "rect": {
+        "x": 0,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 8,
+      "collision_mask": "alpha",
+      "walkable": false
+    },
+    "stone_9": {
+      "rect": {
+        "x": 64,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 9,
+      "collision_mask": "alpha",
+      "walkable": false
+    },
+    "stone_10": {
+      "rect": {
+        "x": 128,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 10,
+      "collision_mask": "alpha",
+      "walkable": false
+    },
+    "stone_11": {
+      "rect": {
+        "x": 192,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 11,
+      "collision_mask": "alpha",
+      "walkable": false
+    },
+    "stone_12": {
+      "rect": {
+        "x": 256,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 12,
+      "collision_mask": "alpha",
+      "walkable": false
+    },
+    "stone_13": {
+      "rect": {
+        "x": 320,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 13,
+      "collision_mask": "alpha",
+      "walkable": false
+    },
+    "stone_14": {
+      "rect": {
+        "x": 384,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 14,
+      "collision_mask": "alpha",
+      "walkable": false
+    },
+    "stone_15": {
+      "rect": {
+        "x": 448,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 15,
+      "collision_mask": "alpha",
+      "walkable": false
+    },
+    "sandstone_0": {
+      "rect": {
+        "x": 0,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 0,
+      "collision_mask": "alpha",
+      "walkable": false
+    },
+    "sandstone_1": {
+      "rect": {
+        "x": 64,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 1,
+      "collision_mask": "alpha",
+      "walkable": false
+    },
+    "sandstone_2": {
+      "rect": {
+        "x": 128,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 2,
+      "collision_mask": "alpha",
+      "walkable": false
+    },
+    "sandstone_3": {
+      "rect": {
+        "x": 192,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 3,
+      "collision_mask": "alpha",
+      "walkable": false
+    },
+    "sandstone_4": {
+      "rect": {
+        "x": 256,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 4,
+      "collision_mask": "alpha",
+      "walkable": false
+    },
+    "sandstone_5": {
+      "rect": {
+        "x": 320,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 5,
+      "collision_mask": "alpha",
+      "walkable": false
+    },
+    "sandstone_6": {
+      "rect": {
+        "x": 384,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 6,
+      "collision_mask": "alpha",
+      "walkable": false
+    },
+    "sandstone_7": {
+      "rect": {
+        "x": 448,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 7,
+      "collision_mask": "alpha",
+      "walkable": false
+    },
+    "sandstone_8": {
+      "rect": {
+        "x": 0,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 8,
+      "collision_mask": "alpha",
+      "walkable": false
+    },
+    "sandstone_9": {
+      "rect": {
+        "x": 64,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 9,
+      "collision_mask": "alpha",
+      "walkable": false
+    },
+    "sandstone_10": {
+      "rect": {
+        "x": 128,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 10,
+      "collision_mask": "alpha",
+      "walkable": false
+    },
+    "sandstone_11": {
+      "rect": {
+        "x": 192,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 11,
+      "collision_mask": "alpha",
+      "walkable": false
+    },
+    "sandstone_12": {
+      "rect": {
+        "x": 256,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 12,
+      "collision_mask": "alpha",
+      "walkable": false
+    },
+    "sandstone_13": {
+      "rect": {
+        "x": 320,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 13,
+      "collision_mask": "alpha",
+      "walkable": false
+    },
+    "sandstone_14": {
+      "rect": {
+        "x": 384,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 14,
+      "collision_mask": "alpha",
+      "walkable": false
+    },
+    "sandstone_15": {
+      "rect": {
+        "x": 448,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "adjacency_mask": 15,
+      "collision_mask": "alpha",
+      "walkable": false
+    }
+  },
+  "adjacency_rules": {
+    "N": 1,
+    "E": 2,
+    "S": 4,
+    "W": 8,
+    "selection": "Sum bits for orthogonally adjacent wall cells. Place above floors. Connected ports are 32 pixels wide."
+  }
+}

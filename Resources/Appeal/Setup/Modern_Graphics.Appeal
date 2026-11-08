@@ -1,0 +1,3 @@
+// Select before creating Graphics windows or loading GPU resources.
+Add_Dynamic_Module Graphics Appeal_SDL2_Modern_OpenGL_Graphics
+Return

@@ -7,8 +7,23 @@ Add_Dynamic_Module Audio Appeal_SDL2_Audio
 Add_Dynamic_Module Network Appeal_SDL2_Network
 
 //Add_Dynamic_Module Graphics Test
-Add_Dynamic_Module Graphics Appeal_SDL2_Graphics
+Add_Dynamic_Module Graphics Appeal_SDL2_Legacy_OpenGL_Graphics
 //Add_Dynamic_Module Input Test
 Add_Dynamic_Module Input Appeal_SDL2_Input
+
+//Add_Dynamic_Module Video Test
+Add_Dynamic_Module Video Appeal_FFmpeg_Video
+//Add_Dynamic_Module Security Test
+Add_Dynamic_Module Security Appeal_Sodium_Security
+
+// Installed plugins
+Add_Dynamic_Module AI Appeal_Recast_BehaviorTree_AI
+Add_Dynamic_Module Storage Appeal_SQLite_Storage
+Add_Dynamic_Module Package Appeal_Standard_Package
+Add_Dynamic_Module World Appeal_Standard_World
+Add_Dynamic_Module Files Appeal_Standard_Files
+Add_Dynamic_Module Mechanics Appeal_Default_2D_Side_Scrolling_Mechanics
+Add_Dynamic_Module Physics Appeal_Box2D_Physics
+// Appeal_Jolt_Physics provides 3D bodies; the default Box2D world is 2D.
 
 Return

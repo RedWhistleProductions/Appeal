@@ -1,0 +1,17 @@
+// Diagnostic only: no real cryptography, credentials, or file writes.
+Add_Dynamic_Module Security Test
+Security Debug True
+Security Set_Paths Resources
+Security Generate_Key
+Security Encrypt diagnostic-payload diagnostic-key
+Security Decrypt diagnostic-cipher diagnostic-key
+Security Encrypt_With_Password diagnostic-payload diagnostic-password
+Security Decrypt_With_Password diagnostic-cipher diagnostic-password
+Security Encrypt_File Input.bin Output.enc diagnostic-key
+Security Decrypt_File Output.enc Restored.bin diagnostic-key
+Security Encrypt_File_With_Password Input.bin Output.enc diagnostic-password
+Security Decrypt_File_With_Password Output.enc Restored.bin diagnostic-password
+Security Backend_Version
+Security Last_Error
+Print SECURITY_TEST_PASSED
+Done

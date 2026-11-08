@@ -1,0 +1,237 @@
+// Shared definitions and placement data; also usable without Graphics.
+World Create Sprite_Garden
+World Create_Typed_Entity Grass Grass 1 1
+World Create_Typed_Entity Soil Soil 1 1
+World Create_Typed_Entity Stone Stone 1 1
+World Create_Typed_Entity Pine Tree 1 1
+World Create_Typed_Entity Narrow_Tree Tree 2 1
+World Create_Typed_Entity Bush Bush 1 1
+World Create_Typed_Entity Boulder Rock 1 1
+World Create_Typed_Entity Sign Sign 1 1
+World Create_Typed_Entity Fence Fence 1 1
+World Create_Typed_Entity Crate Crate 1 0
+World Create_Typed_Entity Adam Character 1 0
+World Create_Typed_Entity Eve Character 2 0
+World Set_Position Adam 176 338 0
+World Set_Position Eve 432 338 0
+
+World Create_Section Garden 8 3
+World Create_Section Orchard 8 3
+World Set_Tile_Size Garden 64 64 1
+World Set_Tile_Size Orchard 64 64 1
+World Set_Section_Position Garden 0 512 0
+World Connect_Sections Garden Right Orchard
+World Create_Section Scenery 16 8
+World Set_Tile_Size Scenery 64 64 1
+World Connect_Sections Garden Front Scenery
+// Scenery overlays the ground sections rather than using the default adjacency offset.
+World Set_Section_Position Scenery 0 0 0
+World Use_Section Garden
+World Set_Tile Garden 0 0 Grass
+World Set_Tile Garden 0 1 Soil
+World Set_Tile Garden 0 2 Stone
+World Set_Tile Garden 1 0 Grass
+World Set_Tile Garden 1 1 Soil
+World Set_Tile Garden 1 2 Stone
+World Set_Tile Garden 2 0 Grass
+World Set_Tile Garden 2 1 Soil
+World Set_Tile Garden 2 2 Stone
+World Set_Tile Garden 3 0 Grass
+World Set_Tile Garden 3 1 Soil
+World Set_Tile Garden 3 2 Stone
+World Set_Tile Garden 4 0 Grass
+World Set_Tile Garden 4 1 Soil
+World Set_Tile Garden 4 2 Stone
+World Set_Tile Garden 5 0 Grass
+World Set_Tile Garden 5 1 Soil
+World Set_Tile Garden 5 2 Stone
+World Set_Tile Garden 6 0 Grass
+World Set_Tile Garden 6 1 Soil
+World Set_Tile Garden 6 2 Stone
+World Set_Tile Garden 7 0 Grass
+World Set_Tile Garden 7 1 Soil
+World Set_Tile Garden 7 2 Stone
+World Set_Tile Orchard 0 0 Grass
+World Set_Tile Orchard 0 1 Soil
+World Set_Tile Orchard 0 2 Stone
+World Set_Tile Orchard 1 0 Grass
+World Set_Tile Orchard 1 1 Soil
+World Set_Tile Orchard 1 2 Stone
+World Set_Tile Orchard 2 0 Grass
+World Set_Tile Orchard 2 1 Soil
+World Set_Tile Orchard 2 2 Stone
+World Set_Tile Orchard 3 0 Grass
+World Set_Tile Orchard 3 1 Soil
+World Set_Tile Orchard 3 2 Stone
+World Set_Tile Orchard 4 0 Grass
+World Set_Tile Orchard 4 1 Soil
+World Set_Tile Orchard 4 2 Stone
+World Set_Tile Orchard 5 0 Grass
+World Set_Tile Orchard 5 1 Soil
+World Set_Tile Orchard 5 2 Stone
+World Set_Tile Orchard 6 0 Grass
+World Set_Tile Orchard 6 1 Soil
+World Set_Tile Orchard 6 2 Stone
+World Set_Tile Orchard 7 0 Grass
+World Set_Tile Orchard 7 1 Soil
+World Set_Tile Orchard 7 2 Stone
+World Set_Tile Scenery 0 6 Pine
+World Set_Tile Scenery 2 6 Narrow_Tree
+World Set_Tile Scenery 8 6 Pine
+World Set_Tile Scenery 14 6 Narrow_Tree
+World Set_Tile Scenery 3 7 Bush
+World Set_Tile Scenery 10 7 Bush
+World Set_Tile Scenery 13 7 Boulder
+World Set_Tile Scenery 6 7 Sign
+World Set_Tile Scenery 9 7 Fence
+World Set_Tile Scenery 12 7 Crate
+// Second screen: two more sections reached through the right neighbor pointers.
+World Create_Typed_Entity Sand Sand 1 1
+World Create_Typed_Entity Trail_Crate Crate 2 0
+World Create_Section Trail 8 3
+World Create_Section Ridge 8 3
+World Set_Tile_Size Trail 64 64 1
+World Set_Tile_Size Ridge 64 64 1
+World Connect_Sections Orchard Right Trail
+World Connect_Sections Trail Right Ridge
+World Create_Section Trail_Scenery 16 8
+World Set_Tile_Size Trail_Scenery 64 64 1
+World Connect_Sections Trail Front Trail_Scenery
+World Set_Section_Position Trail_Scenery 1024 0 0
+World Set_Tile Trail 0 0 Sand
+World Set_Tile Trail 0 1 Stone
+World Set_Tile Trail 0 2 Stone
+World Set_Tile Trail 1 0 Sand
+World Set_Tile Trail 1 1 Stone
+World Set_Tile Trail 1 2 Stone
+World Set_Tile Trail 2 0 Sand
+World Set_Tile Trail 2 1 Stone
+World Set_Tile Trail 2 2 Stone
+World Set_Tile Trail 3 0 Sand
+World Set_Tile Trail 3 1 Stone
+World Set_Tile Trail 3 2 Stone
+World Set_Tile Trail 4 0 Sand
+World Set_Tile Trail 4 1 Stone
+World Set_Tile Trail 4 2 Stone
+World Set_Tile Trail 5 0 Sand
+World Set_Tile Trail 5 1 Stone
+World Set_Tile Trail 5 2 Stone
+World Set_Tile Trail 6 0 Sand
+World Set_Tile Trail 6 1 Stone
+World Set_Tile Trail 6 2 Stone
+World Set_Tile Trail 7 0 Sand
+World Set_Tile Trail 7 1 Stone
+World Set_Tile Trail 7 2 Stone
+World Set_Tile Ridge 0 0 Sand
+World Set_Tile Ridge 0 1 Stone
+World Set_Tile Ridge 0 2 Stone
+World Set_Tile Ridge 1 0 Sand
+World Set_Tile Ridge 1 1 Stone
+World Set_Tile Ridge 1 2 Stone
+World Set_Tile Ridge 2 0 Sand
+World Set_Tile Ridge 2 1 Stone
+World Set_Tile Ridge 2 2 Stone
+World Set_Tile Ridge 3 0 Sand
+World Set_Tile Ridge 3 1 Stone
+World Set_Tile Ridge 3 2 Stone
+World Set_Tile Ridge 4 0 Sand
+World Set_Tile Ridge 4 1 Stone
+World Set_Tile Ridge 4 2 Stone
+World Set_Tile Ridge 5 0 Sand
+World Set_Tile Ridge 5 1 Stone
+World Set_Tile Ridge 5 2 Stone
+World Set_Tile Ridge 6 0 Sand
+World Set_Tile Ridge 6 1 Stone
+World Set_Tile Ridge 6 2 Stone
+World Set_Tile Ridge 7 0 Sand
+World Set_Tile Ridge 7 1 Stone
+World Set_Tile Ridge 7 2 Stone
+World Set_Tile Trail_Scenery 0 6 Narrow_Tree
+World Set_Tile Trail_Scenery 2 6 Pine
+World Set_Tile Trail_Scenery 8 6 Narrow_Tree
+World Set_Tile Trail_Scenery 14 6 Pine
+World Set_Tile Trail_Scenery 3 7 Boulder
+World Set_Tile Trail_Scenery 10 7 Boulder
+World Set_Tile Trail_Scenery 13 7 Bush
+World Set_Tile Trail_Scenery 6 7 Sign
+World Set_Tile Trail_Scenery 9 7 Fence
+World Set_Tile Trail_Scenery 12 7 Trail_Crate
+// Third screen: a woodland camp and a timber bridge.
+World Create_Typed_Entity Wood Wood 1 1
+World Create_Typed_Entity Barrel Barrel 1 1
+World Create_Typed_Entity Camp_Crate Crate 3 0
+World Create_Section Camp 8 3
+World Create_Section Bridge 8 3
+World Set_Tile_Size Camp 64 64 1
+World Set_Tile_Size Bridge 64 64 1
+World Connect_Sections Ridge Right Camp
+World Connect_Sections Camp Right Bridge
+World Create_Section Camp_Scenery 16 8
+World Set_Tile_Size Camp_Scenery 64 64 1
+World Connect_Sections Camp Front Camp_Scenery
+World Set_Section_Position Camp_Scenery 2048 0 0
+World Set_Tile Camp 0 0 Grass
+World Set_Tile Camp 0 1 Wood
+World Set_Tile Camp 0 2 Stone
+World Set_Tile Camp 1 0 Grass
+World Set_Tile Camp 1 1 Wood
+World Set_Tile Camp 1 2 Stone
+World Set_Tile Camp 2 0 Grass
+World Set_Tile Camp 2 1 Wood
+World Set_Tile Camp 2 2 Stone
+World Set_Tile Camp 3 0 Grass
+World Set_Tile Camp 3 1 Wood
+World Set_Tile Camp 3 2 Stone
+World Set_Tile Camp 4 0 Grass
+World Set_Tile Camp 4 1 Wood
+World Set_Tile Camp 4 2 Stone
+World Set_Tile Camp 5 0 Grass
+World Set_Tile Camp 5 1 Wood
+World Set_Tile Camp 5 2 Stone
+World Set_Tile Camp 6 0 Grass
+World Set_Tile Camp 6 1 Wood
+World Set_Tile Camp 6 2 Stone
+World Set_Tile Camp 7 0 Grass
+World Set_Tile Camp 7 1 Wood
+World Set_Tile Camp 7 2 Stone
+World Set_Tile Bridge 0 0 Wood
+World Set_Tile Bridge 0 1 Wood
+World Set_Tile Bridge 0 2 Stone
+World Set_Tile Bridge 1 0 Wood
+World Set_Tile Bridge 1 1 Wood
+World Set_Tile Bridge 1 2 Stone
+World Set_Tile Bridge 2 0 Wood
+World Set_Tile Bridge 2 1 Wood
+World Set_Tile Bridge 2 2 Stone
+World Set_Tile Bridge 3 0 Wood
+World Set_Tile Bridge 3 1 Wood
+World Set_Tile Bridge 3 2 Stone
+World Set_Tile Bridge 4 0 Wood
+World Set_Tile Bridge 4 1 Wood
+World Set_Tile Bridge 4 2 Stone
+World Set_Tile Bridge 5 0 Wood
+World Set_Tile Bridge 5 1 Wood
+World Set_Tile Bridge 5 2 Stone
+World Set_Tile Bridge 6 0 Wood
+World Set_Tile Bridge 6 1 Wood
+World Set_Tile Bridge 6 2 Stone
+World Set_Tile Bridge 7 0 Wood
+World Set_Tile Bridge 7 1 Wood
+World Set_Tile Bridge 7 2 Stone
+World Set_Tile Camp_Scenery 0 6 Pine
+World Set_Tile Camp_Scenery 2 6 Pine
+World Set_Tile Camp_Scenery 8 6 Narrow_Tree
+World Set_Tile Camp_Scenery 14 6 Pine
+World Set_Tile Camp_Scenery 3 7 Barrel
+World Set_Tile Camp_Scenery 10 7 Barrel
+World Set_Tile Camp_Scenery 13 7 Barrel
+World Set_Tile Camp_Scenery 6 7 Sign
+World Set_Tile Camp_Scenery 9 7 Fence
+World Set_Tile Camp_Scenery 12 7 Camp_Crate
+Set_Var Scene_Physics_Active 0
+Set_Var Scene_Page 0
+Set_Var Scene_Camera_X 0
+Set_Var Scene_Left Garden
+Set_Var Scene_Right Orchard
+Set_Var Scene_Props Scenery
+Return

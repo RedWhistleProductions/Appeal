@@ -1,0 +1,282 @@
+// Embeddable first-stage Appeal IDE. Graphics + Files; host owns the window/loop.
+Set_Var IDE_Ready 1
+Set_Var IDE_File ""
+Set_Var IDE_Path Appeal/Untitled.Appeal
+Set_Var IDE_Text ""
+Set_Var IDE_Dirty 0
+Set_Var IDE_Discard 0
+Set_Var IDE_Overwrite 0
+Set_Var IDE_GUI_Ready 0
+Set_Var IDE_Show_Browser 0
+Set_Var IDE_Exit_Pending 0
+Set_Var IDE_Exit_Function ""
+Set_Var IDE_Browse_Root Resources
+Set_Var IDE_Status "New, Open, Save, or Save As. This is the text-editor foundation of the Appeal IDE."
+Define_Function IDE_Read_Text
+    If Var IDE_GUI_Ready == 1
+    {
+        Graphics GUI_Text_Value IDE_Source
+        Set_Var_Global IDE_Text Graphics.GUI.IDE_Source.Value
+    }
+End_Function
+Define_Function IDE_Read_Path
+    If Var IDE_GUI_Ready == 1
+    {
+        Graphics GUI_Text_Value IDE_Path_Control
+        Set_Var_Global IDE_Path Graphics.GUI.IDE_Path_Control.Value
+    }
+End_Function
+Define_Function IDE_Sync
+    If Var IDE_GUI_Ready == 1
+    {
+        Graphics GUI_Set_Text_Value IDE_Source Var IDE_Text
+        Graphics GUI_Set_Text_Value IDE_Path_Control Var IDE_Path
+    }
+End_Function
+Define_Function IDE_Check_Draft
+    Set_Var IDE_Allowed 1
+    If Var IDE_Dirty == 1
+    {
+        If Var IDE_Discard == 0
+        {
+            Set_Var IDE_Allowed 0
+            Set_Var IDE_Status "Save the document or check Discard unsaved text before New or Open."
+        }
+    }
+End_Function
+Define_Function IDE_Changed
+    Set_Var IDE_Dirty 1
+End_Function
+Define_Function IDE_Discard_Changed
+    Set_Var IDE_Discard Var Callback_Value
+End_Function
+Define_Function IDE_Overwrite_Changed
+    Set_Var IDE_Overwrite Var Callback_Value
+End_Function
+Define_Function IDE_New
+    Call IDE_Check_Draft
+    If Var IDE_Allowed == 1
+    {
+        Set_Var IDE_File ""
+        Set_Var IDE_Path Appeal/Untitled.Appeal
+        Set_Var IDE_Text ""
+        Set_Var IDE_Dirty 0
+        Set_Var IDE_Discard 0
+        Set_Var IDE_Overwrite 0
+        Set_Var IDE_Show_Browser 0
+        Call IDE_Sync
+        Set_Var IDE_Status "New untitled document. Enter a path and choose Save or Save As."
+    }
+End_Function
+Define_Function IDE_Open_Internal
+    Call IDE_Check_Draft
+    If Var IDE_Allowed == 1
+    {
+        If Var IDE_Path == ""
+        {
+            Set_Var IDE_Allowed 0
+            Set_Var IDE_Status "Enter a file path or use Browse scripts."
+        }
+        If Var IDE_Allowed == 1
+        {
+            Files Is_Directory Var IDE_Path
+            Set_Var_Global IDE_Is_Directory Files.Last_Is_Directory
+            If Var IDE_Is_Directory == 1
+            {
+                Set_Var IDE_Allowed 0
+                Set_Var IDE_Status "Choose a text file, not a folder."
+            }
+        }
+        If Var IDE_Allowed == 1
+        {
+            Files Open IDE_Read_Check Var IDE_Path Read
+            Set_Var_Global IDE_Can_Read Files.File.IDE_Read_Check.Open
+            Files Close IDE_Read_Check
+            If Var IDE_Can_Read == 0
+            {
+                Set_Var IDE_Allowed 0
+                Set_Var IDE_Status "Could not open that file. The current document is unchanged."
+            }
+        }
+        If Var IDE_Allowed == 1
+        {
+            Files Read_All Var IDE_Path
+            Set_Var_Global IDE_Text Files.File.Last_Read_All
+            Set_Var IDE_File Var IDE_Path
+            Set_Var IDE_Dirty 0
+            Set_Var IDE_Discard 0
+            Set_Var IDE_Overwrite 0
+            Set_Var IDE_Show_Browser 0
+            Call IDE_Sync
+            Set_Var IDE_Status "File opened. Tab inserts indentation; standard text selection, clipboard, and undo are available."
+        }
+    }
+End_Function
+Define_Function IDE_Open
+    Call IDE_Read_Path
+    Call IDE_Open_Internal
+End_Function
+Define_Function IDE_Write
+    Set_Var IDE_Allowed 1
+    If Var IDE_Target == ""
+    {
+        Set_Var IDE_Allowed 0
+        Set_Var IDE_Status "Enter a destination path before saving."
+    }
+    If Var IDE_Allowed == 1
+    {
+        Files Is_Directory Var IDE_Target
+        Set_Var_Global IDE_Is_Directory Files.Last_Is_Directory
+        If Var IDE_Is_Directory == 1
+        {
+            Set_Var IDE_Allowed 0
+            Set_Var IDE_Status "The save path points to a folder. Enter a file name."
+        }
+    }
+    If Var IDE_Allowed == 1
+    {
+        If Var IDE_Target != Var IDE_File
+        {
+            Files Open IDE_Exists_Check Var IDE_Target Read
+            Set_Var_Global IDE_Exists Files.File.IDE_Exists_Check.Open
+            Files Close IDE_Exists_Check
+            If Var IDE_Exists == 1
+            {
+                If Var IDE_Overwrite == 0
+                {
+                    Set_Var IDE_Allowed 0
+                    Set_Var IDE_Status "That file already exists. Check Allow overwriting another file, then Save As again."
+                }
+            }
+        }
+    }
+    If Var IDE_Allowed == 1
+    {
+        Call IDE_Read_Text
+        Files Write_All Var IDE_Target Var IDE_Text
+        Set_Var_Global IDE_Saved Files.File.Last_Write_All
+        If Var IDE_Saved == 1
+        {
+            Set_Var IDE_File Var IDE_Target
+            Set_Var IDE_Path Var IDE_Target
+            Set_Var IDE_Dirty 0
+            Set_Var IDE_Discard 0
+            Set_Var IDE_Overwrite 0
+            If Var IDE_GUI_Ready == 1 { Graphics GUI_Set_Text_Value IDE_Path_Control Var IDE_Path }
+            Set_Var IDE_Status "File saved."
+        }
+        If Var IDE_Saved == 0
+        {
+            Set_Var IDE_Status "Could not save the file. Your document and unsaved-change flag are retained."
+        }
+    }
+End_Function
+Define_Function IDE_Save_As
+    Call IDE_Read_Path
+    Set_Var IDE_Target Var IDE_Path
+    Call IDE_Write
+End_Function
+Define_Function IDE_Save
+    Set_Var IDE_Target Var IDE_File
+    If Var IDE_File == ""
+    {
+        Call IDE_Read_Path
+        Set_Var IDE_Target Var IDE_Path
+    }
+    Call IDE_Write
+End_Function
+Define_Function IDE_Browse
+    Call IDE_Check_Draft
+    If Var IDE_Allowed == 1
+    {
+        Set_Var IDE_Show_Browser 1
+        Graphics GUI_Set_Window_Open "Open Appeal script" True
+    }
+End_Function
+Define_Function IDE_Browser_Close
+    Set_Var IDE_Show_Browser 0
+End_Function
+Define_Function IDE_Picked
+    Graphics GUI_File_Picker_Value IDE_File_Picker
+    Set_Var_Global IDE_Picked_Directory Graphics.GUI.IDE_File_Picker.Selected_Is_Directory
+    If Var IDE_Picked_Directory == 0
+    {
+        Set_Var_Global IDE_Relative Graphics.GUI.IDE_File_Picker.Selected_Relative
+        If Var IDE_Relative != ""
+        {
+            Files Join Var IDE_Browse_Root Var IDE_Relative
+            Set_Var_Global IDE_Path Files.Last_Path
+            Call IDE_Open_Internal
+        }
+    }
+End_Function
+Define_Function IDE_Finish_Exit
+    Set_Var IDE_Exit_Pending 0
+    If Var IDE_Exit_Function != "" { Call Var IDE_Exit_Function }
+End_Function
+Define_Function IDE_Request_Exit
+    If Var IDE_Dirty == 0 { Call IDE_Finish_Exit }
+    If Var IDE_Dirty == 1
+    {
+        Set_Var IDE_Exit_Pending 1
+        Set_Var IDE_Status "Unsaved script: choose Save and Exit, Discard and Exit, or Cancel."
+        Graphics GUI_Set_Window_Open "Unsaved script" True
+    }
+End_Function
+Define_Function IDE_Exit_Save
+    Call IDE_Save
+    If Var IDE_Dirty == 0 { Call IDE_Finish_Exit }
+End_Function
+Define_Function IDE_Exit_Discard
+    Call IDE_Finish_Exit
+End_Function
+Define_Function IDE_Exit_Cancel
+    Set_Var IDE_Exit_Pending 0
+End_Function
+Graphics GUI_Set_Window_Functions "Unsaved script" IDE_Exit_Cancel None
+Define_Function IDE_View
+    Graphics GUI_Text_Editor IDE_Source "Appeal source" Var IDE_Text IDE_Changed
+End_Function
+Run Utilities/Game_Editor/Appeal_IDE/Fonts
+Define_Function IDE_GUI
+    Set_Var IDE_GUI_Ready 1
+    Graphics GUI_Begin_Window "Editor Controls"
+    Graphics GUI_Text IDE_Heading "Appeal IDE - Text Editor"
+    Graphics GUI_Text IDE_Status_Label Var IDE_Status
+    Graphics GUI_Text IDE_File_Label "Current document:"
+    Set_Var IDE_File_Label_Value Var IDE_File
+    If Var IDE_File == "" { Set_Var IDE_File_Label_Value Untitled }
+    Graphics GUI_Text IDE_Current_File Var IDE_File_Label_Value
+    Graphics GUI_Text IDE_Dirty_Label "Unsaved changes:"
+    Graphics GUI_Text IDE_Dirty_Value Var IDE_Dirty
+    Graphics GUI_Input_Text IDE_Path_Control "Open / Save As path" Var IDE_Path None
+    Graphics GUI_Button IDE_Font_Settings_Button "Font settings..." IDE_Fonts_Open
+    Graphics GUI_Button IDE_New_Button New IDE_New
+    Graphics GUI_Button IDE_Browse_Button "Browse scripts..." IDE_Browse
+    Graphics GUI_Button IDE_Open_Button "Open path" IDE_Open
+    Graphics GUI_Button IDE_Save_Button Save IDE_Save
+    Graphics GUI_Button IDE_Save_As_Button "Save As" IDE_Save_As
+    Graphics GUI_Checkbox IDE_Discard_Control "Discard unsaved text for New / Open" Var IDE_Discard IDE_Discard_Changed
+    Graphics GUI_Checkbox IDE_Overwrite_Control "Allow overwriting another file" Var IDE_Overwrite IDE_Overwrite_Changed
+    Graphics GUI_Text IDE_Help "Edit in Editing View. Tab indents. Standard selection, copy/paste and undo are available."
+    Graphics GUI_End_Window
+    If Var IDE_Show_Fonts == 1 { Call IDE_Font_GUI }
+    If Var IDE_Exit_Pending == 1
+    {
+        Graphics GUI_Begin_Window "Unsaved script"
+        Graphics GUI_Text IDE_Exit_Help "Your script has unsaved changes. Save it, discard it, or return to editing."
+        Graphics GUI_Text IDE_Exit_Status Var IDE_Status
+        Graphics GUI_Button IDE_Exit_Save_Button "Save and Exit" IDE_Exit_Save
+        Graphics GUI_Button IDE_Exit_Discard_Button "Discard and Exit" IDE_Exit_Discard
+        Graphics GUI_Button IDE_Exit_Cancel_Button Cancel IDE_Exit_Cancel
+        Graphics GUI_End_Window
+    }
+    If Var IDE_Show_Browser == 1
+    {
+        Graphics GUI_Begin_Window "Open Appeal script"
+        Graphics GUI_File_Picker IDE_File_Picker "Choose a text file" Var IDE_Browse_Root . IDE_Picked
+        Graphics GUI_Button IDE_Browser_Cancel Cancel IDE_Browser_Close
+        Graphics GUI_End_Window
+    }
+End_Function
+Return

@@ -1,0 +1,42 @@
+Add_Dynamic_Module World Appeal_Standard_World
+World Set_Paths Obj/World_Tile_Map_Test/Resources
+World Create Tile_Map_Test
+World Create_Typed_Entity Shared_Tree Tree 7 1
+World Create_Typed_Entity Door Door 2 0
+World Create_Entity Hero
+World Set_Position Hero 10 20 30
+World Set Hero Check FREE_ENTITY_PRESERVED
+World Create_Section Room 2 2
+World Create_Section Path 2 2
+World Set_Tile_Size Room 32 32 1
+World Set_Section_Position Room 10 20 0
+World Set_Tile Room 0 0 Shared_Tree
+World Set_Tile Room 1 0 Shared_Tree
+World Set_Tile Path 0 0 Door
+World Connect_Sections Room Right Path
+World Set_Door_Destination Door Room 1 2 3
+World Use_Section Room
+World Save Tile_Map_Test
+World Close_Scene Tile_Map_Test
+World Load Tile_Map_Test
+Print (World Get_Tile Room 0 0 Type)
+Print (World Get_Tile Room 1 0 ID)
+Print (World Get_Tile Room 1 0 X)
+Print (World Get_Tile Path 0 0 X)
+Print (World Get_Section Room Columns)
+Print (World Get_Neighbor Path Left)
+Print (World Get_Door_Destination Door)
+Print (World Entity_Type Shared_Tree)
+Print (World Entity_ID Shared_Tree)
+World Get Hero Check
+World Save_Section Room
+World Clear_Tile Room 1 0
+World Load_Section Room
+Print (World Get_Tile Room 1 0 Name)
+World Entity_Destroy Shared_Tree
+Print (World Get_Tile Room 0 0 Name)
+World Delete_Section Room
+Print (World Get_Neighbor Path Left)
+Print (World Get_Door_Destination Door)
+Print WORLD_TILE_MAP_SCRIPT_PASSED
+Done

@@ -1,0 +1,307 @@
+{
+  "schema": "bananas.sprite-atlas.v1",
+  "image": "cave_surfaces.png",
+  "format": "RGBA8",
+  "size": {
+    "w": 256,
+    "h": 256
+  },
+  "grid": {
+    "cell_width": 64,
+    "cell_height": 64,
+    "margin": 0,
+    "spacing": 0
+  },
+  "coordinate_origin": "top-left",
+  "projection": "top-down-oblique",
+  "sprites": {
+    "stone_0": {
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "repeat_x": true,
+      "repeat_y": true
+    },
+    "stone_1": {
+      "rect": {
+        "x": 64,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "repeat_x": true,
+      "repeat_y": true
+    },
+    "stone_2": {
+      "rect": {
+        "x": 128,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "repeat_x": true,
+      "repeat_y": true
+    },
+    "stone_3": {
+      "rect": {
+        "x": 192,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "repeat_x": true,
+      "repeat_y": true
+    },
+    "dirt_0": {
+      "rect": {
+        "x": 0,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "repeat_x": true,
+      "repeat_y": true
+    },
+    "dirt_1": {
+      "rect": {
+        "x": 64,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "repeat_x": true,
+      "repeat_y": true
+    },
+    "dirt_2": {
+      "rect": {
+        "x": 128,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "repeat_x": true,
+      "repeat_y": true
+    },
+    "dirt_3": {
+      "rect": {
+        "x": 192,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "repeat_x": true,
+      "repeat_y": true
+    },
+    "water_0": {
+      "rect": {
+        "x": 0,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "repeat_x": true,
+      "repeat_y": true
+    },
+    "water_1": {
+      "rect": {
+        "x": 64,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "repeat_x": true,
+      "repeat_y": true
+    },
+    "water_2": {
+      "rect": {
+        "x": 128,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "repeat_x": true,
+      "repeat_y": true
+    },
+    "water_3": {
+      "rect": {
+        "x": 192,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "repeat_x": true,
+      "repeat_y": true
+    },
+    "wall_gray": {
+      "rect": {
+        "x": 0,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "repeat_x": true,
+      "repeat_y": true
+    },
+    "wall_brown": {
+      "rect": {
+        "x": 64,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "repeat_x": true,
+      "repeat_y": true
+    },
+    "gravel": {
+      "rect": {
+        "x": 128,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "repeat_x": true,
+      "repeat_y": true
+    },
+    "pit": {
+      "rect": {
+        "x": 192,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "repeat_x": true,
+      "repeat_y": true
+    }
+  }
+}

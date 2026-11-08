@@ -1,0 +1,11 @@
+// Demonstration only. Applications supply their credential/storage flow.
+Add_Dynamic_Module Security Appeal_Sodium_Security
+Set_Var Key (Security Generate_Key)
+Set_Var Cipher (Security Encrypt "A private message" Var Key)
+Set_Var Plaintext (Security Decrypt Var Cipher Var Key)
+Print_Global Security.Success
+// Secrets are intentionally not printed or automatically saved.
+Del_Var Key
+Del_Var Plaintext
+Print SECURITY_EXAMPLE_PASSED
+Done

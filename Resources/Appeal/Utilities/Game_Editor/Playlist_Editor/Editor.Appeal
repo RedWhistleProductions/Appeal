@@ -1,0 +1,204 @@
+// Embeddable: caller selects its game database and loads Graphics + Storage.
+Run Setup/Playlists
+Storage Execute_SQL "CREATE TEMP TABLE IF NOT EXISTS PE_Context (Name TEXT PRIMARY KEY, Value TEXT);"
+Storage Execute_SQL "CREATE TEMP VIEW IF NOT EXISTS PE_File_Name AS SELECT 'Current' AS Name,'Levels/Level_' || hex(Value) || '.txt' AS File FROM PE_Context WHERE Name='Level';"
+Set_Var PE_Level ""
+Set_Var PE_Next_Level ""
+Set_Var PE_File ""
+Set_Var PE_Resource_File ""
+Set_Var PE_Audio_Ready 0
+Set_Var PE_Audio_Dirty 1
+Set_Var PE_Audio_Source ""
+Set_Var PE_Audio_Level ""
+Set_Var PE_Volume 100
+Set_Var PE_Now_Playing "Stopped"
+Set_Var PE_Visible 0
+Set_Var PE_Status "Choose a level to edit its playlist."
+// Load Audio only when playback is requested, so embedding need not open a device.
+Define_Function PE_Init_Audio
+    If Var PE_Audio_Ready == 0
+    {
+        Add_Dynamic_Module Audio Appeal_SDL2_Audio
+        Set_Var PE_Audio_Ready 1
+        Audio Set_Volume_Percent Var PE_Volume
+    }
+End_Function
+Define_Function PE_Stop
+    If Var PE_Audio_Ready == 1
+    {
+        Audio Auto_Play_Next 0
+        Audio Stop
+    }
+    Set_Var PE_Now_Playing Stopped
+End_Function
+Define_Function PE_Prepare_Playlist
+    Set_Var PE_Can_Play 0
+    If Var PE_Level != ""
+    {
+        Graphics GUI_Playlist_Item_Count PE_List
+        Set_Var_Global PE_Song_Count Graphics.GUI.PE_List.Item_Count
+        If Var PE_Song_Count > 0
+        {
+            Call PE_Init_Audio
+            Set_Var PE_Reload Var PE_Audio_Dirty
+            If Var PE_Audio_Source != Playlist { Set_Var PE_Reload 1 }
+            If Var PE_Audio_Level != Var PE_Level { Set_Var PE_Reload 1 }
+            If Var PE_Reload == 1
+            {
+                Set_Var PE_Audio_Dirty 1
+                Set_Var PE_Playback_Saved (Graphics GUI_Playlist_Save PE_List)
+                If Var PE_Playback_Saved == 1
+                {
+                    Audio Clear_Play_List
+                    Audio Load_Play_List Var PE_File
+                    Set_Var PE_Audio_Dirty 0
+                    Set_Var PE_Audio_Source Playlist
+                    Set_Var PE_Audio_Level Var PE_Level
+                }
+            }
+            If Var PE_Audio_Dirty == 0
+            {
+                Set_Var PE_Can_Play 1
+                Audio Auto_Play_Next 1
+            }
+        }
+        If Var PE_Song_Count == 0
+        {
+            Call PE_Stop
+            Set_Var PE_Status "Add songs to the playlist before playing it."
+        }
+    }
+End_Function
+Define_Function PE_Play
+    Call PE_Prepare_Playlist
+    If Var PE_Can_Play == 1 { Audio Play }
+End_Function
+Define_Function PE_Next
+    Call PE_Prepare_Playlist
+    If Var PE_Can_Play == 1 { Audio Next }
+End_Function
+Define_Function PE_Back
+    Call PE_Prepare_Playlist
+    If Var PE_Can_Play == 1 { Audio Back }
+End_Function
+Define_Function PE_Volume_Changed
+    Set_Var PE_Volume Var Callback_Value
+    Call PE_Init_Audio
+    Audio Set_Volume_Percent Var PE_Volume
+End_Function
+Define_Function PE_Preview_Song
+    Graphics GUI_Music_Picker_Value PE_Music
+    Set_Var_Global PE_Preview_File Graphics.GUI.PE_Music.Selected_Path
+    Set_Var_Global PE_Preview_Title Graphics.GUI.PE_Music.Selected_Title
+    If Var PE_Preview_File != ""
+    {
+        Call PE_Init_Audio
+        Audio Auto_Play_Next 0
+        Audio Clear_Play_List
+        Audio Load_Song Var PE_Preview_Title Var PE_Preview_File
+        Audio Play
+        Set_Var PE_Audio_Source Library
+        Set_Var PE_Audio_Dirty 1
+    }
+End_Function
+Define_Function PE_Select_Level
+    If Var PE_Next_Level != Var PE_Level
+    {
+        Call PE_Stop
+        Set_Var PE_Audio_Dirty 1
+        Set_Var PE_Level Var PE_Next_Level
+        Set_Var PE_File ""
+        If Var PE_Level != ""
+        {
+            Storage Set_Field PE_Context Name Level Value Var PE_Level
+            Set_Var PE_File (Storage Get_Field Playlists Level_Name Var PE_Level File)
+            If Var PE_File == ""
+            {
+                Set_Var PE_File (Storage Get_Field PE_File_Name Name Current File)
+            }
+            Storage Set_Field PE_Context Name Playlist_File Value Var PE_File
+            Storage Execute_SQL "CREATE TEMP VIEW IF NOT EXISTS PE_Resource_Path AS SELECT 'Current' AS Name,'Audio/Playlist/' || Value AS File FROM PE_Context WHERE Name='Playlist_File';"
+            Set_Var PE_Resource_File (Storage Get_Field PE_Resource_Path Name Current File)
+            Graphics GUI_Playlist_Load PE_List Var PE_Resource_File
+            Set_Var PE_Status "Drag songs into the list. Changes save automatically for this level."
+        }
+    }
+End_Function
+Define_Function PE_Save
+    Call PE_Stop
+    Set_Var PE_Audio_Dirty 1
+    If Var PE_Level != ""
+    {
+        Set_Var PE_Saved (Graphics GUI_Playlist_Save PE_List)
+        If Var PE_Saved == 1
+        {
+            Storage Set_Field Playlists Level_Name Var PE_Level File Var PE_File
+            Storage Set_Field PE_Context Name Saved_Level Value Var PE_Level
+            Storage Execute_SQL "UPDATE Playlists SET Updated_At=CURRENT_TIMESTAMP WHERE Level_Name=(SELECT Value FROM PE_Context WHERE Name='Saved_Level');"
+            Set_Var PE_Status "Playlist saved and linked to this level."
+        }
+        If Var PE_Saved == 0
+        {
+            Set_Var PE_Status "Could not save the playlist file. Check that its folder is writable, then retry Save playlist."
+        }
+    }
+End_Function
+Define_Function PE_Clear
+    If Var PE_Level != ""
+    {
+        Graphics GUI_Playlist_Clear PE_List
+        Call PE_Save
+    }
+End_Function
+Define_Function PE_Close
+    Graphics GUI_Set_Window_Open "Playlist Editor" False
+    Graphics GUI_Set_Window_Open "Music Library" False
+    Call PE_Stop
+    Set_Var PE_Visible 0
+End_Function
+Define_Function PE_Show
+    Graphics GUI_Set_Window_Open "Playlist Editor" True
+    Graphics GUI_Set_Window_Open "Music Library" True
+    Set_Var PE_Visible 1
+End_Function
+Graphics GUI_Set_Window_Functions "Playlist Editor" PE_Close PE_Show
+Graphics GUI_Set_Window_Functions "Music Library" PE_Close PE_Show
+Define_Function PE_GUI
+    Call PE_Select_Level
+    Graphics GUI_Begin_Window "Playlist Editor"
+    Graphics GUI_Text PE_Level_Label "Selected level:"
+    Graphics GUI_Text PE_Level_Name Var PE_Level
+    Graphics GUI_Text PE_Status_Label Var PE_Status
+    If Var PE_Audio_Ready == 1
+    {
+        If (Audio Is_Playing) == 1 { Set_Var PE_Now_Playing (Audio Current_Song) }
+        If (Audio Is_Playing) == 0 { Set_Var PE_Now_Playing Stopped }
+    }
+    Graphics GUI_Text PE_Playing_Label Var PE_Now_Playing
+    Graphics GUI_Button PE_Back_Button Back PE_Back
+    Graphics GUI_Same_Line
+    Graphics GUI_Button PE_Play_Button Play PE_Play
+    Graphics GUI_Same_Line
+    Graphics GUI_Button PE_Stop_Button Stop PE_Stop
+    Graphics GUI_Same_Line
+    Graphics GUI_Button PE_Next_Button Next PE_Next
+    Graphics GUI_Set_Slider_Int_Value PE_Volume_Control Var PE_Volume
+    Graphics GUI_Slider_Int PE_Volume_Control "Volume (%)" Var PE_Volume 0 100 PE_Volume_Changed
+    If Var PE_Level != ""
+    {
+        Graphics GUI_Text PE_Usage "Drag songs from Music Library. Drag list entries to reorder; X removes a song."
+        Graphics GUI_Playlist PE_List "Level playlist" Var PE_Resource_File PE_Save
+        Graphics GUI_Button PE_Save_Button "Save playlist" PE_Save
+        Graphics GUI_Button PE_Clear_Button "Clear playlist" PE_Clear
+    }
+    Graphics GUI_End_Window
+    If Var PE_Level != ""
+    {
+        Graphics GUI_Begin_Window "Music Library"
+        Graphics GUI_Button PE_Preview_Button "Play selected song" PE_Preview_Song
+        Graphics GUI_Music_Picker_Recursive PE_Music True
+        Graphics GUI_Music_Picker PE_Music "Music and subfolders" Audio/Music Audio/Music None
+        Graphics GUI_End_Window
+    }
+End_Function
+Return

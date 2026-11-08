@@ -1,0 +1,197 @@
+// Embeddable game catalog. Load the Level Editor core first; host owns the loop.
+Storage Execute_SQL "CREATE TABLE IF NOT EXISTS Editor_Games (Name TEXT PRIMARY KEY);"
+Storage Execute_SQL "CREATE TABLE IF NOT EXISTS Editor_Game_Level_Membership (Game_Name TEXT, Level_Name TEXT, PRIMARY KEY(Game_Name,Level_Name));"
+Storage Execute_SQL "CREATE TEMP VIEW IF NOT EXISTS GE_Games AS SELECT CAST(row_number() OVER (ORDER BY Name)-1 AS TEXT) AS Number,Name FROM Editor_Games;"
+Storage Execute_SQL "CREATE TEMP VIEW IF NOT EXISTS GE_Catalog AS SELECT 'All' AS Name,count(*) AS Count,group_concat(Name,'|') AS Items FROM (SELECT Name FROM GE_Games ORDER BY CAST(Number AS INTEGER));"
+Storage Execute_SQL "DROP VIEW LE_Saved_Levels;"
+Storage Execute_SQL "CREATE TEMP VIEW LE_Saved_Levels AS SELECT CAST(row_number() OVER (ORDER BY Name)-1 AS TEXT) AS Number,Name FROM Editor_Game_Levels WHERE Name IN (SELECT Level_Name FROM Editor_Game_Level_Membership WHERE Game_Name=(SELECT Value FROM Editor_Context WHERE Name='GE_Game'));"
+Set_Var GE_Host 1
+Set_Var GE_Game ""
+Set_Var GE_New_Name My_Game
+Set_Var GE_Selected ""
+Set_Var GE_GUI_Ready 0
+Set_Var GE_Status "Create a game or select an existing game and open it."
+Define_Function GE_Refresh
+    Set_Var GE_Count (Storage Get_Field GE_Catalog Name All Count)
+    Set_Var GE_Items (Storage Get_Field GE_Catalog Name All Items)
+    Set_Var GE_Index (Storage Get_Field GE_Games Name Var GE_Selected Number)
+    If Var GE_Index == "" { Set_Var GE_Index -1 }
+    If Var GE_Count == 0 { Set_Var GE_Items "No saved games" }
+End_Function
+Define_Function GE_Changed
+    If Var GE_Count > 0
+    {
+        Set_Var GE_Selected (Storage Get_Field GE_Games Number Var Callback_Value Name)
+    }
+End_Function
+Define_Function GE_Check_Switch
+    Set_Var GE_Allowed 1
+    If Var LE_Dirty == 1 { Set_Var GE_Allowed 0 }
+    If Var TE_Dirty == 1 { Set_Var GE_Allowed 0 }
+    If Var CE_Ready == 1
+    {
+        If Var CE_Dirty == 1
+        {
+            If Var CE_Discard == 0 { Set_Var GE_Allowed 0 }
+        }
+    }
+    If Var SS_Ready == 1
+    {
+        If Var SS_Dirty == 1
+        {
+            If Var SS_Discard == 0 { Set_Var GE_Allowed 0 }
+        }
+    }
+    If Var GE_Allowed == 0
+    {
+        Set_Var GE_Status "Save pending editor changes before switching games (or explicitly discard component changes)."
+    }
+End_Function
+Define_Function GE_Create
+    If Var GE_GUI_Ready == 1
+    {
+        Graphics GUI_Text_Value GE_New_Name_Control
+        Set_Var_Global GE_New_Name Graphics.GUI.GE_New_Name_Control.Value
+    }
+    Call GE_Check_Switch
+    If Var GE_New_Name == ""
+    {
+        Set_Var GE_Allowed 0
+        Set_Var GE_Status "Enter a name for the new game."
+    }
+    If (Storage Get_Field Editor_Games Name Var GE_New_Name Name) != ""
+    {
+        Set_Var GE_Allowed 0
+        Set_Var GE_Status "That game already exists. Select it and choose Open game."
+    }
+    If Var GE_Allowed == 1
+    {
+        Storage Set_Field Editor_Games Name Var GE_New_Name Name Var GE_New_Name
+        Set_Var GE_Selected Var GE_New_Name
+        Call GE_Open
+    }
+End_Function
+Define_Function GE_Open
+    Call GE_Check_Switch
+    If Var GE_Selected == "" { Set_Var GE_Allowed 0 }
+    If (Storage Get_Field Editor_Games Name Var GE_Selected Name) == "" { Set_Var GE_Allowed 0 }
+    If Var GE_Allowed == 1
+    {
+        Call LE_Show_Level
+        Set_Var GE_Game Var GE_Selected
+        Storage Set_Field Editor_Context Name GE_Game Value Var GE_Game
+        If Var CE_Ready == 1
+        {
+            Set_Var CE_Next_Game Var GE_Game
+            Call CE_Use_Game
+        }
+        If Var SS_Ready == 1
+        {
+            Set_Var SS_Next_Game Var GE_Game
+            Call SS_Use_Game
+        }
+        Set_Var LE_Map_Ready 0
+        Storage Execute_SQL "CREATE TEMP VIEW IF NOT EXISTS GE_Default_Level AS SELECT 'All' AS Name,Value || '_Level_1' AS Value FROM Editor_Context WHERE Name='GE_Game';"
+        Set_Var LE_Name (Storage Get_Field GE_Default_Level Name All Value)
+        Call LE_New
+        Set_Var LE_Dirty 0
+        Call LE_Refresh_Levels
+        If Var LE_Level_Count > 0
+        {
+            Set_Var LE_Name (Storage Get_Field LE_Saved_Levels Number 0 Name)
+            Call LE_Load_Level
+        }
+        Graphics GUI_Set_Text_Value LE_Name_Control Var LE_Name
+        Set_Var GE_Mode Level
+        Set_Var GE_Status "Game opened. Saved levels belong to this game; tile maps remain reusable."
+    }
+    Call GE_Refresh
+End_Function
+Define_Function GE_Attach_Level
+    If Var GE_Game != ""
+    {
+        Storage Set_Field Editor_Context Name GE_Level Value Var LE_Name
+        Storage Execute_SQL "INSERT OR IGNORE INTO Editor_Game_Level_Membership SELECT (SELECT Value FROM Editor_Context WHERE Name='GE_Game'),(SELECT Value FROM Editor_Context WHERE Name='GE_Level');"
+    }
+End_Function
+Define_Function GE_Show
+    Call LE_Show_Level
+    Call LE_Clear_Thumbnails
+    Set_Var GE_Mode Game
+End_Function
+Define_Function GE_Show_Level
+    If Var GE_Game != ""
+    {
+        Call LE_Show_Level
+        Set_Var GE_Mode Level
+        Call LE_Build_Thumbnails
+    }
+End_Function
+Define_Function GE_Show_Character
+    Call LE_Show_Level
+    Call LE_Clear_Thumbnails
+    If Var CE_Game != Var GE_Game
+    {
+        Set_Var CE_Next_Game Var GE_Game
+        Call CE_Use_Game
+    }
+    Set_Var GE_Mode Character
+End_Function
+Define_Function GE_Show_Database
+    Call LE_Show_Level
+    Call LE_Clear_Thumbnails
+    Set_Var GE_Mode Database
+End_Function
+Define_Function GE_Show_Screens
+    Call LE_Show_Level
+    Call LE_Clear_Thumbnails
+    If Var SS_Game != Var GE_Game
+    {
+        Set_Var SS_Next_Game Var GE_Game
+        Call SS_Use_Game
+    }
+    Set_Var GE_Mode Screens
+End_Function
+Define_Function GE_Show_IDE
+    Call LE_Show_Level
+    Call LE_Clear_Thumbnails
+    Set_Var GE_Mode IDE
+    Input Set_Focus GUI
+End_Function
+Define_Function GE_Request_Exit
+    If Var IDE_Ready == 1
+    {
+        Set_Var IDE_Exit_Function TE_Exit
+        Call IDE_Request_Exit
+        If Var IDE_Exit_Pending == 1 { Call GE_Show_IDE }
+    }
+    If Var IDE_Ready != 1 { Call TE_Exit }
+End_Function
+Define_Function GE_Toolbar
+    Graphics GUI_Text GE_Current Var GE_Game
+    Graphics GUI_Button GE_Component_Game "Game Editor" GE_Show
+    Graphics GUI_Button GE_Component_Level "Level Editor" GE_Show_Level
+    Graphics GUI_Button GE_Component_Database "Database Editor" GE_Show_Database
+    Graphics GUI_Button GE_Component_Character "Character Editor" GE_Show_Character
+    Graphics GUI_Button GE_Component_Screens "Splash / Title Screens" GE_Show_Screens
+    Graphics GUI_Button GE_Component_IDE "Appeal IDE" GE_Show_IDE
+    Graphics GUI_Separator
+End_Function
+Define_Function GE_GUI
+    Set_Var GE_GUI_Ready 1
+    Call GE_Refresh
+    Graphics GUI_Begin_Window "Editor Controls"
+    Graphics GUI_Text GE_Heading "Bananas Game Editor"
+    Graphics GUI_Text GE_Status_Label Var GE_Status
+    Graphics GUI_Input_Text GE_New_Name_Control "New game name" Var GE_New_Name None
+    Graphics GUI_Button GE_Create_Button "Create new game" GE_Create
+    Graphics GUI_Set_Selection_Value GE_Game_Menu Var GE_Index
+    Graphics GUI_Combo GE_Game_Menu "Existing games" Var GE_Items Var GE_Index GE_Changed
+    Graphics GUI_Button GE_Open_Button "Open game" GE_Open
+    Graphics GUI_Text GE_Current_Label "Current game:"
+    Graphics GUI_Text GE_Current_Name Var GE_Game
+    Graphics GUI_Text GE_Help "Choose Level Editor in Components to edit this game's levels."
+    Graphics GUI_End_Window
+End_Function
+Call GE_Refresh
+Return

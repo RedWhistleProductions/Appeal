@@ -1,0 +1,291 @@
+{
+  "schema": "bananas.sprite-atlas.v1",
+  "image": "dungeon_props.png",
+  "format": "RGBA8",
+  "size": {
+    "w": 512,
+    "h": 384
+  },
+  "grid": {
+    "cell_width": 64,
+    "cell_height": 64,
+    "margin": 0,
+    "spacing": 0
+  },
+  "coordinate_origin": "top-left",
+  "projection": "top-down-oblique",
+  "sprites": {
+    "chest_closed": {
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 32,
+        "y": 62
+      },
+      "sort_anchor": "pivot"
+    },
+    "chest_open": {
+      "rect": {
+        "x": 64,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 32,
+        "y": 62
+      },
+      "sort_anchor": "pivot"
+    },
+    "door_closed": {
+      "rect": {
+        "x": 128,
+        "y": 0,
+        "w": 64,
+        "h": 128
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 2
+      },
+      "pivot": {
+        "x": 32,
+        "y": 126
+      },
+      "sort_anchor": "pivot"
+    },
+    "door_open": {
+      "rect": {
+        "x": 192,
+        "y": 0,
+        "w": 64,
+        "h": 128
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 2
+      },
+      "pivot": {
+        "x": 32,
+        "y": 126
+      },
+      "sort_anchor": "pivot"
+    },
+    "stairs_down": {
+      "rect": {
+        "x": 256,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 32,
+        "y": 62
+      },
+      "sort_anchor": "pivot"
+    },
+    "stairs_up": {
+      "rect": {
+        "x": 320,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 32,
+        "y": 62
+      },
+      "sort_anchor": "pivot"
+    },
+    "barrel": {
+      "rect": {
+        "x": 384,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 32,
+        "y": 62
+      },
+      "sort_anchor": "pivot"
+    },
+    "crate": {
+      "rect": {
+        "x": 448,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 32,
+        "y": 62
+      },
+      "sort_anchor": "pivot"
+    },
+    "column": {
+      "rect": {
+        "x": 0,
+        "y": 192,
+        "w": 64,
+        "h": 128
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 2
+      },
+      "pivot": {
+        "x": 32,
+        "y": 126
+      },
+      "sort_anchor": "pivot"
+    },
+    "column_broken": {
+      "rect": {
+        "x": 64,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 32,
+        "y": 62
+      },
+      "sort_anchor": "pivot"
+    },
+    "rubble": {
+      "rect": {
+        "x": 128,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 32,
+        "y": 62
+      },
+      "sort_anchor": "pivot"
+    },
+    "spikes_raised": {
+      "rect": {
+        "x": 192,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 32,
+        "y": 62
+      },
+      "sort_anchor": "pivot"
+    },
+    "brazier_unlit": {
+      "rect": {
+        "x": 256,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 32,
+        "y": 62
+      },
+      "sort_anchor": "pivot"
+    },
+    "brazier_lit": {
+      "rect": {
+        "x": 320,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 32,
+        "y": 62
+      },
+      "sort_anchor": "pivot"
+    },
+    "table": {
+      "rect": {
+        "x": 384,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 32,
+        "y": 62
+      },
+      "sort_anchor": "pivot"
+    },
+    "lever": {
+      "rect": {
+        "x": 448,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 32,
+        "y": 62
+      },
+      "sort_anchor": "pivot"
+    }
+  }
+}

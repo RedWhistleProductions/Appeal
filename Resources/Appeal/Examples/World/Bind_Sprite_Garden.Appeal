@@ -1,0 +1,292 @@
+Set_Var Scene_Section Var Scene_Left
+Set_Var Scene_Column 0
+Set_Var Scene_Row 0
+Set_Var Scene_Drawable 1000
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Left
+Set_Var Scene_Column 1
+Set_Var Scene_Row 0
+Set_Var Scene_Drawable 1001
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Left
+Set_Var Scene_Column 2
+Set_Var Scene_Row 0
+Set_Var Scene_Drawable 1002
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Left
+Set_Var Scene_Column 3
+Set_Var Scene_Row 0
+Set_Var Scene_Drawable 1003
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Left
+Set_Var Scene_Column 4
+Set_Var Scene_Row 0
+Set_Var Scene_Drawable 1004
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Left
+Set_Var Scene_Column 5
+Set_Var Scene_Row 0
+Set_Var Scene_Drawable 1005
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Left
+Set_Var Scene_Column 6
+Set_Var Scene_Row 0
+Set_Var Scene_Drawable 1006
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Left
+Set_Var Scene_Column 7
+Set_Var Scene_Row 0
+Set_Var Scene_Drawable 1007
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Left
+Set_Var Scene_Column 0
+Set_Var Scene_Row 1
+Set_Var Scene_Drawable 1008
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Left
+Set_Var Scene_Column 1
+Set_Var Scene_Row 1
+Set_Var Scene_Drawable 1009
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Left
+Set_Var Scene_Column 2
+Set_Var Scene_Row 1
+Set_Var Scene_Drawable 1010
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Left
+Set_Var Scene_Column 3
+Set_Var Scene_Row 1
+Set_Var Scene_Drawable 1011
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Left
+Set_Var Scene_Column 4
+Set_Var Scene_Row 1
+Set_Var Scene_Drawable 1012
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Left
+Set_Var Scene_Column 5
+Set_Var Scene_Row 1
+Set_Var Scene_Drawable 1013
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Left
+Set_Var Scene_Column 6
+Set_Var Scene_Row 1
+Set_Var Scene_Drawable 1014
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Left
+Set_Var Scene_Column 7
+Set_Var Scene_Row 1
+Set_Var Scene_Drawable 1015
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Left
+Set_Var Scene_Column 0
+Set_Var Scene_Row 2
+Set_Var Scene_Drawable 1016
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Left
+Set_Var Scene_Column 1
+Set_Var Scene_Row 2
+Set_Var Scene_Drawable 1017
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Left
+Set_Var Scene_Column 2
+Set_Var Scene_Row 2
+Set_Var Scene_Drawable 1018
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Left
+Set_Var Scene_Column 3
+Set_Var Scene_Row 2
+Set_Var Scene_Drawable 1019
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Left
+Set_Var Scene_Column 4
+Set_Var Scene_Row 2
+Set_Var Scene_Drawable 1020
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Left
+Set_Var Scene_Column 5
+Set_Var Scene_Row 2
+Set_Var Scene_Drawable 1021
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Left
+Set_Var Scene_Column 6
+Set_Var Scene_Row 2
+Set_Var Scene_Drawable 1022
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Left
+Set_Var Scene_Column 7
+Set_Var Scene_Row 2
+Set_Var Scene_Drawable 1023
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Right
+Set_Var Scene_Column 0
+Set_Var Scene_Row 0
+Set_Var Scene_Drawable 1024
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Right
+Set_Var Scene_Column 1
+Set_Var Scene_Row 0
+Set_Var Scene_Drawable 1025
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Right
+Set_Var Scene_Column 2
+Set_Var Scene_Row 0
+Set_Var Scene_Drawable 1026
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Right
+Set_Var Scene_Column 3
+Set_Var Scene_Row 0
+Set_Var Scene_Drawable 1027
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Right
+Set_Var Scene_Column 4
+Set_Var Scene_Row 0
+Set_Var Scene_Drawable 1028
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Right
+Set_Var Scene_Column 5
+Set_Var Scene_Row 0
+Set_Var Scene_Drawable 1029
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Right
+Set_Var Scene_Column 6
+Set_Var Scene_Row 0
+Set_Var Scene_Drawable 1030
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Right
+Set_Var Scene_Column 7
+Set_Var Scene_Row 0
+Set_Var Scene_Drawable 1031
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Right
+Set_Var Scene_Column 0
+Set_Var Scene_Row 1
+Set_Var Scene_Drawable 1032
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Right
+Set_Var Scene_Column 1
+Set_Var Scene_Row 1
+Set_Var Scene_Drawable 1033
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Right
+Set_Var Scene_Column 2
+Set_Var Scene_Row 1
+Set_Var Scene_Drawable 1034
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Right
+Set_Var Scene_Column 3
+Set_Var Scene_Row 1
+Set_Var Scene_Drawable 1035
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Right
+Set_Var Scene_Column 4
+Set_Var Scene_Row 1
+Set_Var Scene_Drawable 1036
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Right
+Set_Var Scene_Column 5
+Set_Var Scene_Row 1
+Set_Var Scene_Drawable 1037
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Right
+Set_Var Scene_Column 6
+Set_Var Scene_Row 1
+Set_Var Scene_Drawable 1038
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Right
+Set_Var Scene_Column 7
+Set_Var Scene_Row 1
+Set_Var Scene_Drawable 1039
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Right
+Set_Var Scene_Column 0
+Set_Var Scene_Row 2
+Set_Var Scene_Drawable 1040
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Right
+Set_Var Scene_Column 1
+Set_Var Scene_Row 2
+Set_Var Scene_Drawable 1041
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Right
+Set_Var Scene_Column 2
+Set_Var Scene_Row 2
+Set_Var Scene_Drawable 1042
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Right
+Set_Var Scene_Column 3
+Set_Var Scene_Row 2
+Set_Var Scene_Drawable 1043
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Right
+Set_Var Scene_Column 4
+Set_Var Scene_Row 2
+Set_Var Scene_Drawable 1044
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Right
+Set_Var Scene_Column 5
+Set_Var Scene_Row 2
+Set_Var Scene_Drawable 1045
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Right
+Set_Var Scene_Column 6
+Set_Var Scene_Row 2
+Set_Var Scene_Drawable 1046
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Right
+Set_Var Scene_Column 7
+Set_Var Scene_Row 2
+Set_Var Scene_Drawable 1047
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Props
+Set_Var Scene_Column 0
+Set_Var Scene_Row 6
+Set_Var Scene_Drawable 2000
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Props
+Set_Var Scene_Column 2
+Set_Var Scene_Row 6
+Set_Var Scene_Drawable 2001
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Props
+Set_Var Scene_Column 8
+Set_Var Scene_Row 6
+Set_Var Scene_Drawable 2002
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Props
+Set_Var Scene_Column 14
+Set_Var Scene_Row 6
+Set_Var Scene_Drawable 2003
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Props
+Set_Var Scene_Column 3
+Set_Var Scene_Row 7
+Set_Var Scene_Drawable 2004
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Props
+Set_Var Scene_Column 10
+Set_Var Scene_Row 7
+Set_Var Scene_Drawable 2005
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Props
+Set_Var Scene_Column 13
+Set_Var Scene_Row 7
+Set_Var Scene_Drawable 2006
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Props
+Set_Var Scene_Column 6
+Set_Var Scene_Row 7
+Set_Var Scene_Drawable 2007
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Props
+Set_Var Scene_Column 9
+Set_Var Scene_Row 7
+Set_Var Scene_Drawable 2008
+Call Scene_Bind_Tile
+Set_Var Scene_Section Var Scene_Props
+Set_Var Scene_Column 12
+Set_Var Scene_Row 7
+Set_Var Scene_Drawable 2009
+Call Scene_Bind_Tile
+Return
+

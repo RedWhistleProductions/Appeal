@@ -1,0 +1,557 @@
+// Standalone or embedded database browser. Storage + Files + Graphics must be loaded.
+// DE_Return_DB is restored after every callback; the host keeps its own connection.
+Set_Var DE_Return_DB ""
+Set_Var DE_Folder Resources/Storage
+Set_Var DE_GUI_Ready 0
+Set_Var DE_Attached 0
+Set_Var DE_Dirty 0
+Set_Var DE_Pending 0
+Set_Var DE_Discard 0
+Set_Var DE_Confirm_Delete 0
+Set_Var DE_Page 0
+Set_Var DE_Record -1
+Set_Var DE_Column 0
+Set_Var DE_Database ""
+Set_Var DE_Table ""
+Set_Var DE_Value ""
+Set_Var DE_Kind text
+Set_Var DE_Kind_Index 0
+Set_Var DE_New_Database New_Database
+Set_Var DE_New_Table New_Table
+Set_Var DE_Definition "ID INTEGER PRIMARY KEY, Name TEXT"
+Set_Var DE_Status "Select a database and table. Stage field edits, then Create or Update the record."
+Storage Open_Memory Database_Editor_Workspace
+Storage Execute_SQL "PRAGMA foreign_keys=ON;"
+Storage Execute_SQL "CREATE TEMP TABLE DE_Context (Name TEXT PRIMARY KEY,Value TEXT);"
+Storage Execute_SQL "CREATE TEMP TABLE DE_Databases (Number TEXT PRIMARY KEY,Name TEXT,File TEXT);"
+Storage Execute_SQL "CREATE TEMP TABLE DE_Tables (Number TEXT PRIMARY KEY,Name TEXT,Label TEXT,Definition TEXT);"
+Storage Execute_SQL "CREATE TEMP TABLE DE_Columns (Number TEXT PRIMARY KEY,Name TEXT,Declared TEXT,Hidden INTEGER,PK INTEGER);"
+Storage Execute_SQL "CREATE TEMP TABLE DE_Rows (Number TEXT PRIMARY KEY,Key TEXT,Label TEXT);"
+Storage Execute_SQL "CREATE TEMP TABLE DE_Draft (Number TEXT PRIMARY KEY,Name TEXT,Value TEXT,Kind TEXT,Edited INTEGER,Hidden INTEGER);"
+Storage Execute_SQL "CREATE TEMP TABLE DE_Kinds (Number TEXT PRIMARY KEY,Name TEXT); INSERT INTO DE_Kinds VALUES('0','text'),('1','integer'),('2','real'),('3','null'),('4','blob');"
+Storage Execute_SQL "CREATE TEMP VIEW DE_Databases_Catalog AS SELECT 'All' AS Name,count(*) AS Count,group_concat(Name,'|') AS Items FROM (SELECT * FROM DE_Databases ORDER BY CAST(Number AS INTEGER));"
+Storage Execute_SQL "CREATE TEMP VIEW DE_Tables_Catalog AS SELECT 'All' AS Name,count(*) AS Count,group_concat(Label,'|') AS Items FROM (SELECT * FROM DE_Tables ORDER BY CAST(Number AS INTEGER));"
+Storage Execute_SQL "CREATE TEMP VIEW DE_Rows_Catalog AS SELECT 'All' AS Name,count(*) AS Count,group_concat(Label,'|') AS Items FROM (SELECT * FROM DE_Rows ORDER BY CAST(Number AS INTEGER));"
+Storage Execute_SQL "CREATE TEMP VIEW DE_Columns_Catalog AS SELECT 'All' AS Name,count(*) AS Count,group_concat(replace(Name,'|','/'),'|') AS Items FROM (SELECT * FROM DE_Columns ORDER BY CAST(Number AS INTEGER));"
+Storage Execute_SQL "CREATE TEMP VIEW DE_Names AS SELECT 'All' AS Root_Name,char(34) || replace((SELECT Value FROM DE_Context WHERE Name='Table'),char(34),(char(34) || char(34))) || char(34) AS T;"
+Storage Execute_SQL "CREATE TEMP VIEW DE_Field_Values AS SELECT *, char(34) || replace(Name,char(34),(char(34) || char(34))) || char(34) AS Q, CASE Kind WHEN 'null' THEN 'NULL' WHEN 'integer' THEN 'CAST(' || quote(Value) || ' AS INTEGER)' WHEN 'real' THEN 'CAST(' || quote(Value) || ' AS REAL)' WHEN 'blob' THEN 'X''' || Value || '''' ELSE 'CAST(X''' || hex(Value) || ''' AS TEXT)' END AS Literal FROM DE_Draft;"
+Storage Execute_SQL "CREATE TEMP VIEW DE_Identity AS SELECT 'All' AS Name,CASE WHEN (SELECT wr FROM pragma_table_list WHERE schema='DE_Target' AND name=(SELECT Value FROM DE_Context WHERE Name='Table'))=0 AND NOT EXISTS(SELECT 1 FROM DE_Columns WHERE lower(Name)='_rowid_') THEN '''_rowid_ IS '' || quote(_rowid_)' ELSE (SELECT group_concat(E, ' || '' AND '' || ') FROM (SELECT quote(char(34) || replace(Name,char(34),(char(34) || char(34))) || ('' || char(34) || ' IS ')) || ' || CASE typeof(' || char(34) || replace(Name,char(34),(char(34) || char(34))) || char(34) || ') WHEN ''text'' THEN ''CAST(X'' || char(39) || hex(' || char(34) || replace(Name,char(34),(char(34) || char(34))) || char(34) || ') || char(39) || '' AS TEXT)'' ELSE quote(' || char(34) || replace(Name,char(34),(char(34) || char(34))) || char(34) || ') END' AS E FROM DE_Columns WHERE PK>0 ORDER BY PK)) END AS Expression;"
+Storage Execute_SQL "CREATE TEMP VIEW DE_SQL AS SELECT 'Attach' AS Name, (SELECT 'ATTACH DATABASE ' || quote((SELECT Value FROM DE_Context WHERE Name='File')) || ' AS DE_Target;') AS Value UNION ALL SELECT 'Rows' AS Name, (SELECT 'INSERT INTO DE_Rows SELECT CAST(row_number() OVER ()-1-' || (CAST((SELECT Value FROM DE_Context WHERE Name='Page') AS INTEGER)*200) || ' AS TEXT),' || (SELECT Expression FROM DE_Identity) || ',replace(substr(coalesce(CAST(' || char(34) || replace((SELECT Name FROM DE_Columns ORDER BY CAST(Number AS INTEGER) LIMIT 1),char(34),(char(34) || char(34))) || char(34) || ' AS TEXT),''''),1,80),''|'',''/'') || '' [record '' || row_number() OVER () || '']'' FROM DE_Target.' || T || ' LIMIT 200 OFFSET ' || (CAST((SELECT Value FROM DE_Context WHERE Name='Page') AS INTEGER)*200) || ';' FROM DE_Names) AS Value UNION ALL SELECT 'Read' AS Name, (SELECT 'INSERT INTO DE_Draft ' || group_concat(S,' UNION ALL ') || ';' FROM (SELECT 'SELECT ' || quote(Number) || ',' || quote(Name) || ',CASE typeof(' || Q || ') WHEN ''blob'' THEN hex(' || Q || ') ELSE CAST(' || Q || ' AS TEXT) END,typeof(' || Q || '),0,' || Hidden || ' FROM DE_Target.' || T || ' WHERE ' || (SELECT Value FROM DE_Context WHERE Name='Key') AS S FROM (SELECT *, char(34) || replace(Name,char(34),(char(34) || char(34))) || char(34) AS Q FROM DE_Columns),DE_Names)) AS Value UNION ALL SELECT 'Update' AS Name, (SELECT 'UPDATE DE_Target.' || T || ' SET ' || (SELECT group_concat(Q || '=' || Literal,',') FROM DE_Field_Values WHERE Edited=1 AND Hidden=0) || ' WHERE ' || (SELECT Value FROM DE_Context WHERE Name='Key') || ';' FROM DE_Names) AS Value UNION ALL SELECT 'Create' AS Name, (SELECT 'INSERT INTO DE_Target.' || T || CASE WHEN (SELECT count(*) FROM DE_Field_Values WHERE Edited=1 AND Hidden=0)=0 THEN ' DEFAULT VALUES;' ELSE ' (' || (SELECT group_concat(Q,',') FROM DE_Field_Values WHERE Edited=1 AND Hidden=0) || ') SELECT ' || (SELECT group_concat(Literal,',') FROM DE_Field_Values WHERE Edited=1 AND Hidden=0) || ';' END FROM DE_Names) AS Value UNION ALL SELECT 'Delete' AS Name, (SELECT 'DELETE FROM DE_Target.' || T || ' WHERE ' || (SELECT Value FROM DE_Context WHERE Name='Key') || ';' FROM DE_Names) AS Value UNION ALL SELECT 'Match' AS Name, (SELECT 'INSERT INTO DE_Context SELECT ''Matches'',CAST(count(*) AS TEXT) FROM DE_Target.' || T || ' WHERE ' || (SELECT Value FROM DE_Context WHERE Name='Key') || ';' FROM DE_Names) AS Value UNION ALL SELECT 'Create_Table' AS Name, (SELECT 'CREATE TABLE DE_Target.' || char(34) || replace((SELECT Value FROM DE_Context WHERE Name='New_Table'),char(34),(char(34) || char(34))) || ('' || char(34) || ' (') || (SELECT Value FROM DE_Context WHERE Name='Definition') || ');') AS Value UNION ALL SELECT 'Rename_Table' AS Name, (SELECT 'ALTER TABLE DE_Target.' || T || ' RENAME TO ' || char(34) || replace((SELECT Value FROM DE_Context WHERE Name='New_Table'),char(34),(char(34) || char(34))) || ('' || char(34) || ';') FROM DE_Names) AS Value UNION ALL SELECT 'Drop_Table' AS Name, (SELECT 'DROP TABLE DE_Target.' || T || ';' FROM DE_Names) AS Value;"
+Storage Execute_SQL "CREATE TEMP VIEW DE_Value_Check AS SELECT 'All' AS Name,CASE WHEN Kind IN ('integer','real') THEN CASE WHEN json_valid(Value) THEN json_type(Value) IN ('integer','real') AND (Kind!='integer' OR json_type(Value)='integer') ELSE 0 END WHEN Kind='blob' THEN length(Value)%2=0 AND Value NOT GLOB '*[^0123456789abcdefABCDEF]*' ELSE 1 END AS Valid FROM DE_Draft WHERE Number=(SELECT Value FROM DE_Context WHERE Name='Column');"
+Define_Function DE_Begin
+    Storage Use Database_Editor_Workspace
+End_Function
+Define_Function DE_End
+    If Var DE_Return_DB != "" { Storage Use Var DE_Return_DB }
+End_Function
+Define_Function DE_Check_Draft
+    Set_Var DE_Allowed 1
+    If Var DE_Discard == 0
+    {
+        If Var DE_Dirty == 1 { Set_Var DE_Allowed 0 }
+        If Var DE_Pending == 1 { Set_Var DE_Allowed 0 }
+    }
+    If Var DE_Allowed == 0 { Set_Var DE_Status "Create / Update the record, or check Discard field edits before changing selection." }
+End_Function
+Define_Function DE_Read_Catalogs
+    Set_Var DE_DB_Items (Storage Get_Field DE_Databases_Catalog Name All Items)
+    Set_Var DE_DB_Count (Storage Get_Field DE_Databases_Catalog Name All Count)
+    Set_Var DE_DB_Index (Storage Get_Field DE_Databases File Var DE_Database Number)
+    If Var DE_DB_Index == "" { Set_Var DE_DB_Index -1 }
+    If Var DE_DB_Count == 0 { Set_Var DE_DB_Items "No databases found" }
+    Set_Var DE_Table_Items (Storage Get_Field DE_Tables_Catalog Name All Items)
+    Set_Var DE_Table_Count (Storage Get_Field DE_Tables_Catalog Name All Count)
+    Set_Var DE_Table_Index (Storage Get_Field DE_Tables Name Var DE_Table Number)
+    If Var DE_Table_Index == "" { Set_Var DE_Table_Index -1 }
+    If Var DE_Table_Count == 0 { Set_Var DE_Table_Items "No tables" }
+    Set_Var DE_Row_Items (Storage Get_Field DE_Rows_Catalog Name All Items)
+    Set_Var DE_Row_Count (Storage Get_Field DE_Rows_Catalog Name All Count)
+    If Var DE_Row_Count == 0 { Set_Var DE_Row_Items "No records on this page" }
+    Set_Var DE_Column_Items (Storage Get_Field DE_Columns_Catalog Name All Items)
+    Set_Var DE_Column_Count (Storage Get_Field DE_Columns_Catalog Name All Count)
+    If Var DE_Column_Count == 0 { Set_Var DE_Column_Items "No fields" }
+End_Function
+Define_Function DE_Refresh_Databases
+    Call DE_Begin
+    Files Scan DE_Files Var DE_Folder
+    Set_Var_Global DE_Scan Files.DE_Files.Items
+    Storage Set_Field DE_Context Name Scan Value Var DE_Scan
+    Storage Set_Field DE_Context Name Folder Value Var DE_Folder
+    Storage Execute_SQL "DELETE FROM DE_Databases;"
+    Storage Execute_SQL "WITH RECURSIVE parts(item,rest) AS (SELECT '',Value FROM DE_Context WHERE Name='Scan' UNION ALL SELECT substr(rest,1,instr(rest,'|')-1),substr(rest,instr(rest,'|')+1) FROM parts WHERE instr(rest,'|')>0) INSERT INTO DE_Databases SELECT CAST(row_number() OVER (ORDER BY item)-1 AS TEXT),item,(SELECT Value FROM DE_Context WHERE Name='Folder') || '/' || item FROM parts WHERE lower(item) LIKE '%.appealdb' OR lower(item) LIKE '%.sqlite' OR lower(item) LIKE '%.sqlite3' OR lower(item) LIKE '%.db';"
+    Call DE_Read_Catalogs
+    Call DE_End
+End_Function
+Define_Function DE_Clear_Record
+    Storage Execute_SQL "DELETE FROM DE_Draft; INSERT INTO DE_Draft SELECT Number,Name,'','text',0,Hidden FROM DE_Columns;"
+    Set_Var DE_Record -1
+    Set_Var DE_Dirty 0
+    Set_Var DE_Pending 0
+    Set_Var DE_Discard 0
+    Set_Var DE_Confirm_Delete 0
+    Set_Var DE_Column 0
+    Call DE_Select_Field
+End_Function
+Define_Function DE_Load_Tables
+    Storage Execute_SQL "DELETE FROM DE_Tables; DELETE FROM DE_Columns; DELETE FROM DE_Rows; DELETE FROM DE_Draft;"
+    Storage Execute_SQL "INSERT INTO DE_Tables SELECT CAST(row_number() OVER (ORDER BY name)-1 AS TEXT),name,replace(name,'|','/'),coalesce(sql,'') FROM DE_Target.sqlite_schema WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name IN (SELECT name FROM pragma_table_list WHERE schema='DE_Target' AND type='table');"
+    Set_Var DE_Table ""
+    Set_Var DE_Record -1
+    Set_Var DE_Dirty 0
+    Set_Var DE_Pending 0
+    Set_Var DE_Discard 0
+    Set_Var DE_Page 0
+    Set_Var DE_Confirm_Delete 0
+    Call DE_Read_Catalogs
+End_Function
+Define_Function DE_Open_Database
+    Call DE_Begin
+    Call DE_Check_Draft
+    If Var DE_Allowed == 1
+    {
+        If Var DE_Next_Database != ""
+        {
+            If Var DE_Attached == 1
+            {
+                Set_Var DE_Error (Storage Try_SQL "DETACH DATABASE DE_Target;")
+                If Var DE_Error == ""
+                {
+                    Set_Var DE_Attached 0
+                    Set_Var DE_Database ""
+                    Set_Var DE_Table ""
+                    Storage Execute_SQL "DELETE FROM DE_Tables; DELETE FROM DE_Columns; DELETE FROM DE_Rows; DELETE FROM DE_Draft;"
+                }
+            }
+            If Var DE_Attached == 0
+            {
+                Storage Set_Field DE_Context Name File Value Var DE_Next_Database
+                Set_Var DE_Error (Storage Try_SQL (Storage Get_Field DE_SQL Name Attach Value))
+                If Var DE_Error == ""
+                {
+                    Set_Var DE_Attached 1
+                    Set_Var DE_Database Var DE_Next_Database
+                    Call DE_Load_Tables
+                    Set_Var DE_Status "Database opened. Select a table."
+                }
+            }
+            If Var DE_Error != "" { Set_Var DE_Status Var DE_Error }
+        }
+    }
+    Call DE_End
+End_Function
+Define_Function DE_Database_Changed
+    Call DE_Begin
+    Set_Var DE_Next_Database (Storage Get_Field DE_Databases Number Var Callback_Value File)
+    Call DE_Open_Database
+    Call DE_End
+End_Function
+Define_Function DE_Load_Rows
+    Storage Set_Field DE_Context Name Page Value Var DE_Page
+    Storage Execute_SQL "DELETE FROM DE_Rows;"
+    Set_Var DE_SQL_Text (Storage Get_Field DE_SQL Name Rows Value)
+    Set_Var DE_Error "This table has no usable row identity."
+    If Var DE_SQL_Text != "" { Set_Var DE_Error (Storage Try_SQL Var DE_SQL_Text) }
+    If Var DE_Error != "" { Set_Var DE_Status Var DE_Error }
+    Call DE_Clear_Record
+    Call DE_Read_Catalogs
+End_Function
+Define_Function DE_Load_Table
+    Storage Set_Field DE_Context Name Table Value Var DE_Table
+    Storage Execute_SQL "DELETE FROM DE_Columns; INSERT INTO DE_Columns SELECT CAST(cid AS TEXT),name,type,hidden,pk FROM pragma_table_xinfo((SELECT Value FROM DE_Context WHERE Name='Table'),'DE_Target') WHERE hidden!=1;"
+    Set_Var DE_Page 0
+    Call DE_Load_Rows
+End_Function
+Define_Function DE_Table_Changed
+    Call DE_Begin
+    Call DE_Check_Draft
+    If Var DE_Allowed == 1
+    {
+        Set_Var DE_Table (Storage Get_Field DE_Tables Number Var Callback_Value Name)
+        If Var DE_Attached == 1
+        {
+            Set_Var DE_Old_Table Var DE_Table
+            Call DE_Load_Tables
+            If (Storage Get_Field DE_Tables Name Var DE_Old_Table Name) != ""
+            {
+                Set_Var DE_Table Var DE_Old_Table
+                Call DE_Load_Table
+            }
+        }
+    }
+    Call DE_End
+End_Function
+Define_Function DE_Select_Field
+    Set_Var DE_Field_Name (Storage Get_Field DE_Draft Number Var DE_Column Name)
+    Set_Var DE_Value (Storage Get_Field DE_Draft Number Var DE_Column Value)
+    Set_Var DE_Kind (Storage Get_Field DE_Draft Number Var DE_Column Kind)
+    Set_Var DE_Kind_Index (Storage Get_Field DE_Kinds Name Var DE_Kind Number)
+    Set_Var DE_Hidden (Storage Get_Field DE_Draft Number Var DE_Column Hidden)
+    Set_Var DE_Pending 0
+    If Var DE_GUI_Ready == 1 { Graphics GUI_Set_Text_Value DE_Value_Control Var DE_Value }
+End_Function
+Define_Function DE_Field_Changed
+    Call DE_Begin
+    Set_Var DE_Next_Column Var Callback_Value
+    Call DE_Stage_Internal
+    If Var DE_Error == ""
+    {
+        Set_Var DE_Column Var DE_Next_Column
+        Call DE_Select_Field
+    }
+    Call DE_End
+End_Function
+Define_Function DE_Kind_Changed
+    Call DE_Begin
+    Set_Var DE_Kind_Index Var Callback_Value
+    Set_Var DE_Kind (Storage Get_Field DE_Kinds Number Var DE_Kind_Index Name)
+    Set_Var DE_Pending 1
+    Call DE_End
+End_Function
+Define_Function DE_Value_Changed
+    Set_Var DE_Pending 1
+End_Function
+Define_Function DE_Read_Record_Internal
+    Storage Set_Field DE_Context Name Key Value (Storage Get_Field DE_Rows Number Var DE_Record Key)
+    Storage Execute_SQL "DELETE FROM DE_Draft;"
+    Set_Var DE_Error (Storage Try_SQL (Storage Get_Field DE_SQL Name Read Value))
+    If Var DE_Error == ""
+    {
+        Set_Var DE_Dirty 0
+        Set_Var DE_Discard 0
+        Set_Var DE_Confirm_Delete 0
+        Set_Var DE_Column 0
+        Call DE_Select_Field
+        Set_Var DE_Status "Record read. Edit a field, then Update; Create inserts a new record."
+    }
+    If Var DE_Error != "" { Set_Var DE_Status Var DE_Error }
+End_Function
+Define_Function DE_Record_Changed
+    Call DE_Begin
+    Call DE_Check_Draft
+    If Var DE_Allowed == 1
+    {
+        Set_Var DE_Record Var Callback_Value
+        If (Storage Get_Field DE_Rows Number Var DE_Record Key) != "" { Call DE_Read_Record_Internal }
+    }
+    Call DE_End
+End_Function
+Define_Function DE_Read
+    Call DE_Begin
+    Call DE_Check_Draft
+    If Var DE_Allowed == 1
+    {
+        If Var DE_Record >= 0 { Call DE_Read_Record_Internal }
+    }
+    Call DE_End
+End_Function
+Define_Function DE_New_Record
+    Call DE_Begin
+    Call DE_Check_Draft
+    If Var DE_Allowed == 1
+    {
+        Call DE_Clear_Record
+        Set_Var DE_Status "New record draft. Unedited fields use their database defaults when created."
+    }
+    Call DE_End
+End_Function
+Define_Function DE_Stage_Internal
+    Set_Var DE_Error ""
+    If Var DE_Pending == 1
+    {
+        If Var DE_Hidden != 0
+        {
+            Set_Var DE_Error "Generated fields are read-only."
+        }
+        If Var DE_Hidden == 0
+        {
+            If Var DE_GUI_Ready == 1
+            {
+                Graphics GUI_Text_Value DE_Value_Control
+                Set_Var_Global DE_Value Graphics.GUI.DE_Value_Control.Value
+            }
+            Storage Set_Field DE_Context Name Column Value Var DE_Column
+            Storage Set_Field DE_Draft Number Var DE_Column Value Var DE_Value
+            Storage Set_Field DE_Draft Number Var DE_Column Kind Var DE_Kind
+            If (Storage Get_Field DE_Value_Check Name All Valid) != 1
+            {
+                Set_Var DE_Error "Invalid value: use a JSON number for integer/real or even-length hexadecimal for blob."
+            }
+            If Var DE_Error == ""
+            {
+                Storage Set_Field DE_Draft Number Var DE_Column Edited 1
+                Set_Var DE_Dirty 1
+                Set_Var DE_Pending 0
+            }
+        }
+        If Var DE_Error != "" { Set_Var DE_Status Var DE_Error }
+    }
+End_Function
+Define_Function DE_Stage
+    Call DE_Begin
+    Call DE_Stage_Internal
+    If Var DE_Error == "" { Set_Var DE_Status "Field staged. Create or Update writes the record."
+    }
+    Call DE_End
+End_Function
+Define_Function DE_Match
+    Storage Execute_SQL "DELETE FROM DE_Context WHERE Name='Matches';"
+    Set_Var DE_Error (Storage Try_SQL (Storage Get_Field DE_SQL Name Match Value))
+    If Var DE_Error == ""
+    {
+        If (Storage Get_Field DE_Context Name Matches Value) != 1 { Set_Var DE_Error "Record changed or has no unique identity. Refresh and select it again." }
+    }
+End_Function
+Define_Function DE_Write
+    Call DE_Begin
+    Call DE_Stage_Internal
+    If Var DE_Table == "" { Set_Var DE_Error "Select a table first." }
+    If Var DE_Action == Update
+    {
+        If Var DE_Record < 0 { Set_Var DE_Error "Select an existing record before Update." }
+        If Var DE_Error == "" { Call DE_Match }
+        If Var DE_Error == ""
+        {
+            If Var DE_Dirty == 0 { Set_Var DE_Error "No field changes to update." }
+        }
+    }
+    If Var DE_Error == ""
+    {
+        Set_Var DE_Error (Storage Try_SQL (Storage Get_Field DE_SQL Name Var DE_Action Value))
+        If Var DE_Error == ""
+        {
+            Call DE_Load_Rows
+            Set_Var DE_Status "Record saved. Select a record to read its stored values."
+        }
+    }
+    If Var DE_Error != "" { Set_Var DE_Status Var DE_Error }
+    Call DE_End
+End_Function
+Define_Function DE_Create
+    Set_Var DE_Action Create
+    Call DE_Write
+End_Function
+Define_Function DE_Update
+    Set_Var DE_Action Update
+    Call DE_Write
+End_Function
+Define_Function DE_Delete_Record
+    Call DE_Begin
+    Set_Var DE_Error "Select a record and check Confirm delete."
+    If Var DE_Confirm_Delete == 1
+    {
+        If Var DE_Record >= 0
+        {
+            Call DE_Match
+            If Var DE_Error == ""
+            {
+                Set_Var DE_Error (Storage Try_SQL (Storage Get_Field DE_SQL Name Delete Value))
+                If Var DE_Error == ""
+                {
+                    Call DE_Load_Rows
+                    Set_Var DE_Status "Record deleted."
+                }
+            }
+        }
+    }
+    If Var DE_Error != "" { Set_Var DE_Status Var DE_Error }
+    Call DE_End
+End_Function
+Define_Function DE_Discard_Changed
+    Set_Var DE_Discard Var Callback_Value
+End_Function
+Define_Function DE_Delete_Changed
+    Set_Var DE_Confirm_Delete Var Callback_Value
+End_Function
+Define_Function DE_Refresh
+    Call DE_Begin
+    Call DE_Check_Draft
+    If Var DE_Allowed == 1
+    {
+        If Var DE_Attached == 1
+        {
+            Set_Var DE_Old_Table Var DE_Table
+            Call DE_Load_Tables
+            If (Storage Get_Field DE_Tables Name Var DE_Old_Table Name) != ""
+            {
+                Set_Var DE_Table Var DE_Old_Table
+                Call DE_Load_Table
+            }
+        }
+    }
+    Call DE_End
+    Call DE_Refresh_Databases
+End_Function
+Define_Function DE_Previous
+    Call DE_Begin
+    Call DE_Check_Draft
+    If Var DE_Allowed == 1
+    {
+        If Var DE_Page > 0
+        {
+            Set_Var DE_Page (Subtract Var DE_Page 1)
+            Call DE_Load_Rows
+        }
+    }
+    Call DE_End
+End_Function
+Define_Function DE_Next
+    Call DE_Begin
+    Call DE_Check_Draft
+    If Var DE_Allowed == 1
+    {
+        If Var DE_Row_Count == 200
+        {
+            Set_Var DE_Page (Add Var DE_Page 1)
+            Call DE_Load_Rows
+        }
+    }
+    Call DE_End
+End_Function
+Define_Function DE_Use_Folder
+    Graphics GUI_Text_Value DE_Folder_Control
+    Set_Var_Global DE_Folder Graphics.GUI.DE_Folder_Control.Value
+    Call DE_Refresh_Databases
+End_Function
+Define_Function DE_Create_Database
+    Call DE_Begin
+    Call DE_Check_Draft
+    If Var DE_GUI_Ready == 1
+    {
+        Graphics GUI_Text_Value DE_New_Database_Control
+        Set_Var_Global DE_New_Database Graphics.GUI.DE_New_Database_Control.Value
+    }
+    Storage Set_Field DE_Context Name New_Database Value Var DE_New_Database
+    Storage Execute_SQL "INSERT OR REPLACE INTO DE_Context SELECT 'Valid_DB',CASE WHEN Value!='' AND Value NOT GLOB '*[^a-zA-Z0-9_ -]*' THEN '1' ELSE '0' END FROM DE_Context WHERE Name='New_Database';"
+    If (Storage Get_Field DE_Context Name Valid_DB Value) != 1
+    {
+        Set_Var DE_Allowed 0
+        Set_Var DE_Status "Use letters, numbers, spaces, underscores or hyphens in the database name."
+    }
+    If Var DE_Allowed == 1
+    {
+        Storage Execute_SQL "INSERT OR REPLACE INTO DE_Context SELECT 'New_File',(SELECT Value FROM DE_Context WHERE Name='Folder') || '/' || Value || '.appealdb' FROM DE_Context WHERE Name='New_Database';"
+        Set_Var DE_Next_Database (Storage Get_Field DE_Context Name New_File Value)
+        If (Storage Get_Field DE_Databases File Var DE_Next_Database Name) != ""
+        {
+            Set_Var DE_Status "That database already exists. Select it from the database list."
+        }
+        If (Storage Get_Field DE_Databases File Var DE_Next_Database Name) == ""
+        {
+            Call DE_Open_Database
+            Call DE_Refresh_Databases
+        }
+    }
+    Call DE_End
+End_Function
+Define_Function DE_Table_Operation
+    Call DE_Begin
+    Call DE_Check_Draft
+    If Var DE_GUI_Ready == 1
+    {
+        Graphics GUI_Text_Value DE_New_Table_Control
+        Set_Var_Global DE_New_Table Graphics.GUI.DE_New_Table_Control.Value
+        Graphics GUI_Text_Value DE_Definition_Control
+        Set_Var_Global DE_Definition Graphics.GUI.DE_Definition_Control.Value
+    }
+    If Var DE_Attached != 1 { Set_Var DE_Allowed 0 }
+    If Var DE_Action == Drop_Table
+    {
+        If Var DE_Confirm_Delete != 1 { Set_Var DE_Allowed 0 }
+    }
+    If Var DE_Allowed == 1
+    {
+        Storage Set_Field DE_Context Name New_Table Value Var DE_New_Table
+        Storage Set_Field DE_Context Name Definition Value Var DE_Definition
+        Set_Var DE_Error (Storage Try_SQL (Storage Get_Field DE_SQL Name Var DE_Action Value))
+        If Var DE_Error == ""
+        {
+            Call DE_Load_Tables
+            Set_Var DE_Status "Table operation completed. Select a table to browse it."
+        }
+        If Var DE_Error != "" { Set_Var DE_Status Var DE_Error }
+    }
+    If Var DE_Allowed == 0 { Set_Var DE_Status "Select a database, save/discard field edits, and confirm deletion before dropping a table." }
+    Call DE_End
+End_Function
+Define_Function DE_Create_Table
+    Set_Var DE_Action Create_Table
+    Call DE_Table_Operation
+End_Function
+Define_Function DE_Rename_Table
+    Set_Var DE_Action Rename_Table
+    Call DE_Table_Operation
+End_Function
+Define_Function DE_Drop_Table
+    Set_Var DE_Action Drop_Table
+    Call DE_Table_Operation
+End_Function
+Define_Function DE_GUI
+    Call DE_Begin
+    Set_Var DE_GUI_Ready 1
+    Call DE_Read_Catalogs
+    Graphics GUI_Begin_Window "Editor Controls"
+    Graphics GUI_Text DE_Heading "Database Editor"
+    Graphics GUI_Text DE_Status_Label Var DE_Status
+    Graphics GUI_Input_Text DE_Folder_Control "Database folder" Var DE_Folder None
+    Graphics GUI_Button DE_Folder_Button "Scan database folder" DE_Use_Folder
+    Graphics GUI_Set_Selection_Value DE_Database_Menu Var DE_DB_Index
+    Graphics GUI_Combo DE_Database_Menu Database Var DE_DB_Items Var DE_DB_Index DE_Database_Changed
+    Graphics GUI_Set_Selection_Value DE_Table_Menu Var DE_Table_Index
+    Graphics GUI_Combo DE_Table_Menu Table Var DE_Table_Items Var DE_Table_Index DE_Table_Changed
+    Graphics GUI_Set_Selection_Value DE_Record_Menu Var DE_Record
+    Graphics GUI_Combo DE_Record_Menu Record Var DE_Row_Items Var DE_Record DE_Record_Changed
+    Graphics GUI_Text DE_Page_Label "Page (200 records):"
+    Graphics GUI_Text DE_Page_Value Var DE_Page
+    Graphics GUI_Button DE_Previous_Button "Previous page" DE_Previous
+    Graphics GUI_Button DE_Next_Button "Next page" DE_Next
+    Graphics GUI_Button DE_Refresh_Button Refresh DE_Refresh
+    Graphics GUI_Separator
+    Graphics GUI_Button DE_New_Button "New record draft" DE_New_Record
+    Graphics GUI_Button DE_Create_Button "Create record" DE_Create
+    Graphics GUI_Button DE_Read_Button "Read record" DE_Read
+    Graphics GUI_Button DE_Update_Button "Update record" DE_Update
+    Graphics GUI_Checkbox DE_Delete_Check "Confirm delete (record or table)" Var DE_Confirm_Delete DE_Delete_Changed
+    Graphics GUI_Button DE_Delete_Button "Delete record" DE_Delete_Record
+    Graphics GUI_Checkbox DE_Discard_Check "Discard field edits when changing selection" Var DE_Discard DE_Discard_Changed
+    Graphics GUI_Separator
+    Graphics GUI_Input_Text DE_New_Database_Control "New database name" Var DE_New_Database None
+    Graphics GUI_Button DE_Create_Database_Button "Create database" DE_Create_Database
+    Graphics GUI_Input_Text DE_New_Table_Control "New / renamed table name" Var DE_New_Table None
+    Graphics GUI_Input_Text_Multiline DE_Definition_Control "Column definitions (SQL)" Var DE_Definition 0 90 None
+    Graphics GUI_Button DE_Create_Table_Button "Create table" DE_Create_Table
+    Graphics GUI_Button DE_Rename_Table_Button "Rename selected table" DE_Rename_Table
+    Graphics GUI_Button DE_Drop_Table_Button "Delete selected table" DE_Drop_Table
+    Graphics GUI_End_Window
+    Call DE_End
+End_Function
+Define_Function DE_View
+    Call DE_Begin
+    Graphics GUI_Text DE_View_Database Var DE_Database
+    Graphics GUI_Text DE_View_Table Var DE_Table
+    If Var DE_Column_Count > 0
+    {
+        Graphics GUI_Set_Selection_Value DE_Field_Menu Var DE_Column
+        Graphics GUI_Combo DE_Field_Menu Field Var DE_Column_Items Var DE_Column DE_Field_Changed
+        Graphics GUI_Text DE_Field_Type (Storage Get_Field DE_Columns Number Var DE_Column Declared)
+        Graphics GUI_Set_Selection_Value DE_Kind_Menu Var DE_Kind_Index
+        Graphics GUI_Combo DE_Kind_Menu "Value type" "text|integer|real|null|blob" Var DE_Kind_Index DE_Kind_Changed
+        Graphics GUI_Input_Text_Multiline DE_Value_Control Value Var DE_Value 0 180 DE_Value_Changed
+        Graphics GUI_Text DE_Value_Help "Null ignores Value. Blob uses hexadecimal. Generated fields are read-only."
+        Graphics GUI_Button DE_Stage_Button "Stage field value" DE_Stage
+        Graphics GUI_Text DE_Draft_Label "Staged changes:"
+        Graphics GUI_Text DE_Draft_Value Var DE_Dirty
+        Set_Var DE_Show_Column 0
+        Loop While Var DE_Show_Column < Var DE_Column_Count
+        {
+            Graphics GUI_Text (Add 800000 Var DE_Show_Column) (Storage Get_Field DE_Draft Number Var DE_Show_Column Name)
+            Graphics GUI_Text (Add 810000 Var DE_Show_Column) (Storage Get_Field DE_Draft Number Var DE_Show_Column Value)
+            Set_Var DE_Show_Column (Add Var DE_Show_Column 1)
+        }
+    }
+    If Var DE_Column_Count == 0 { Graphics GUI_Text DE_Empty_Help "Choose a database and table in Editor Controls." }
+    Graphics GUI_Text DE_Schema_Label "Selected table schema:"
+    Graphics GUI_Text DE_Schema (Storage Get_Field DE_Tables Name Var DE_Table Definition)
+    Call DE_End
+End_Function
+Call DE_Refresh_Databases
+Return

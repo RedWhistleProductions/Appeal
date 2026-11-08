@@ -1,0 +1,7 @@
+SQLite character and level loading
+map editors
+Object Collision
+create characters
+create FSM AI for npcs and bad guys
+add attacks, damage, fuel, items, etc
+Add Voice Chat

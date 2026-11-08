@@ -1,0 +1,3 @@
+"The_Black_Bagpipe" Samples/The_Black_Bagpipe.mp3
+"The_Celebration" Samples/The_Celebration.mp3
+"The_Last_Stand_-_Electric_Remix" Samples/The_Last_Stand_-_Electric_Remix.mp3

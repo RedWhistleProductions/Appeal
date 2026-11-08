@@ -1,0 +1,51 @@
+// Run: Appeal.exe Examples/World/Sprite_Garden
+// Adam: A/D, left Shift/Ctrl, Space. Eve: arrows, right Shift/Ctrl, Enter.
+Run Setup/Config
+Run Examples/World/Setup_Sprite_Garden
+Run Examples/Graphics/Setup_Character_Mechanics
+Run Examples/Graphics/Character_Animation_Controls
+// 1024px view minus the 192px character sprite width.
+Set_Var Character_Max_X 832
+// Feet end at pixel 58 in the 64px frame: 512 - (58 * 3) = 338.
+Set_Var Character_Standing_Y 338
+Set_Var Character_Foot_Y 58
+Run Examples/World/Sprite_Garden_Transitions
+Run Examples/World/Define_Sprite_Garden_Renderer
+Run Examples/World/Sprite_Garden_GUI
+Run Examples/World/Sprite_Garden_Physics
+Graphics Add_Window Main "Sprite Garden - A/D + Space; arrows + Enter; F1 focus" 1024 704
+Graphics Set_FPS 60
+Graphics Set_GUI_Docking False
+Graphics Set_GUI_Visible True
+Run Examples/World/Bind_Sprite_Garden
+Run Examples/Graphics/Setup_Characters
+Run Examples/Graphics/Setup_Character_Input
+Run GUIs/CONFIG_Controller
+Graphics Window_Open Main
+Set_Var_Global Scene_Open Graphics.Window.Main.Open
+Loop While Var Scene_Open == 1
+{
+    Input Update Default
+    Call Character_Check_Focus
+    Call Adam_Read_Input
+    Call Eve_Read_Input
+    Call Scene_Physics_Update
+    Call Scene_Physics_Check_Advance
+    Call Adam_Draw_Mechanics
+    Call Eve_Draw_Mechanics
+    // Free character placements remain separate from the optional tile array.
+    World Set_Position Adam (Add Var Scene_Camera_X Var Adam_X) Var Adam_Y 0
+    World Set_Position Eve (Add Var Scene_Camera_X Var Eve_X) Var Eve_Y 0
+    Call Scene_GUI
+    Graphics Render
+    Graphics Update
+    Graphics Window_Open Main
+    Set_Var_Global Scene_Open Graphics.Window.Main.Open
+}
+Call Scene_Physics_Close
+Mechanics Release Adam
+Mechanics Release Eve
+Input Close_Controller -1
+World Close_Scene Sprite_Garden
+Graphics Close_All
+Done

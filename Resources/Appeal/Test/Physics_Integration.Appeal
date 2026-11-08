@@ -1,0 +1,19 @@
+Add_Dynamic_Module Physics Appeal_Box2D_Physics
+Add_Dynamic_Module Mechanics Appeal_Default_2D_Side_Scrolling_Mechanics
+Add_Dynamic_Module World Appeal_Standard_World
+Run Examples/World/Setup_Sprite_Garden
+Run Examples/Graphics/Setup_Character_Mechanics
+Run Examples/World/Sprite_Garden_Physics
+Set_Var Adam_Axis 100
+Set_Var Eve_Axis 0
+Set_Var Frames 0
+Loop While Var Frames < 120
+{
+ Call Scene_Physics_Update
+ Set_Var Frames (Add Var Frames 1)
+}
+Print (Physics Get Adam Position_X)
+Print (Physics Get Adam Grounded)
+Print (Mechanics Get Adam Position_Y)
+Call Scene_Physics_Close
+Done

@@ -1,0 +1,19 @@
+// Exercise every Test plugin function.
+Files Debug 1
+Files Set_Paths Sample
+Files Scan Sample Sample
+Files Open Sample Sample Sample
+Files Close Sample
+Files Read Sample
+Files Write Sample Sample
+Files Read_All Sample
+Files Write_All Sample Sample
+Files Join Sample Sample
+Files Parent Sample
+Files Relative Sample Sample
+Files Add_Extension Sample Sample
+Files Is_Directory Sample
+Files Create_Directory Sample
+Files Create_Game_Project Sample
+Files Append_Line Sample Sample
+Return

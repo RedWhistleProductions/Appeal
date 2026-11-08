@@ -1,0 +1,340 @@
+{
+  "schema": "bananas.sprite-atlas.v1",
+  "image": "Terrain_Tiles_Top_Down.png",
+  "format": "RGBA8",
+  "size": {
+    "w": 256,
+    "h": 256
+  },
+  "grid": {
+    "cell_width": 64,
+    "cell_height": 64,
+    "margin": 0,
+    "spacing": 0
+  },
+  "coordinate_origin": "top-left",
+  "projection": "top-down-oblique",
+  "license": "CC0-1.0",
+  "sprites": {
+    "grass_0": {
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "repeat_x": true,
+      "repeat_y": true,
+      "walkable": true,
+      "material": "grass"
+    },
+    "grass_1": {
+      "rect": {
+        "x": 64,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "repeat_x": true,
+      "repeat_y": true,
+      "walkable": true,
+      "material": "grass"
+    },
+    "grass_2": {
+      "rect": {
+        "x": 128,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "repeat_x": true,
+      "repeat_y": true,
+      "walkable": true,
+      "material": "grass"
+    },
+    "grass_3": {
+      "rect": {
+        "x": 192,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "repeat_x": true,
+      "repeat_y": true,
+      "walkable": true,
+      "material": "grass"
+    },
+    "soil_0": {
+      "rect": {
+        "x": 0,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "repeat_x": true,
+      "repeat_y": true,
+      "walkable": true,
+      "material": "soil"
+    },
+    "soil_1": {
+      "rect": {
+        "x": 64,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "repeat_x": true,
+      "repeat_y": true,
+      "walkable": true,
+      "material": "soil"
+    },
+    "soil_2": {
+      "rect": {
+        "x": 128,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "repeat_x": true,
+      "repeat_y": true,
+      "walkable": true,
+      "material": "soil"
+    },
+    "soil_3": {
+      "rect": {
+        "x": 192,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "repeat_x": true,
+      "repeat_y": true,
+      "walkable": true,
+      "material": "soil"
+    },
+    "stone_0": {
+      "rect": {
+        "x": 0,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "repeat_x": true,
+      "repeat_y": true,
+      "walkable": true,
+      "material": "stone"
+    },
+    "stone_1": {
+      "rect": {
+        "x": 64,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "repeat_x": true,
+      "repeat_y": true,
+      "walkable": true,
+      "material": "stone"
+    },
+    "stone_2": {
+      "rect": {
+        "x": 128,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "repeat_x": true,
+      "repeat_y": true,
+      "walkable": true,
+      "material": "stone"
+    },
+    "stone_3": {
+      "rect": {
+        "x": 192,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "repeat_x": true,
+      "repeat_y": true,
+      "walkable": true,
+      "material": "stone"
+    },
+    "sand": {
+      "rect": {
+        "x": 0,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "repeat_x": true,
+      "repeat_y": true,
+      "walkable": true,
+      "material": "sand"
+    },
+    "wood_planks": {
+      "rect": {
+        "x": 64,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "repeat_x": true,
+      "repeat_y": true,
+      "walkable": true,
+      "material": "wood"
+    },
+    "water_deep": {
+      "rect": {
+        "x": 128,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "repeat_x": true,
+      "repeat_y": true,
+      "walkable": false,
+      "material": "water"
+    },
+    "water_shallow": {
+      "rect": {
+        "x": 192,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "repeat_x": true,
+      "repeat_y": true,
+      "walkable": false,
+      "material": "water"
+    }
+  }
+}

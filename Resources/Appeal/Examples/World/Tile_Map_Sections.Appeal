@@ -1,0 +1,32 @@
+// Optional tile sections alongside freely positioned entities.
+// Run: Appeal.exe Examples/World/Tile_Map_Sections
+Run Setup/Config
+World Create Tile_Demo
+World Create_Typed_Entity Rock Rock 1 1
+World Create_Typed_Entity Door Door 1 0
+World Create_Entity Player
+World Set_Position Player 3.5 2.25 0
+
+World Create_Section Entrance 8 6
+World Create_Section Forest 8 6
+World Set_Tile_Size Entrance 32 32 1
+World Set_Tile_Size Forest 32 32 1
+World Set_Tile Entrance 0 0 Rock
+World Set_Tile Entrance 1 0 Rock
+World Set_Tile Entrance 7 1 Door
+World Set_Tile Forest 0 0 Rock
+World Connect_Sections Entrance Right Forest
+World Set_Door_Destination Door Forest 32 32 0
+World Use_Section Entrance
+
+// Save writes each type list and each named section separately.
+World Save Tile_Demo
+World Close_Scene Tile_Demo
+World Load Tile_Demo
+Print (World Get_Tile Entrance 1 0 Type)
+Print (World Get_Tile Entrance 1 0 ID)
+Print (World Get_Neighbor Entrance Right)
+Print (World Get_Door_Destination Door)
+// World Draw emits placements to an installed native Entity_Renderer callback.
+// A game renderer can also query Get_Tile Name/X/Y/Z without moving prototypes.
+Done

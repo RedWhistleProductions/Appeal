@@ -1,0 +1,28 @@
+// Serve the HTML folder over HTTPS using a user-supplied certificate and key.
+Add_Dynamic_Module Network Appeal_SDL2_Network
+Set_Var TLS_Ready (Network Configure_TLS Resources/Network/TLS/server.crt Resources/Network/TLS/server.key)
+If Var TLS_Ready == 0
+{
+    Print (Network Last_Error)
+    Done
+}
+Network Set_HTML_Path Resources/Network/HTML
+// This example exposes only HTTPS. Keep HTTP configured separately if wanted.
+Network Disable HTTP
+Network Disable ECHO
+Network Disable CHAT
+Network Disable APPEAL
+Network Configure HTTPS 127.0.0.1 8443
+Network Server
+If (Network Is_Server_Running) == 0
+{
+    Print (Network Last_Error)
+    Done
+}
+Print "HTTPS server: https://localhost:8443"
+Loop While (Network Is_Server_Running) == 1
+{
+    Delay 1
+}
+Network Stop_Server
+Done

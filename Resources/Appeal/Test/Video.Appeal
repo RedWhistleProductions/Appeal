@@ -1,0 +1,41 @@
+// Module diagnostic: no decoder, Graphics, Audio, or media files required.
+Add_Dynamic_Module Video Test
+Video Debug True
+Video Set_Paths Resources
+Video Load Intro Sample.mp4
+Video Load Other Other.mp4
+Video Use Intro
+Video Play
+Video Update
+Video Pause
+Video Seek 1.5
+Video Auto_Play_Next True
+Video Auto_Play_Next_Status
+Video Set_Current_Loop True
+Video Current_Looping
+Video Current_Video
+Video Width
+Video Height
+Video Duration
+Video Position
+Video Has_Audio
+Video Is_Playing
+Video Info Intro Ended
+Video Bind_Texture Intro Screen_Texture
+Video Get_Texture Intro
+Video Audio_Output Intro False
+Video Draw Intro 0 0 320 180
+Video Play_Video Intro
+Video Play_Track 2
+Video Back
+Video Next
+Video Stop
+Video Last_Error
+Video Set_Playlist_Path Resources/Video/Playlist
+Video Load_Play_List Sample.txt
+Video Close Other
+Video Clear_Play_List
+Video Load_Video Again Sample.mp4
+Video Close_All
+Print VIDEO_TEST_PASSED
+Done

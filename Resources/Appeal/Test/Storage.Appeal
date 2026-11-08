@@ -1,0 +1,33 @@
+// Exercise every Test plugin function.
+Storage Debug 1
+Storage Set_Paths Sample
+Storage Open Sample
+Storage Close Sample
+Storage Use Sample
+Storage Read Sample
+Storage Write Sample Sample
+Storage Exists Sample
+Storage Delete Sample
+Storage Set Sample Sample
+Storage Get Sample
+Storage Insert Sample Sample Sample
+Storage Update Sample Sample Sample
+Storage Find Sample Sample
+Storage List Sample
+Storage Remove Sample Sample
+Storage Begin
+Storage Commit
+Storage Rollback
+Storage Backup Sample
+Storage Restore Sample
+Storage Export Sample
+Storage Import Sample
+Storage Save Sample
+Storage Load Sample
+Storage Execute_SQL "SELECT 1;"
+Storage Get_Field Sample Name Sample A
+Storage Set_Field Sample Name Sample A Sample
+Storage Create_Level Sample
+Storage Save_Level Sample Sample
+Storage Load_Level Sample
+Return

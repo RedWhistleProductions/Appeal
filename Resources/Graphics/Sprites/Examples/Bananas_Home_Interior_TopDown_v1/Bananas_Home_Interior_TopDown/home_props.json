@@ -1,0 +1,291 @@
+{
+  "schema": "bananas.sprite-atlas.v1",
+  "image": "home_props.png",
+  "format": "RGBA8",
+  "size": {
+    "w": 768,
+    "h": 768
+  },
+  "grid": {
+    "cell_width": 64,
+    "cell_height": 64,
+    "margin": 0,
+    "spacing": 0
+  },
+  "coordinate_origin": "top-left",
+  "projection": "top-down-oblique",
+  "sprites": {
+    "bed_single": {
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 128
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 2
+      },
+      "pivot": {
+        "x": 32,
+        "y": 126
+      },
+      "sort_anchor": "pivot"
+    },
+    "bed_double": {
+      "rect": {
+        "x": 192,
+        "y": 0,
+        "w": 128,
+        "h": 128
+      },
+      "footprint": {
+        "columns": 2,
+        "rows": 2
+      },
+      "pivot": {
+        "x": 64,
+        "y": 126
+      },
+      "sort_anchor": "pivot"
+    },
+    "wardrobe": {
+      "rect": {
+        "x": 384,
+        "y": 0,
+        "w": 64,
+        "h": 128
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 2
+      },
+      "pivot": {
+        "x": 32,
+        "y": 126
+      },
+      "sort_anchor": "pivot"
+    },
+    "bookcase": {
+      "rect": {
+        "x": 576,
+        "y": 0,
+        "w": 64,
+        "h": 128
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 2
+      },
+      "pivot": {
+        "x": 32,
+        "y": 126
+      },
+      "sort_anchor": "pivot"
+    },
+    "dining_table": {
+      "rect": {
+        "x": 0,
+        "y": 192,
+        "w": 128,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 2,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 64,
+        "y": 62
+      },
+      "sort_anchor": "pivot"
+    },
+    "chair": {
+      "rect": {
+        "x": 192,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 32,
+        "y": 62
+      },
+      "sort_anchor": "pivot"
+    },
+    "stove": {
+      "rect": {
+        "x": 384,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 32,
+        "y": 62
+      },
+      "sort_anchor": "pivot"
+    },
+    "kitchen_counter": {
+      "rect": {
+        "x": 576,
+        "y": 192,
+        "w": 128,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 2,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 64,
+        "y": 62
+      },
+      "sort_anchor": "pivot"
+    },
+    "dresser": {
+      "rect": {
+        "x": 0,
+        "y": 384,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 32,
+        "y": 62
+      },
+      "sort_anchor": "pivot"
+    },
+    "side_table": {
+      "rect": {
+        "x": 192,
+        "y": 384,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 32,
+        "y": 62
+      },
+      "sort_anchor": "pivot"
+    },
+    "sofa": {
+      "rect": {
+        "x": 384,
+        "y": 384,
+        "w": 128,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 2,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 64,
+        "y": 62
+      },
+      "sort_anchor": "pivot"
+    },
+    "fireplace": {
+      "rect": {
+        "x": 576,
+        "y": 384,
+        "w": 128,
+        "h": 128
+      },
+      "footprint": {
+        "columns": 2,
+        "rows": 2
+      },
+      "pivot": {
+        "x": 64,
+        "y": 126
+      },
+      "sort_anchor": "pivot"
+    },
+    "rug_red": {
+      "rect": {
+        "x": 0,
+        "y": 576,
+        "w": 128,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 2,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 64,
+        "y": 62
+      },
+      "sort_anchor": "pivot"
+    },
+    "rug_blue": {
+      "rect": {
+        "x": 192,
+        "y": 576,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 32,
+        "y": 62
+      },
+      "sort_anchor": "pivot"
+    },
+    "door_closed": {
+      "rect": {
+        "x": 384,
+        "y": 576,
+        "w": 64,
+        "h": 128
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 2
+      },
+      "pivot": {
+        "x": 32,
+        "y": 126
+      },
+      "sort_anchor": "pivot"
+    },
+    "door_open": {
+      "rect": {
+        "x": 576,
+        "y": 576,
+        "w": 64,
+        "h": 128
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 2
+      },
+      "pivot": {
+        "x": 32,
+        "y": 126
+      },
+      "sort_anchor": "pivot"
+    }
+  }
+}

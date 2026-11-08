@@ -1,0 +1,603 @@
+// Shared editor operations. TE_Render=0 permits headless map operations.
+Set_Var TE_Render 0
+Set_Var TE_Origin_X 20
+Set_Var TE_Origin_Y 40
+Set_Var TE_Draw_Offset 0
+Set_Var TE_Draw_Gap 1
+Set_Var TE_Draw_Scale_Y 1
+Set_Var TE_Columns 16
+Set_Var TE_Rows 12
+Set_Var TE_New_Columns 16
+Set_Var TE_New_Rows 12
+Set_Var TE_Default gray_100
+Set_Var TE_Brush red_100
+Set_Var TE_Name My_Map
+Set_Var TE_Status "Choose a default and dimensions, then New Map. F1 switches to painting."
+Set_Var TE_Drawn 0
+Set_Var TE_Layer 0
+Set_Var TE_Layer_Count 1
+Set_Var TE_Section Map
+Set_Var TE_Draw_Layer 0
+Set_Var TE_Dirty 0
+Set_Var TE_Confirm 0
+Set_Var TE_Items (Storage Get_Field Editor_Catalog Name All Items)
+Set_Var TE_Brush_Index (Storage Get_Field Editor_Brush_List Name Var TE_Brush Number)
+Set_Var TE_Default_Index (Storage Get_Field Editor_Brush_List Name Var TE_Default Number)
+
+Define_Function TE_Select_Layer
+    Set_Var TE_Section (Storage Get_Field Editor_Layers Number Var TE_Layer Section)
+    Set_Var TE_Draw_Layer Var TE_Layer
+    World Use_Section Var TE_Section
+End_Function
+Define_Function TE_Update_Layers
+    Set_Var TE_Layer_Count (Storage Get_Field Editor_Layer_Info Name All Count)
+    Set_Var TE_Layer_Items (Storage Get_Field Editor_Layer_Info Name All Items)
+    If Var TE_Layer >= Var TE_Layer_Count
+    {
+        Set_Var TE_Layer (Subtract Var TE_Layer_Count 1)
+    }
+    // New-map setup calls this before creating its first World section.
+    Set_Var TE_Section (Storage Get_Field Editor_Layers Number Var TE_Layer Section)
+End_Function
+Define_Function TE_Layer_Changed
+    Set_Var TE_Layer Var Callback_Value
+    Call TE_Select_Layer
+    Call TE_Update_Palette
+End_Function
+Define_Function TE_Add_Layer
+    Set_Var TE_New_Section (Storage Get_Field Editor_Layer_Info Name All Next_Section)
+    World Create_Section Var TE_New_Section Var TE_Columns Var TE_Rows
+    World Set_Tile_Size Var TE_New_Section 64 64 1
+    Storage Set_Field Editor_Layers Number Var TE_Layer_Count Section Var TE_New_Section
+    Set_Var TE_Layer Var TE_Layer_Count
+    Call TE_Update_Layers
+    Call TE_Select_Layer
+    Call TE_Init_Layer_Palettes
+    Call TE_Update_Palette
+    Set_Var TE_Dirty 1
+    Call TE_Rebuild
+    Set_Var TE_Status "Added a transparent layer above the existing layers."
+End_Function
+Define_Function TE_Remove_Layer
+    If Var TE_Layer_Count == 1
+    {
+        Set_Var TE_Status "A map must have at least one layer."
+    }
+    If Var TE_Layer_Count > 1
+    {
+        Call TE_Clear_Drawables
+        Call TE_Select_Layer
+        Storage Set_Field Editor_Context Name Removed_Section Value Var TE_Section
+        Storage Execute_SQL "DELETE FROM Editor_Layer_Folders WHERE Section=(SELECT Value FROM Editor_Context WHERE Name='Removed_Section');"
+        Storage Execute_SQL "DELETE FROM Editor_Layer_Palettes WHERE Section=(SELECT Value FROM Editor_Context WHERE Name='Removed_Section');"
+        Storage Execute_SQL "DELETE FROM Editor_Layer_Search WHERE Section=(SELECT Value FROM Editor_Context WHERE Name='Removed_Section');"
+        World Delete_Section Var TE_Section
+        Storage Set_Field Editor_Context Name Remove_Layer Value Var TE_Layer
+        Storage Execute_SQL "DELETE FROM Editor_Layers WHERE Number=(SELECT Value FROM Editor_Context WHERE Name='Remove_Layer');"
+        Storage Execute_SQL "DELETE FROM Editor_Layer_Copy;"
+        Storage Execute_SQL "INSERT INTO Editor_Layer_Copy SELECT Number, Section FROM Editor_Layers;"
+        Storage Execute_SQL "DELETE FROM Editor_Layers;"
+        Storage Execute_SQL "INSERT INTO Editor_Layers SELECT CAST(row_number() OVER (ORDER BY CAST(Number AS INTEGER))-1 AS TEXT), Section FROM Editor_Layer_Copy;"
+        Call TE_Update_Layers
+        Call TE_Select_Layer
+        Set_Var TE_Dirty 1
+        Call TE_Rebuild
+        Call TE_Update_Palette
+        Set_Var TE_Status "Removed the selected layer. Remaining layers were renumbered from 0."
+    }
+End_Function
+
+Define_Function TE_Refresh
+    Storage Use Tile_Editor
+    Call TE_Discover_Tiles
+    Set_Var TE_Status "Sprite list and tile folders refreshed from the database."
+End_Function
+Define_Function TE_Brush_Changed
+    If Var TE_Palette_Count > 0
+    {
+        Set_Var TE_Brush_Index Var Callback_Value
+        Set_Var TE_Brush (Storage Get_Field Editor_Brush_List Number Var Callback_Value Name)
+    }
+End_Function
+Define_Function TE_Cycle_Brush
+    Set_Var TE_Brush_Count (Storage Get_Field Editor_Brush_Catalog Name All Count)
+    If Var TE_Brush_Count > 0
+    {
+        Set_Var TE_Brush_Index (Storage Get_Field Editor_Brush_List Name Var TE_Brush Number)
+        If Var TE_Brush_Index == ""
+        {
+            Set_Var TE_Brush_Index 0
+        }
+        Set_Var TE_Brush_Index (Subtract Var TE_Brush_Index Var TE_Wheel)
+        Loop While Var TE_Brush_Index < 0
+        {
+            Set_Var TE_Brush_Index (Add Var TE_Brush_Index Var TE_Brush_Count)
+        }
+        Loop While Var TE_Brush_Index >= Var TE_Brush_Count
+        {
+            Set_Var TE_Brush_Index (Subtract Var TE_Brush_Index Var TE_Brush_Count)
+        }
+        Set_Var TE_Brush (Storage Get_Field Editor_Brush_List Number Var TE_Brush_Index Name)
+    }
+End_Function
+Define_Function TE_Default_Changed
+    If Var TE_Palette_Count > 0
+    {
+        Set_Var TE_Default_Index Var Callback_Value
+        Set_Var TE_Default (Storage Get_Field Editor_Brush_List Number Var Callback_Value Name)
+    }
+End_Function
+Define_Function TE_Columns_Changed
+    Set_Var TE_New_Columns Var Callback_Value
+End_Function
+Define_Function TE_Rows_Changed
+    Set_Var TE_New_Rows Var Callback_Value
+End_Function
+Define_Function TE_Confirm_Changed
+    Set_Var TE_Confirm Var Callback_Value
+End_Function
+Define_Function TE_Read_Name
+    Graphics GUI_Text_Value TE_Map_Name
+    Set_Var_Global TE_Name Graphics.GUI.TE_Map_Name.Value
+End_Function
+Define_Function TE_Request_New
+    Set_Var TE_Allowed 0
+    If Var TE_Dirty == 0
+    {
+        Set_Var TE_Allowed 1
+    }
+    If Var TE_Confirm == 1
+    {
+        Set_Var TE_Allowed 1
+    }
+    If Var TE_Allowed == 0
+    {
+        Set_Var TE_Status "Unsaved changes: save first or check Discard unsaved changes."
+    }
+    If Var TE_Allowed == 1
+    {
+        Call TE_New
+    }
+End_Function
+
+Define_Function TE_Clear_Drawables
+    If Var TE_Render == 1
+    {
+        Set_Var TE_Index 0
+        Loop While Var TE_Index < Var TE_Drawn
+        {
+            Graphics Free_Asset (Add 1000000 (Multiply Var TE_Index 2))
+            Graphics Free_Asset (Add 1000001 (Multiply Var TE_Index 2))
+            Set_Var TE_Index (Add Var TE_Index 1)
+        }
+    }
+    Set_Var TE_Drawn 0
+End_Function
+
+Define_Function TE_Layout
+    // Fit the complete map within the fixed canvas; one pixel separates cells.
+    Set_Var TE_Cell 48
+    Loop While (Multiply Var TE_Cell Var TE_Columns) > 1056
+    {
+        Set_Var TE_Cell (Subtract Var TE_Cell 1)
+    }
+    Loop While (Multiply Var TE_Cell Var TE_Rows) > 720
+    {
+        Set_Var TE_Cell (Subtract Var TE_Cell 1)
+    }
+End_Function
+
+Define_Function TE_New
+    Set_Var TE_Last_Filter_Section ""
+    Call TE_Clear_Drawables
+    Set_Var TE_Columns Var TE_New_Columns
+    Set_Var TE_Rows Var TE_New_Rows
+    World Close_Scene Tile_Editor
+    World Create Tile_Editor
+    Storage Execute_SQL "DELETE FROM Editor_Layers;"
+    Storage Set_Field Editor_Layers Number 0 Section Map
+    Set_Var TE_Layer 0
+    Call TE_Update_Layers
+    World Create_Section Map Var TE_Columns Var TE_Rows
+    World Set_Tile_Size Map 64 64 1
+    World Use_Section Map
+    Storage Execute_SQL "DELETE FROM Editor_Layer_Folders;"
+    Storage Execute_SQL "DELETE FROM Editor_Layer_Search;"
+    Storage Execute_SQL "DELETE FROM Editor_Layer_Palettes;"
+    Call TE_Init_Layer_Palettes
+    Call TE_Update_Palette
+    World Create_Typed_Entity Var TE_Default Tile 1 1
+    Storage Execute_SQL "DELETE FROM Editor_Prototypes;"
+    Storage Set_Field Editor_Prototypes Name Var TE_Default Present 1
+    Set_Var TE_Y 0
+    Loop While Var TE_Y < Var TE_Rows
+    {
+        Set_Var TE_X 0
+        Loop While Var TE_X < Var TE_Columns
+        {
+            World Set_Tile Map Var TE_X Var TE_Y Var TE_Default
+            Set_Var TE_X (Add Var TE_X 1)
+        }
+        Set_Var TE_Y (Add Var TE_Y 1)
+    }
+    Set_Var TE_Dirty 1
+    Set_Var TE_Confirm 0
+    Call TE_Rebuild
+    Set_Var TE_Status "New map filled with the right brush. Left / right drag: paint. Middle drag: erase."
+End_Function
+
+Define_Function TE_Draw_Cell
+    Set_Var TE_Index (Add (Multiply Var TE_Draw_Layer (Multiply Var TE_Columns Var TE_Rows)) (Add (Multiply Var TE_Y Var TE_Columns) Var TE_X))
+    Set_Var TE_Index (Add Var TE_Index Var TE_Draw_Offset)
+    Set_Var TE_Drawable (Add 1000000 (Multiply Var TE_Index 2))
+    Set_Var TE_Sprite (World Get_Tile Var TE_Section Var TE_X Var TE_Y Name)
+    Graphics Free_Asset Var TE_Drawable
+    Graphics Free_Asset (Add 1000001 (Multiply Var TE_Index 2))
+    If Var TE_Sprite != ""
+    {
+        Set_Var TE_File (Storage Get_Field Sprites Name Var TE_Sprite File)
+        If Var TE_File != ""
+        {
+            Set_Var TE_W (Storage Get_Field Sprites Name Var TE_Sprite Frame_Width)
+            Set_Var TE_H (Storage Get_Field Sprites Name Var TE_Sprite Frame_Height)
+            Set_Var TE_Frame (Storage Get_Field Sprites Name Var TE_Sprite Frame)
+            Set_Var TE_Loaded (Graphics Load_Animation Var TE_Drawable Still Var TE_File Var TE_W Var TE_H Var TE_Frame 1)
+            Graphics Set_Draw_Order Var TE_Drawable Var TE_Draw_Layer
+            Set_Var TE_Part_Width (Subtract Var TE_Cell Var TE_Draw_Gap)
+            Set_Var TE_Rect_Left (Add Var TE_Origin_X (Multiply Var TE_X Var TE_Cell))
+            Set_Var TE_Rect_Top (Add Var TE_Origin_Y (Multiply (Multiply Var TE_Y Var TE_Cell) Var TE_Draw_Scale_Y))
+            Set_Var TE_Rect_Bottom (Add Var TE_Rect_Top (Multiply (Subtract Var TE_Cell Var TE_Draw_Gap) Var TE_Draw_Scale_Y))
+            Set_Var TE_Second_Frame (Storage Get_Field Sprite_Extras Name Var TE_Sprite Second_Frame)
+            If Var TE_Second_Frame != ""
+            {
+                Set_Var TE_Part_Width (Divide Var TE_Part_Width 2)
+                Set_Var TE_Second_Loaded (Graphics Load_Animation (Add 1000001 (Multiply Var TE_Index 2)) Still Var TE_File Var TE_W Var TE_H Var TE_Second_Frame 1)
+                Graphics Set_Draw_Order (Add 1000001 (Multiply Var TE_Index 2)) Var TE_Draw_Layer
+                Graphics Set_Scale (Add 1000001 (Multiply Var TE_Index 2)) (Divide Var TE_Part_Width Var TE_W) (Divide (Multiply (Subtract Var TE_Cell Var TE_Draw_Gap) Var TE_Draw_Scale_Y) Var TE_H) 1
+                Graphics Paste_Rect (Add 1000001 (Multiply Var TE_Index 2)) (Add Var TE_Rect_Left Var TE_Part_Width) Var TE_Rect_Top (Add Var TE_Rect_Left (Multiply Var TE_Part_Width 2)) Var TE_Rect_Bottom
+                If Var TE_Second_Loaded != 1
+                {
+                    Set_Var TE_Loaded 0
+                }
+            }
+            Graphics Set_Scale Var TE_Drawable (Divide Var TE_Part_Width Var TE_W) (Divide (Multiply (Subtract Var TE_Cell Var TE_Draw_Gap) Var TE_Draw_Scale_Y) Var TE_H) 1
+            Graphics Paste_Rect Var TE_Drawable Var TE_Rect_Left Var TE_Rect_Top (Add Var TE_Rect_Left Var TE_Part_Width) Var TE_Rect_Bottom
+            If Var TE_Loaded != 1
+            {
+                Set_Var TE_Status "A sprite image could not be loaded. Check its database file and frame."
+            }
+        }
+        If Var TE_File == ""
+        {
+            Set_Var TE_Status "Map contains a sprite missing from the catalog."
+        }
+    }
+End_Function
+
+Define_Function TE_Rebuild
+    Call TE_Layout
+    If Var TE_Render == 1
+    {
+        Set_Var TE_Draw_Layer 0
+        Loop While Var TE_Draw_Layer < Var TE_Layer_Count
+        {
+            Set_Var TE_Section (Storage Get_Field Editor_Layers Number Var TE_Draw_Layer Section)
+            Set_Var TE_Y 0
+            Loop While Var TE_Y < Var TE_Rows
+            {
+                Set_Var TE_X 0
+                Loop While Var TE_X < Var TE_Columns
+                {
+                    Call TE_Draw_Cell
+                    Set_Var TE_X (Add Var TE_X 1)
+                }
+                Set_Var TE_Y (Add Var TE_Y 1)
+            }
+            Set_Var TE_Draw_Layer (Add Var TE_Draw_Layer 1)
+        }
+    }
+    Call TE_Select_Layer
+    Set_Var TE_Drawn (Multiply Var TE_Layer_Count (Multiply Var TE_Columns Var TE_Rows))
+End_Function
+
+Define_Function TE_Paint
+    Call TE_Select_Layer
+    Set_Var TE_Old (World Get_Tile Var TE_Section Var TE_X Var TE_Y Name)
+    If Var TE_Old != Var TE_Paint_Sprite
+    {
+        If (Storage Get_Field Editor_Prototypes Name Var TE_Paint_Sprite Present) == ""
+        {
+            World Create_Typed_Entity Var TE_Paint_Sprite Tile 0 1
+            Storage Set_Field Editor_Prototypes Name Var TE_Paint_Sprite Present 1
+        }
+        World Set_Tile Var TE_Section Var TE_X Var TE_Y Var TE_Paint_Sprite
+        Set_Var TE_Dirty 1
+        If Var TE_Render == 1
+        {
+            Call TE_Draw_Cell
+        }
+    }
+End_Function
+
+Define_Function TE_Apply_Brush
+    Set_Var TE_Paint_Sprite Var TE_Brush
+    If Var TE_Right_Down == 1
+    {
+        Set_Var TE_Paint_Sprite Var TE_Default
+    }
+    If Var TE_Middle_Down == 1
+    {
+        Set_Var TE_Paint_Sprite Transparent
+    }
+    Call TE_Paint
+End_Function
+
+Define_Function TE_Input
+    Set_Var TE_Wheel (Graphics GUI_Viewport_Value TE_Canvas Wheel)
+    If Var TE_Wheel != 0
+    {
+        Call TE_Cycle_Brush
+    }
+    Set_Var TE_Left_Down (Graphics GUI_Viewport_Value TE_Canvas Left)
+    Set_Var TE_Right_Down (Graphics GUI_Viewport_Value TE_Canvas Right)
+    Set_Var TE_Middle_Down (Graphics GUI_Viewport_Value TE_Canvas Middle)
+    If Var TE_Palette_Count == 0
+    {
+        Set_Var TE_Left_Down 0
+        Set_Var TE_Right_Down 0
+    }
+    Set_Var TE_Down (Add (Add Var TE_Left_Down Var TE_Right_Down) Var TE_Middle_Down)
+    If Var TE_Down > 0
+    {
+        Input Set_Focus Game
+        Set_Var TE_MX (Graphics GUI_Viewport_Value TE_Canvas X)
+        Set_Var TE_MY (Graphics GUI_Viewport_Value TE_Canvas Y)
+        If Var TE_MX >= 0
+        {
+            If Var TE_MY >= 0
+            {
+                If Var TE_MX < (Multiply Var TE_Columns Var TE_Cell)
+                {
+                    If Var TE_MY < (Multiply Var TE_Rows Var TE_Cell)
+                    {
+                        // Integer cell coordinates without requiring a floor command.
+                        Set_Var TE_X 0
+                        Loop While Var TE_MX >= Var TE_Cell
+                        {
+                            Set_Var TE_X (Add Var TE_X 1)
+                            Set_Var TE_MX (Subtract Var TE_MX Var TE_Cell)
+                        }
+                        Set_Var TE_Y 0
+                        Loop While Var TE_MY >= Var TE_Cell
+                        {
+                            Set_Var TE_Y (Add Var TE_Y 1)
+                            Set_Var TE_MY (Subtract Var TE_MY Var TE_Cell)
+                        }
+                        Call TE_Apply_Brush
+                    }
+                }
+            }
+        }
+    }
+End_Function
+
+Define_Function TE_Save
+    Call TE_Read_Name
+    Call TE_Save_Map
+End_Function
+Define_Function TE_Save_Map
+    If Var TE_Name == ""
+    {
+        Set_Var TE_Status "Enter a map name before saving."
+    }
+    If Var TE_Name != ""
+    {
+        Storage Use Tile_Editor
+        Storage Begin
+        Storage Save_Level Var TE_Name (World Export_Level)
+        Storage Set_Field Editor_Context Name Level Value Var TE_Name
+        Storage Execute_SQL "DELETE FROM Editor_Level_Prototypes WHERE Level_Name=(SELECT Value FROM Editor_Context WHERE Name='Level');"
+        Storage Execute_SQL "INSERT INTO Editor_Level_Prototypes SELECT (SELECT Value FROM Editor_Context WHERE Name='Level'), Name FROM Editor_Prototypes;"
+        Storage Execute_SQL "DELETE FROM Editor_Level_Layers WHERE Level_Name=(SELECT Value FROM Editor_Context WHERE Name='Level');"
+        Storage Execute_SQL "INSERT INTO Editor_Level_Layers SELECT (SELECT Value FROM Editor_Context WHERE Name='Level'), Number, Section FROM Editor_Layers;"
+        Storage Execute_SQL "DELETE FROM Editor_Level_Folders WHERE Level_Name=(SELECT Value FROM Editor_Context WHERE Name='Level');"
+        Storage Execute_SQL "INSERT INTO Editor_Level_Folders SELECT (SELECT Value FROM Editor_Context WHERE Name='Level'), f.Section, f.Folder, f.Enabled FROM Editor_Layer_Folders f JOIN Editor_Layers l ON l.Section=f.Section;"
+        Storage Execute_SQL "DELETE FROM Editor_Level_Palettes WHERE Level_Name=(SELECT Value FROM Editor_Context WHERE Name='Level');"
+        Storage Execute_SQL "INSERT INTO Editor_Level_Palettes SELECT (SELECT Value FROM Editor_Context WHERE Name='Level'), p.Section, p.Opaque, p.Transparent FROM Editor_Layer_Palettes p JOIN Editor_Layers l ON l.Section=p.Section;"
+        Storage Execute_SQL "DELETE FROM Editor_Level_Search WHERE Level_Name=(SELECT Value FROM Editor_Context WHERE Name='Level');"
+        Storage Execute_SQL "INSERT INTO Editor_Level_Search SELECT (SELECT Value FROM Editor_Context WHERE Name='Level'), q.Section, q.Search FROM Editor_Layer_Search q JOIN Editor_Layers l ON l.Section=q.Section;"
+        Storage Commit
+        Set_Var TE_Dirty 0
+        Set_Var TE_Confirm 0
+        Set_Var TE_Status "Map saved to the Tile_Editor database."
+    }
+End_Function
+
+Define_Function TE_Load
+    Call TE_Read_Name
+    Call TE_Load_Map
+End_Function
+Define_Function TE_Load_Map
+    Set_Var TE_Allowed 1
+    If Var TE_Dirty == 1
+    {
+        If Var TE_Confirm == 0
+        {
+            Set_Var TE_Allowed 0
+            Set_Var TE_Status "Unsaved changes: save first or check Discard unsaved changes."
+        }
+    }
+    If Var TE_Allowed == 1
+    {
+        Storage Use Tile_Editor
+        Set_Var TE_Found ""
+        If (Storage Get_Field sqlite_master name Levels name) != ""
+        {
+            Set_Var TE_Found (Storage Get_Field Levels Name Var TE_Name Name)
+        }
+        If Var TE_Found == ""
+        {
+            Set_Var TE_Status "No saved map with that name."
+        }
+        If Var TE_Found != ""
+        {
+            Call TE_Do_Load
+        }
+    }
+End_Function
+Define_Function TE_Do_Load
+    Set_Var TE_Last_Filter_Section ""
+    World Import_Level (Storage Load_Level Var TE_Name)
+    Storage Set_Field Editor_Context Name Level Value Var TE_Name
+    Storage Execute_SQL "DELETE FROM Editor_Prototypes;"
+    Storage Execute_SQL "INSERT INTO Editor_Prototypes SELECT Sprite, '1' FROM Editor_Level_Prototypes WHERE Level_Name=(SELECT Value FROM Editor_Context WHERE Name='Level');"
+    Call TE_Clear_Drawables
+    Storage Execute_SQL "DELETE FROM Editor_Layers;"
+    Storage Execute_SQL "INSERT INTO Editor_Layers SELECT Number, Section FROM Editor_Level_Layers WHERE Level_Name=(SELECT Value FROM Editor_Context WHERE Name='Level');"
+    // Saved maps from the original editor have one section named Map.
+    If (Storage Get_Field Editor_Layer_Info Name All Count) == 0
+    {
+        Storage Set_Field Editor_Layers Number 0 Section Map
+    }
+    Storage Execute_SQL "DELETE FROM Editor_Layer_Folders;"
+    Storage Execute_SQL "DELETE FROM Editor_Layer_Search;"
+    Storage Execute_SQL "DELETE FROM Editor_Layer_Palettes;"
+    Storage Execute_SQL "INSERT INTO Editor_Layer_Folders SELECT Section || char(31) || Folder, Section, Folder, Enabled FROM Editor_Level_Folders WHERE Level_Name=(SELECT Value FROM Editor_Context WHERE Name='Level');"
+    Storage Execute_SQL "INSERT INTO Editor_Layer_Palettes SELECT Section, Opaque, Transparent FROM Editor_Level_Palettes WHERE Level_Name=(SELECT Value FROM Editor_Context WHERE Name='Level');"
+    Set_Var TE_Layer 0
+    Call TE_Update_Layers
+    Storage Execute_SQL "INSERT INTO Editor_Layer_Search SELECT Section, Search FROM Editor_Level_Search WHERE Level_Name=(SELECT Value FROM Editor_Context WHERE Name='Level');"
+    Call TE_Init_Layer_Palettes
+    Call TE_Update_Palette
+    Set_Var TE_Columns (World Get_Section Var TE_Section Columns)
+    Set_Var TE_Rows (World Get_Section Var TE_Section Rows)
+    Set_Var TE_Dirty 0
+    Set_Var TE_Confirm 0
+    Call TE_Rebuild
+    Set_Var TE_Status "Map loaded. F1 switches to painting."
+End_Function
+Define_Function TE_Start_Paint
+    Input Set_Focus Game
+End_Function
+Define_Function TE_Grid
+    Set_Var TE_Line 0
+    Loop While Var TE_Line <= Var TE_Columns
+    {
+        Graphics Draw_Rect (Add 100000 Var TE_Line) (Add 19 (Multiply Var TE_Line Var TE_Cell)) 39 1 (Add 1 (Multiply Var TE_Rows Var TE_Cell)) 80 85 95 255
+        Set_Var TE_Line (Add Var TE_Line 1)
+    }
+    Set_Var TE_Line 0
+    Loop While Var TE_Line <= Var TE_Rows
+    {
+        Graphics Draw_Rect (Add 200000 Var TE_Line) 19 (Add 39 (Multiply Var TE_Line Var TE_Cell)) (Add 1 (Multiply Var TE_Columns Var TE_Cell)) 1 80 85 95 255
+        Set_Var TE_Line (Add Var TE_Line 1)
+    }
+End_Function
+Define_Function TE_Exit
+    Set_Var TE_Running 0
+End_Function
+Define_Function TE_Reset_Layout
+    Graphics GUI_Reset_Editor_Layout
+End_Function
+Define_Function TE_Workspace
+    Set_Var TE_Folders_Drawn 0
+    Graphics GUI_Begin_Frame
+    Graphics GUI_Begin_Window Components
+    Graphics GUI_Text TE_Components_Label "Components"
+    Graphics GUI_Button TE_Component_Tile "Tile Map Editor" TE_Start_Paint
+    Graphics GUI_Separator
+    Graphics GUI_Button TE_Reset_Layout_Button "Reset layout" TE_Reset_Layout
+    Graphics GUI_Button TE_Exit_Button "Exit editor" TE_Exit
+    Graphics GUI_End_Window
+    Graphics GUI_Begin_Window "Editing View"
+    Graphics GUI_Editor_Viewport TE_Canvas 20 40 (Multiply Var TE_Columns Var TE_Cell) (Multiply Var TE_Rows Var TE_Cell)
+    Graphics GUI_End_Window
+    Call TE_GUI
+    If Var TE_Show_Folders == 1
+    {
+        Call TE_Folders_GUI
+    }
+End_Function
+Define_Function TE_Brush_Preview
+    Set_Var TE_Preview_File (Storage Get_Field Sprites Name Var TE_Preview_Sprite File)
+    Set_Var TE_Preview_W (Storage Get_Field Sprites Name Var TE_Preview_Sprite Frame_Width)
+    Set_Var TE_Preview_H (Storage Get_Field Sprites Name Var TE_Preview_Sprite Frame_Height)
+    Set_Var TE_Preview_Frame (Storage Get_Field Sprites Name Var TE_Preview_Sprite Frame)
+    Set_Var TE_Preview_Span 1
+    If (Storage Get_Field Sprite_Extras Name Var TE_Preview_Sprite Second_Frame) != ""
+    {
+        Set_Var TE_Preview_Span 2
+    }
+    Graphics GUI_Image Var TE_Preview_Name Var TE_Preview_File Var TE_Preview_W Var TE_Preview_H Var TE_Preview_Frame Var TE_Preview_Span 96
+End_Function
+Define_Function TE_GUI
+    Graphics GUI_Begin_Window "Editor Controls"
+    Graphics GUI_Text TE_Component_Heading "Tile Map Editor"
+    Graphics GUI_Text TE_Help "F1: controls / view. Wheel: left brush. Left / right drag: brushes. Middle drag: erase."
+    Graphics GUI_Text TE_Status_Text Var TE_Status
+    If Var TE_Dirty == 1
+    {
+        Graphics GUI_Text TE_Unsaved "Unsaved changes"
+    }
+    If Var TE_Dirty == 0
+    {
+        Graphics GUI_Text TE_Unsaved "Saved"
+    }
+    Graphics GUI_Set_Selection_Value TE_Layer_Menu Var TE_Layer
+    Graphics GUI_Combo TE_Layer_Menu "Drawing layer (0 is bottom)" Var TE_Layer_Items Var TE_Layer TE_Layer_Changed
+    Graphics GUI_Button TE_Add_Layer_Button "Add layer" TE_Add_Layer
+    Graphics GUI_Same_Line
+    Graphics GUI_Button TE_Remove_Layer_Button "Remove selected layer" TE_Remove_Layer
+    Graphics GUI_Button TE_Folders_Button "Tile filters..." TE_Open_Folders
+    Graphics GUI_Input_Text TE_Map_Name "Map name" Var TE_Name None
+    If Var TE_Palette_Count == 0
+    {
+        Graphics GUI_Text TE_Empty_Palette "No matching tiles. Enable a folder or tile type."
+    }
+    Set_Var TE_Menu_Items Var TE_Items
+    If Var TE_Palette_Count == 0
+    {
+        Set_Var TE_Menu_Items "No matching tiles"
+    }
+    Set_Var TE_Brush_Index (Storage Get_Field Editor_Brush_List Name Var TE_Brush Number)
+    If Var TE_Brush_Index == ""
+    {
+        Set_Var TE_Brush_Index 0
+    }
+    Graphics GUI_Set_Selection_Value TE_Brush_Menu Var TE_Brush_Index
+    Graphics GUI_Text TE_Left_Label "Left mouse brush"
+    Graphics GUI_Set_Next_Item_Width -112
+    Graphics GUI_Combo TE_Brush_Menu "##LeftBrush" Var TE_Menu_Items Var TE_Brush_Index TE_Brush_Changed
+    Graphics GUI_Same_Line
+    Set_Var TE_Preview_Sprite Var TE_Brush
+    Set_Var TE_Preview_Name TE_Brush_Preview
+    Call TE_Brush_Preview
+    Set_Var TE_Default_Index (Storage Get_Field Editor_Brush_List Name Var TE_Default Number)
+    If Var TE_Default_Index == ""
+    {
+        Set_Var TE_Default_Index 0
+    }
+    Graphics GUI_Set_Selection_Value TE_Default_Menu Var TE_Default_Index
+    Graphics GUI_Text TE_Right_Label "Right mouse brush / new map fill"
+    Graphics GUI_Set_Next_Item_Width -112
+    Graphics GUI_Combo TE_Default_Menu "##RightBrush" Var TE_Menu_Items Var TE_Default_Index TE_Default_Changed
+    Graphics GUI_Same_Line
+    Set_Var TE_Preview_Sprite Var TE_Default
+    Set_Var TE_Preview_Name TE_Right_Brush_Preview
+    Call TE_Brush_Preview
+    Graphics GUI_Slider_Int TE_Columns_Control "New map columns" Var TE_New_Columns 1 64 TE_Columns_Changed
+    Graphics GUI_Slider_Int TE_Rows_Control "New map rows" Var TE_New_Rows 1 64 TE_Rows_Changed
+    Graphics GUI_Checkbox TE_Discard "Discard unsaved changes for New / Load" Var TE_Confirm TE_Confirm_Changed
+    Graphics GUI_Button TE_New_Button "New Map" TE_Request_New
+    Graphics GUI_Same_Line
+    Graphics GUI_Button TE_Save_Button "Save" TE_Save
+    Graphics GUI_Same_Line
+    Graphics GUI_Button TE_Load_Button "Load" TE_Load
+    Graphics GUI_Button TE_Refresh_Button "Refresh sprite database list" TE_Refresh
+    Graphics GUI_Button TE_Paint_Button "Paint map (F1 returns to controls)" TE_Start_Paint
+    Graphics GUI_End_Window
+End_Function
+Run "Utilities/Game_Editor/Level_Editor/Tile_Editor/Import_Tiles"
+Run "Utilities/Game_Editor/Level_Editor/Tile_Editor/Palette"
+Call TE_Discover_Tiles
+Return

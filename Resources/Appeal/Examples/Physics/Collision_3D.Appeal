@@ -1,0 +1,69 @@
+// Run: Appeal.exe Examples/Physics/Collision_3D
+// Finite simulation; no Graphics or controller required. The actor can be an NPC.
+Add_Dynamic_Module Physics Appeal_Jolt_Physics
+Add_Dynamic_Module Mechanics Appeal_Default_3D_Mechanics
+Add_Dynamic_Module World Appeal_Standard_World
+World Create Collision_3D
+World Create_Typed_Entity Actor Character 1 0
+World Create_Typed_Entity Exit Door 1 0
+World Create_Section Room 8 8
+World Create_Section Next_Room 8 8
+World Set_Door_Destination Exit Next_Room 0 0.9 0
+World Use_Section Room
+Physics Use Floor Default
+Physics Set_Body_Type Floor Static
+Physics Set_Box_3D Floor 20 1 20
+Physics Set_Position Floor 0 -0.5 0
+Physics Use Exit Default
+Physics Set_Body_Type Exit Static
+Physics Set Exit Sensor 1
+Physics Set Exit Tag Door
+Physics Set_Box_3D Exit 4 3 0.5
+Physics Set_Position Exit 0 1.5 3
+Mechanics Use Actor Default
+Mechanics Set Actor External_Physics 1
+Mechanics Set Actor Speed 3
+Physics Use Actor Default
+Physics Set_Capsule Actor 0.3 1.8
+Physics Set_Position Actor 0 3 0
+Set_Var Frame 0
+Set_Var Door_Used 0
+Loop While Var Frame < 120
+{
+    Mechanics Select Actor
+    Mechanics Walk
+    Physics Set_Velocity Actor (Mechanics Get Actor Velocity_X) (Physics Get Actor Velocity_Y) (Mechanics Get Actor Velocity_Z)
+    Physics Step 0.016666667
+    Mechanics Set Actor Position_X (Physics Get Actor Position_X)
+    Mechanics Set Actor Position_Y (Subtract (Physics Get Actor Position_Y) 0.9)
+    Mechanics Set Actor Position_Z (Physics Get Actor Position_Z)
+    Mechanics Set Actor Grounded (Physics Get Actor Grounded)
+    Mechanics Update Actor
+    Set_Var Contact_Index 0
+    Set_Var Event_Count (Physics Get Actor Event_Count)
+    Loop While Var Contact_Index < Var Event_Count
+    {
+        If (Physics Event Actor Var Contact_Index Type) == Hit
+        {
+            Print "Actor hit a solid surface"
+        }
+        If (Physics Event Actor Var Contact_Index Type) == Begin
+        {
+            If (Physics Event Actor Var Contact_Index Other) == Exit
+            {
+                World Use_Section (World Get_Door_Destination Exit)
+                Print (World Get_Door_Destination Exit)
+                Set_Var Door_Used 1
+            }
+        }
+        Set_Var Contact_Index (Add Var Contact_Index 1)
+    }
+    Set_Var Frame (Add Var Frame 1)
+}
+Print Var Door_Used
+Physics Release Actor
+Physics Release Exit
+Physics Release Floor
+Mechanics Release Actor
+World Close_Scene Collision_3D
+Done

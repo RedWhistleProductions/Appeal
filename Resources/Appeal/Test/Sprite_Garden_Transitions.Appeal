@@ -1,0 +1,104 @@
+Run Setup/Config
+Run Examples/World/Setup_Sprite_Garden
+Run Examples/Graphics/Setup_Character_Mechanics
+Run Examples/Graphics/Character_Animation_Controls
+Set_Var Character_Max_X 832
+// Feet end at pixel 58 in the 64px frame: 512 - (58 * 3) = 338.
+Set_Var Character_Standing_Y 338
+Set_Var Character_Foot_Y 58
+Run Examples/World/Sprite_Garden_Transitions
+Run Examples/World/Define_Sprite_Garden_Renderer
+Graphics Add_Window Main "Scene transition check" 1024 704
+Graphics Set_GUI_Docking False
+Graphics Set_GUI_Visible True
+Run Examples/World/Sprite_Garden_GUI
+Run Examples/World/Bind_Sprite_Garden
+Run Examples/Graphics/Setup_Characters
+Run Examples/Graphics/Setup_Character_Input
+Call Adam_Draw_Mechanics
+Call Eve_Draw_Mechanics
+Mechanics Set Adam Position_X 801
+Call Scene_Check_Advance
+Print Var Scene_Page
+Print Var Scene_Left
+Call Adam_Draw_Mechanics
+Call Eve_Draw_Mechanics
+Call Scene_GUI
+Graphics Render
+Graphics Update
+Mechanics Set Adam Position_X 801
+Call Scene_Check_Advance
+Print Var Scene_Page
+Print Var Scene_Left
+Call Adam_Draw_Mechanics
+Call Eve_Draw_Mechanics
+Call Scene_GUI
+Graphics Render
+Graphics Update
+Mechanics Set Adam Position_X 801
+Call Scene_Check_Advance
+Print Var Scene_Page
+Print Var Scene_Left
+Call Adam_Draw_Mechanics
+Call Eve_Draw_Mechanics
+Call Scene_GUI
+Graphics Render
+Graphics Update
+Mechanics Set Adam Position_X 31
+Call Scene_Check_Advance
+Print Var Scene_Page
+Print Var Scene_Left
+Call Adam_Draw_Mechanics
+Call Eve_Draw_Mechanics
+Call Scene_GUI
+Graphics Render
+Graphics Update
+Mechanics Set Adam Position_X 31
+Call Scene_Check_Advance
+Print Var Scene_Page
+Print Var Scene_Left
+Call Adam_Draw_Mechanics
+Call Eve_Draw_Mechanics
+Call Scene_GUI
+Graphics Render
+Graphics Update
+Mechanics Set Adam Position_X 31
+Call Scene_Check_Advance
+Print Var Scene_Page
+Print Var Scene_Left
+Call Adam_Draw_Mechanics
+Call Eve_Draw_Mechanics
+Call Scene_GUI
+Graphics Render
+Graphics Update
+// Eve can also reach the new third scene.
+Mechanics Set Eve Position_X 801
+Call Scene_Check_Advance
+Print Var Scene_Page
+Mechanics Set Eve Position_X 801
+Call Scene_Check_Advance
+Print Var Scene_Page
+Print (World Get_Tile Bridge 0 0 Name)
+Print (World Get_Tile Camp_Scenery 3 7 Name)
+Print Var Scene_Camera_X
+Call Adam_Draw_Mechanics
+Call Eve_Draw_Mechanics
+Input Toggle_Focus
+Call Character_Check_Focus
+Print (Input Focus)
+Call Scene_GUI
+Graphics Render
+Graphics Update
+Input Toggle_Focus
+Call Character_Check_Focus
+Print (Input Focus)
+Call Scene_GUI
+Graphics Render
+Graphics Update
+Graphics Close_All
+Mechanics Release Adam
+Mechanics Release Eve
+Input Close_Controller -1
+World Close_Scene Sprite_Garden
+Print SPRITE_GARDEN_TRANSITIONS_PASSED
+Done

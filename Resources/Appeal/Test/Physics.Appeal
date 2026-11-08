@@ -1,0 +1,24 @@
+// Exercise every Test plugin function.
+Physics Debug 1
+Physics Set_Paths Sample
+Physics Use Sample Default
+Physics Update Sample
+Physics Set Sample Sample Sample
+Physics Set_Body_Type Sample Sample
+Physics Set_Position Sample 1 1 1
+Physics Set_Velocity Sample 1 1 1
+Physics Apply_Force Sample 1 1 1
+Physics Apply_Impulse Sample 1 1 1
+Physics Set_Gravity 1 1 1
+Physics Step 0.016666667
+Physics Set_Units_Per_Meter 1
+Physics Set_Box Sample 1 1
+Physics Set_Box_3D Sample 1 1 1
+Physics Set_Circle Sample 1
+Physics Set_Sphere Sample 1
+Physics Set_Capsule Sample 1 2
+Physics Get Sample Position_X
+Physics Contact Sample 0 Other
+Physics Event Sample 0 Type
+Physics Release Sample
+Return

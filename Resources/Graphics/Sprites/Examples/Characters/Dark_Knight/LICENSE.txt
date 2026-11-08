@@ -1,0 +1,9 @@
+SPDX-License-Identifier: CC0-1.0
+
+Bananas Generic Enemy Graphics Assets
+
+At the user's direction, these generic enemy PNG assets and accompanying JSON metadata are dedicated under CC0 1.0 Universal. To the extent the contributor holds copyright or related rights in these assets, those rights are waived under CC0. They may be copied, modified, redistributed, and used commercially without attribution.
+
+CC0 legal instrument: https://creativecommons.org/publicdomain/zero/1.0/legalcode
+
+Provided as-is without warranty. No claim of exclusive copyright is made over AI-generated imagery. Red Whistle Productions names, trademarks, and proprietary mascot assets are not included in this dedication.

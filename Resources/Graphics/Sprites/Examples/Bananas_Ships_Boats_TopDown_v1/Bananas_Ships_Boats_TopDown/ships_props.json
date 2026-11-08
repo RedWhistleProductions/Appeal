@@ -1,0 +1,291 @@
+{
+  "schema": "bananas.sprite-atlas.v1",
+  "image": "ships_props.png",
+  "format": "RGBA8",
+  "size": {
+    "w": 1024,
+    "h": 1536
+  },
+  "grid": {
+    "cell_width": 64,
+    "cell_height": 64,
+    "margin": 0,
+    "spacing": 0
+  },
+  "coordinate_origin": "top-left",
+  "projection": "top-down-oblique",
+  "sprites": {
+    "rowboat": {
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 128
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 2
+      },
+      "pivot": {
+        "x": 32,
+        "y": 126
+      },
+      "sort_anchor": "pivot"
+    },
+    "canoe": {
+      "rect": {
+        "x": 256,
+        "y": 0,
+        "w": 64,
+        "h": 128
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 2
+      },
+      "pivot": {
+        "x": 32,
+        "y": 126
+      },
+      "sort_anchor": "pivot"
+    },
+    "raft": {
+      "rect": {
+        "x": 512,
+        "y": 0,
+        "w": 128,
+        "h": 128
+      },
+      "footprint": {
+        "columns": 2,
+        "rows": 2
+      },
+      "pivot": {
+        "x": 64,
+        "y": 126
+      },
+      "sort_anchor": "pivot"
+    },
+    "fishing_boat": {
+      "rect": {
+        "x": 768,
+        "y": 0,
+        "w": 128,
+        "h": 192
+      },
+      "footprint": {
+        "columns": 2,
+        "rows": 3
+      },
+      "pivot": {
+        "x": 64,
+        "y": 190
+      },
+      "sort_anchor": "pivot"
+    },
+    "sailboat_red": {
+      "rect": {
+        "x": 0,
+        "y": 384,
+        "w": 128,
+        "h": 192
+      },
+      "footprint": {
+        "columns": 2,
+        "rows": 3
+      },
+      "pivot": {
+        "x": 64,
+        "y": 190
+      },
+      "sort_anchor": "pivot"
+    },
+    "sailboat_blue": {
+      "rect": {
+        "x": 256,
+        "y": 384,
+        "w": 128,
+        "h": 192
+      },
+      "footprint": {
+        "columns": 2,
+        "rows": 3
+      },
+      "pivot": {
+        "x": 64,
+        "y": 190
+      },
+      "sort_anchor": "pivot"
+    },
+    "merchant_ship": {
+      "rect": {
+        "x": 512,
+        "y": 384,
+        "w": 192,
+        "h": 320
+      },
+      "footprint": {
+        "columns": 3,
+        "rows": 5
+      },
+      "pivot": {
+        "x": 96,
+        "y": 318
+      },
+      "sort_anchor": "pivot"
+    },
+    "armed_ship": {
+      "rect": {
+        "x": 768,
+        "y": 384,
+        "w": 192,
+        "h": 320
+      },
+      "footprint": {
+        "columns": 3,
+        "rows": 5
+      },
+      "pivot": {
+        "x": 96,
+        "y": 318
+      },
+      "sort_anchor": "pivot"
+    },
+    "mooring_post": {
+      "rect": {
+        "x": 0,
+        "y": 768,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 32,
+        "y": 62
+      },
+      "sort_anchor": "pivot"
+    },
+    "pier_section": {
+      "rect": {
+        "x": 256,
+        "y": 768,
+        "w": 64,
+        "h": 128
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 2
+      },
+      "pivot": {
+        "x": 32,
+        "y": 126
+      },
+      "sort_anchor": "pivot"
+    },
+    "anchor": {
+      "rect": {
+        "x": 512,
+        "y": 768,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 32,
+        "y": 62
+      },
+      "sort_anchor": "pivot"
+    },
+    "rope_coil": {
+      "rect": {
+        "x": 768,
+        "y": 768,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 32,
+        "y": 62
+      },
+      "sort_anchor": "pivot"
+    },
+    "helm": {
+      "rect": {
+        "x": 0,
+        "y": 1152,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 32,
+        "y": 62
+      },
+      "sort_anchor": "pivot"
+    },
+    "hatch_closed": {
+      "rect": {
+        "x": 256,
+        "y": 1152,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 32,
+        "y": 62
+      },
+      "sort_anchor": "pivot"
+    },
+    "hatch_open": {
+      "rect": {
+        "x": 512,
+        "y": 1152,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 32,
+        "y": 62
+      },
+      "sort_anchor": "pivot"
+    },
+    "cargo": {
+      "rect": {
+        "x": 768,
+        "y": 1152,
+        "w": 128,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 2,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 64,
+        "y": 62
+      },
+      "sort_anchor": "pivot"
+    }
+  }
+}

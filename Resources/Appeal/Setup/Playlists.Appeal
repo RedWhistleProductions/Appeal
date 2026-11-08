@@ -1,0 +1,3 @@
+// Creates level-to-playlist links in the currently selected database.
+Storage Execute_SQL "CREATE TABLE IF NOT EXISTS Playlists (Level_Name TEXT PRIMARY KEY, File TEXT NOT NULL UNIQUE, Updated_At TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);"
+Return

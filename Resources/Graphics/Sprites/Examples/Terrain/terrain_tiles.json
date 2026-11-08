@@ -1,6 +1,6 @@
 {
   "schema": "bananas.sprite-atlas.v1",
-  "image": "terrain_tiles.png",
+  "image": "Terrain_Tiles.png",
   "format": "RGBA8",
   "size": {
     "w": 256,

@@ -65,8 +65,12 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 $(OBJ_DIR)/Preprocessor_Tests$(EXE_EXT): Tests/Preprocessor_Tests.cpp $(filter-out $(OBJ_DIR)/main.o,$(OBJ_FILES)) $(wildcard Source/*.h)
 	$(CXX) $(CXXFLAGS) -I$(SRC_DIR) -o $@ $< $(filter-out $(OBJ_DIR)/main.o,$(OBJ_FILES)) $(LDLIBS)
 
-test: $(OBJ_DIR)/Preprocessor_Tests$(EXE_EXT)
+$(OBJ_DIR)/Named_List_Memory_Tests$(EXE_EXT): Tests/Named_List_Memory_Tests.cpp $(wildcard Source/*.h)
+	$(CXX) $(CXXFLAGS) -I$(SRC_DIR) -o $@ $<
+
+test: $(OBJ_DIR)/Preprocessor_Tests$(EXE_EXT) $(OBJ_DIR)/Named_List_Memory_Tests$(EXE_EXT)
 	./$(OBJ_DIR)/Preprocessor_Tests$(EXE_EXT)
+	./$(OBJ_DIR)/Named_List_Memory_Tests$(EXE_EXT)
 
 # Compile Windows resource files
 $(OBJ_DIR)/%.res: $(SRC_DIR)/%.rc

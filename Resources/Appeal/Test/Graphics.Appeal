@@ -133,7 +133,7 @@ Graphics Update
 Graphics Wait_Until_Close Main
 Graphics Window_Open Main
 
-Graphics Load_Animation Adam Standing Examples/Characters/Adam_Movement.png 64 64 0 8
+Graphics Load_Animation Adam Standing Examples/Characters/Adam/Adam_Movement.png 64 64 0 8
 Graphics Set_Animation Adam Standing
 Graphics Set_Animation_FPS Adam Standing 7
 Graphics Set_Animation_Mode Adam Standing Hold

@@ -1,0 +1,18 @@
+Add_Dynamic_Module Video Appeal_FFmpeg_Video
+Print (Video Load Intro Sample.mp4)
+Print (Video Width)
+Print (Video Height)
+Print (Video Has_Audio)
+Video Audio_Output Intro False
+Video Play
+Print (Video Is_Playing)
+Print (Video Update)
+Video Pause
+Print (Video Is_Playing)
+Print (Video Seek 1.5)
+Print (Video Update)
+Video Stop
+Print (Video Position)
+Video Close_All
+Print VIDEO_FFMPEG_PASSED
+Done

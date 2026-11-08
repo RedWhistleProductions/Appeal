@@ -1,5 +1,5 @@
 //Debug On
-Run Setup/Config
+// The active standalone demo below loads Setup/Config once.
 
 //Run Test/Audio
 //Run Examples/Audio/Using_A_Playlist
@@ -17,8 +17,9 @@ Run Setup/Config
 // Music Player uses the Audio module and Graphics module together
 //Run Examples/Music_Player
 Run Examples/Animation_Music_Player
+//Run Examples/World/Sprite_Garden
 
 //Run Test/Input
-
+//Run Utilities/Game_Editor/Main
 
 Done

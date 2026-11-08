@@ -1,13 +1,31 @@
-// Standalone: Appeal.exe Examples/Graphics/Create_A_Window
+// Standalone Mechanics demo without the music/GUI overlay.
+// Adam: A/D, left Shift/Ctrl, Space. Eve: arrows, right Shift/Ctrl, Enter.
 Run Setup/Config
-Graphics Add_Window Main "Appeal Window - Adam and Eve" 800 600
+Run Examples/Graphics/Setup_Character_Mechanics
+Run Examples/Graphics/Character_Animation_Controls
+Graphics Add_Window Main "Adam and Eve - GAME focus (F1 / Back: GUI)" 800 600
 Graphics Set_FPS 60
 Graphics Set_GUI_Visible False
-
 Run Examples/Graphics/Setup_Characters
+Run Examples/Graphics/Setup_Character_Input
 
-// Select Walking with: Graphics Set_Animation Adam Walking
-// Return to the first animation with: Graphics Reset_Animation Adam
-// The renderer advances animations automatically, including in this loop.
-Graphics Wait_Until_Close Main
+Graphics Window_Open Main
+Set_Var_Global Character_Window_Open Graphics.Window.Main.Open
+Loop While Var Character_Window_Open == 1
+{
+    Input Update Default
+    Call Character_Check_Focus
+    Call Adam_Read_Input
+    Call Eve_Read_Input
+    Call Character_Mechanics_Update
+    Call Adam_Draw_Mechanics
+    Call Eve_Draw_Mechanics
+    Graphics Render
+    Graphics Update
+    Graphics Window_Open Main
+    Set_Var_Global Character_Window_Open Graphics.Window.Main.Open
+}
+Mechanics Release Adam
+Mechanics Release Eve
+Input Close_Controller -1
 Graphics Close_All

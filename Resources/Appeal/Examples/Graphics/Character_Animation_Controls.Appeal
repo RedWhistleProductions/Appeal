@@ -1,116 +1,344 @@
-// Select independently from the animations loaded by Setup_Characters.
-Define_Function Adam_Select_Animation
-    Graphics GUI_Selection_Text Adam_Animation
-    Set_Var_Global Adam_Selected_Animation Graphics.GUI.Adam_Animation.Text
-    Graphics Set_Animation Adam Var Adam_Selected_Animation
+// Default for the original 800px demos; wider scenes can override after loading.
+Set_Var Character_Max_X 608
+Set_Var Character_Standing_Y 320
+Set_Var Character_Foot_Y 64
+Set_Var Character_Focus Game
+Set_Var Character_Last_Focus Game
+Define_Function Character_Check_Focus
+    Set_Var Character_Focus (Input Focus)
+    If Var Character_Focus != Var Character_Last_Focus
+    {
+        Set_Var Adam_Direction 0
+        Set_Var Adam_Stick 0
+        Set_Var Adam_Pad_Left 0
+        Set_Var Adam_Pad_Right 0
+        Set_Var Adam_Pad_Run 0
+        Set_Var Adam_Pad_Duck 0
+        Set_Var Adam_Axis 0
+        Set_Var Adam_Running 0
+        Set_Var Adam_Ducking 0
+        Mechanics Select Adam
+        Mechanics Stop
+        Set_Var Eve_Direction 0
+        Set_Var Eve_Stick 0
+        Set_Var Eve_Pad_Left 0
+        Set_Var Eve_Pad_Right 0
+        Set_Var Eve_Pad_Run 0
+        Set_Var Eve_Pad_Duck 0
+        Set_Var Eve_Axis 0
+        Set_Var Eve_Running 0
+        Set_Var Eve_Ducking 0
+        Mechanics Select Eve
+        Mechanics Stop
+        Set_Var Character_Last_Focus Var Character_Focus
+        If Var Character_Focus == Game
+        {
+            Graphics Set_Window_Title Main "Adam and Eve - GAME focus (F1 / Back: GUI)"
+        }
+        If Var Character_Focus == GUI
+        {
+            Graphics Set_Window_Title Main "Adam and Eve - GUI focus (F1 / Back: Game)"
+        }
+    }
+End_Function
+Define_Function Character_Toggle_Focus
+    Input Toggle_Focus
 End_Function
 
-Define_Function Eve_Select_Animation
-    Graphics GUI_Selection_Text Eve_Animation
-    Set_Var_Global Eve_Selected_Animation Graphics.GUI.Eve_Animation.Text
-    Graphics Set_Animation Eve Var Eve_Selected_Animation
-End_Function
-
-Define_Function Adam_Set_Speed
-    Set_Var Adam_Speed Var Callback_Value
-End_Function
-
-Define_Function Adam_Move_Up
-    Set_Var Adam_Y (Subtract Var Adam_Y Var Adam_Speed)
-    Graphics Paste Adam Var Adam_X Var Adam_Y 0
-End_Function
-
-Define_Function Adam_Move_Down
-    Set_Var Adam_Y (Add Var Adam_Y Var Adam_Speed)
-    Graphics Paste Adam Var Adam_X Var Adam_Y 0
-End_Function
-
-Define_Function Adam_Move_Left
-    Set_Var Adam_X (Subtract Var Adam_X Var Adam_Speed)
-    Graphics Paste Adam Var Adam_X Var Adam_Y 0
-End_Function
-
-Define_Function Adam_Move_Right
-    Set_Var Adam_X (Add Var Adam_X Var Adam_Speed)
-    Graphics Paste Adam Var Adam_X Var Adam_Y 0
-End_Function
-
-Define_Function Eve_Set_Speed
-    Set_Var Eve_Speed Var Callback_Value
-End_Function
-
-Define_Function Eve_Move_Up
-    Set_Var Eve_Y (Subtract Var Eve_Y Var Eve_Speed)
-    Graphics Paste Eve Var Eve_X Var Eve_Y 0
-End_Function
-
-Define_Function Eve_Move_Down
-    Set_Var Eve_Y (Add Var Eve_Y Var Eve_Speed)
-    Graphics Paste Eve Var Eve_X Var Eve_Y 0
-End_Function
-
-Define_Function Eve_Move_Left
-    Set_Var Eve_X (Subtract Var Eve_X Var Eve_Speed)
-    Graphics Paste Eve Var Eve_X Var Eve_Y 0
-End_Function
-
-Define_Function Eve_Move_Right
-    Set_Var Eve_X (Add Var Eve_X Var Eve_Speed)
-    Graphics Paste Eve Var Eve_X Var Eve_Y 0
-End_Function
-
+// Requires Setup_Character_Mechanics and Setup_Characters.
+Set_Var Adam_Deadzone 24
 Define_Function Adam_Stick_X
-    Set_Var Adam_X (Add Var Adam_X Var Callback_Value)
-    Graphics Paste Adam Var Adam_X Var Adam_Y 0
+    Set_Var Adam_Stick Var Callback_Value
 End_Function
-
-Define_Function Adam_Stick_Y
-    Set_Var Adam_Y (Add Var Adam_Y Var Callback_Value)
-    Graphics Paste Adam Var Adam_X Var Adam_Y 0
-End_Function
-
 Define_Function Adam_Set_Deadzone
     Set_Var Adam_Deadzone Var Callback_Value
     Input Set_Controller_Deadzone Var Adam_Deadzone
 End_Function
 
-Define_Function Adam_Set_DPad_Repeat
-    Set_Var Adam_DPad_Repeat Var Callback_Value
-    Input Set_Controller_Button_Repeat DPad_Up Var Adam_DPad_Repeat
-    Input Set_Controller_Button_Repeat DPad_Down Var Adam_DPad_Repeat
-    Input Set_Controller_Button_Repeat DPad_Left Var Adam_DPad_Repeat
-    Input Set_Controller_Button_Repeat DPad_Right Var Adam_DPad_Repeat
+Define_Function Adam_Pad_Left_Down
+    Set_Var Adam_Pad_Left 1
 End_Function
 
-// Tabs keep both sets of controls within the existing top panel.
+Define_Function Adam_Pad_Left_Up
+    Set_Var Adam_Pad_Left 0
+End_Function
+
+Define_Function Adam_Pad_Right_Down
+    Set_Var Adam_Pad_Right 1
+End_Function
+
+Define_Function Adam_Pad_Right_Up
+    Set_Var Adam_Pad_Right 0
+End_Function
+
+Define_Function Adam_Pad_Run_Down
+    Set_Var Adam_Pad_Run 1
+End_Function
+
+Define_Function Adam_Pad_Run_Up
+    Set_Var Adam_Pad_Run 0
+End_Function
+
+Define_Function Adam_Pad_Duck_Down
+    Set_Var Adam_Pad_Duck 1
+End_Function
+
+Define_Function Adam_Pad_Duck_Up
+    Set_Var Adam_Pad_Duck 0
+End_Function
+
+Define_Function Adam_Read_Input
+    Set_Var Adam_Axis Var Adam_Direction
+    Set_Var Adam_Running Var Adam_Run
+    Set_Var Adam_Ducking Var Adam_Duck
+    If Var Adam_Stick != 0
+    {
+        Set_Var Adam_Axis Var Adam_Stick
+    }
+    Set_Var Adam_Keys (Multiply (Subtract (Input Down Adam_Right) (Input Down Adam_Left)) 100)
+    If Var Adam_Keys != 0
+    {
+        Set_Var Adam_Axis Var Adam_Keys
+    }
+    If Var Adam_Pad_Left == 1
+    {
+        Set_Var Adam_Axis -100
+    }
+    If Var Adam_Pad_Right == 1
+    {
+        Set_Var Adam_Axis 100
+    }
+    If (Input Down Adam_Run) == 1
+    {
+        Set_Var Adam_Running 1
+    }
+    If Var Adam_Pad_Run == 1
+    {
+        Set_Var Adam_Running 1
+    }
+    If (Input Down Adam_Duck) == 1
+    {
+        Set_Var Adam_Ducking 1
+    }
+    If Var Adam_Pad_Duck == 1
+    {
+        Set_Var Adam_Ducking 1
+    }
+End_Function
+
+Define_Function Adam_Draw_Mechanics
+    Set_Var_Global Adam_X Mechanics.Adam.Position_X
+    Set_Var_Global Adam_Height Mechanics.Adam.Position_Y
+    Set_Var_Global Adam_Action Mechanics.Adam.Action
+    Set_Var_Global Adam_Duck_Amount Mechanics.Adam.Duck_Amount
+    If Var Adam_X < 0
+    {
+        Mechanics Set Adam Position_X 0
+        Set_Var Adam_X 0
+    }
+    If Var Adam_X > Var Character_Max_X
+    {
+        Mechanics Set Adam Position_X Var Character_Max_X
+        Set_Var Adam_X Var Character_Max_X
+    }
+    Set_Var Adam_Y (Subtract Var Character_Standing_Y Var Adam_Height)
+    Set_Var Adam_Scale_Y (Subtract 3 Var Adam_Duck_Amount)
+    Set_Var Adam_Y (Add Var Adam_Y (Multiply Var Adam_Duck_Amount Var Character_Foot_Y))
+    Set_Var Adam_Draw_X Var Adam_X
+    If Var Adam_Facing < 0
+    {
+        Set_Var Adam_Draw_X (Add Var Adam_X 192)
+    }
+    Graphics Set_Scale Adam Var Adam_Facing Var Adam_Scale_Y 1
+    Graphics Paste Adam Var Adam_Draw_X Var Adam_Y 0
+    If Var Adam_Action != Var Adam_Last_Action
+    {
+        Graphics Set_Animation Adam Standing
+        Graphics Set_Animation_FPS Adam Standing 7
+        Graphics Set_Animation_FPS Adam Walking 10
+        If Var Adam_Action == Walk
+        {
+            Graphics Set_Animation Adam Walking
+        }
+        If Var Adam_Action == Run
+        {
+            Graphics Set_Animation Adam Walking
+            Graphics Set_Animation_FPS Adam Walking 16
+        }
+        If Var Adam_Action == Duck_Walk
+        {
+            Graphics Set_Animation Adam Walking
+            Graphics Set_Animation_FPS Adam Walking 7
+        }
+        If Var Adam_Action == Jump
+        {
+            Graphics Set_Animation_FPS Adam Standing 7
+        }
+        Set_Var Adam_Last_Action Var Adam_Action
+    }
+End_Function
+
+Define_Function Eve_Pad_Left_Down
+    Set_Var Eve_Pad_Left 1
+End_Function
+
+Define_Function Eve_Pad_Left_Up
+    Set_Var Eve_Pad_Left 0
+End_Function
+
+Define_Function Eve_Pad_Right_Down
+    Set_Var Eve_Pad_Right 1
+End_Function
+
+Define_Function Eve_Pad_Right_Up
+    Set_Var Eve_Pad_Right 0
+End_Function
+
+Define_Function Eve_Pad_Run_Down
+    Set_Var Eve_Pad_Run 1
+End_Function
+
+Define_Function Eve_Pad_Run_Up
+    Set_Var Eve_Pad_Run 0
+End_Function
+
+Define_Function Eve_Pad_Duck_Down
+    Set_Var Eve_Pad_Duck 1
+End_Function
+
+Define_Function Eve_Pad_Duck_Up
+    Set_Var Eve_Pad_Duck 0
+End_Function
+
+Define_Function Eve_Read_Input
+    Set_Var Eve_Axis Var Eve_Direction
+    Set_Var Eve_Running Var Eve_Run
+    Set_Var Eve_Ducking Var Eve_Duck
+    If Var Eve_Stick != 0
+    {
+        Set_Var Eve_Axis Var Eve_Stick
+    }
+    Set_Var Eve_Keys (Multiply (Subtract (Input Down Eve_Right) (Input Down Eve_Left)) 100)
+    If Var Eve_Keys != 0
+    {
+        Set_Var Eve_Axis Var Eve_Keys
+    }
+    If Var Eve_Pad_Left == 1
+    {
+        Set_Var Eve_Axis -100
+    }
+    If Var Eve_Pad_Right == 1
+    {
+        Set_Var Eve_Axis 100
+    }
+    If (Input Down Eve_Run) == 1
+    {
+        Set_Var Eve_Running 1
+    }
+    If Var Eve_Pad_Run == 1
+    {
+        Set_Var Eve_Running 1
+    }
+    If (Input Down Eve_Duck) == 1
+    {
+        Set_Var Eve_Ducking 1
+    }
+    If Var Eve_Pad_Duck == 1
+    {
+        Set_Var Eve_Ducking 1
+    }
+End_Function
+
+Define_Function Eve_Draw_Mechanics
+    Set_Var_Global Eve_X Mechanics.Eve.Position_X
+    Set_Var_Global Eve_Height Mechanics.Eve.Position_Y
+    Set_Var_Global Eve_Action Mechanics.Eve.Action
+    Set_Var_Global Eve_Duck_Amount Mechanics.Eve.Duck_Amount
+    If Var Eve_X < 0
+    {
+        Mechanics Set Eve Position_X 0
+        Set_Var Eve_X 0
+    }
+    If Var Eve_X > Var Character_Max_X
+    {
+        Mechanics Set Eve Position_X Var Character_Max_X
+        Set_Var Eve_X Var Character_Max_X
+    }
+    Set_Var Eve_Y (Subtract Var Character_Standing_Y Var Eve_Height)
+    Set_Var Eve_Scale_Y (Subtract 3 Var Eve_Duck_Amount)
+    Set_Var Eve_Y (Add Var Eve_Y (Multiply Var Eve_Duck_Amount Var Character_Foot_Y))
+    Set_Var Eve_Draw_X Var Eve_X
+    If Var Eve_Facing < 0
+    {
+        Set_Var Eve_Draw_X (Add Var Eve_X 192)
+    }
+    Graphics Set_Scale Eve Var Eve_Facing Var Eve_Scale_Y 1
+    Graphics Paste Eve Var Eve_Draw_X Var Eve_Y 0
+    If Var Eve_Action != Var Eve_Last_Action
+    {
+        Graphics Set_Animation Eve Standing
+        Graphics Set_Animation_FPS Eve Standing 7
+        Graphics Set_Animation_FPS Eve Walking 10
+        If Var Eve_Action == Walk
+        {
+            Graphics Set_Animation Eve Walking
+        }
+        If Var Eve_Action == Run
+        {
+            Graphics Set_Animation Eve Walking
+            Graphics Set_Animation_FPS Eve Walking 16
+        }
+        If Var Eve_Action == Duck_Walk
+        {
+            Graphics Set_Animation Eve Walking
+            Graphics Set_Animation_FPS Eve Walking 7
+        }
+        If Var Eve_Action == Jump
+        {
+            Graphics Set_Animation_FPS Eve Standing 7
+        }
+        Set_Var Eve_Last_Action Var Eve_Action
+    }
+End_Function
+
 Define_Function Character_Animation_GUI
-    Graphics GUI_Separator_Text "Characters"
+    Graphics GUI_Separator_Text "Side-scrolling Mechanics"
+    Graphics GUI_Text Character_Focus_Help "F1 / Pad Back: switch Game / GUI focus"
+    Graphics GUI_Text Character_Input_Focus Var Character_Focus
+    Graphics GUI_Text Character_Keys "Adam: A/D, Shift run, Ctrl duck, Space jump. Eve: arrows, RShift, RCtrl, Enter."
+    Graphics GUI_Text Character_Pad "Pad: stick/D-pad; A jump, B duck, X run."
     Graphics GUI_Tab_Bar_Begin Character_Controls
+
     Graphics GUI_Tab_Item_Begin Adam
-    Graphics GUI_Checkbox Adam_DPad_Repeat_Control "Repeat D-pad while held" Var Adam_DPad_Repeat Adam_Set_DPad_Repeat
+    Graphics GUI_Text Adam_State Var Adam_Action
+    Graphics GUI_Slider_Int Adam_Speed_Control "Speed (pixels/sec)##Adam" Var Adam_Speed 30 360 Adam_Set_Speed
+    Graphics GUI_Button Adam_Left_Button "< Walk##Adam" Adam_Move_Left
+    Graphics GUI_Same_Line
+    Graphics GUI_Button Adam_Right_Button "Walk >##Adam" Adam_Move_Right
+    Graphics GUI_Same_Line
+    Graphics GUI_Button Adam_Stop_Button "Stop##Adam" Adam_Stop
+    Graphics GUI_Same_Line
+    Graphics GUI_Button Adam_Jump_Button "Jump##Adam" Adam_Jump
+    Graphics GUI_Checkbox Adam_Run_Control "Run##Adam" Var Adam_Run Adam_Set_Run
+    Graphics GUI_Same_Line
+    Graphics GUI_Checkbox Adam_Duck_Control "Duck##Adam" Var Adam_Duck Adam_Set_Duck
     Graphics GUI_Slider_Int Adam_Deadzone_Control "Stick dead zone (%)" Var Adam_Deadzone 0 99 Adam_Set_Deadzone
-    Graphics GUI_Combo Adam_Animation "Adam animation" "Standing|Walking" 0 Adam_Select_Animation
-    Graphics GUI_Slider_Int Adam_Speed_Control "Speed (pixels/click)##Adam" Var Adam_Speed 1 50 Adam_Set_Speed
-    Graphics GUI_Button Adam_Up_Button "^ Up##Adam" Adam_Move_Up
-    Graphics GUI_Same_Line
-    Graphics GUI_Button Adam_Down_Button "v Down##Adam" Adam_Move_Down
-    Graphics GUI_Same_Line
-    Graphics GUI_Button Adam_Left_Button "< Left##Adam" Adam_Move_Left
-    Graphics GUI_Same_Line
-    Graphics GUI_Button Adam_Right_Button "Right >##Adam" Adam_Move_Right
     Graphics GUI_Tab_Item_End
+
     Graphics GUI_Tab_Item_Begin Eve
-    Graphics GUI_Combo Eve_Animation "Eve animation" "Standing|Walking" 0 Eve_Select_Animation
-    Graphics GUI_Slider_Int Eve_Speed_Control "Speed (pixels/click)##Eve" Var Eve_Speed 1 50 Eve_Set_Speed
-    Graphics GUI_Button Eve_Up_Button "^ Up##Eve" Eve_Move_Up
+    Graphics GUI_Text Eve_State Var Eve_Action
+    Graphics GUI_Slider_Int Eve_Speed_Control "Speed (pixels/sec)##Eve" Var Eve_Speed 30 360 Eve_Set_Speed
+    Graphics GUI_Button Eve_Left_Button "< Walk##Eve" Eve_Move_Left
     Graphics GUI_Same_Line
-    Graphics GUI_Button Eve_Down_Button "v Down##Eve" Eve_Move_Down
+    Graphics GUI_Button Eve_Right_Button "Walk >##Eve" Eve_Move_Right
     Graphics GUI_Same_Line
-    Graphics GUI_Button Eve_Left_Button "< Left##Eve" Eve_Move_Left
+    Graphics GUI_Button Eve_Stop_Button "Stop##Eve" Eve_Stop
     Graphics GUI_Same_Line
-    Graphics GUI_Button Eve_Right_Button "Right >##Eve" Eve_Move_Right
+    Graphics GUI_Button Eve_Jump_Button "Jump##Eve" Eve_Jump
+    Graphics GUI_Checkbox Eve_Run_Control "Run##Eve" Var Eve_Run Eve_Set_Run
+    Graphics GUI_Same_Line
+    Graphics GUI_Checkbox Eve_Duck_Control "Duck##Eve" Var Eve_Duck Eve_Set_Duck
     Graphics GUI_Tab_Item_End
     Graphics GUI_Tab_Bar_End
 End_Function
-
 Return

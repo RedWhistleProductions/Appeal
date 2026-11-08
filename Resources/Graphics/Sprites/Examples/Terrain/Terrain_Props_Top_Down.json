@@ -1,0 +1,362 @@
+{
+  "schema": "bananas.sprite-atlas.v1",
+  "image": "Terrain_Props_Top_Down.png",
+  "format": "RGBA8",
+  "size": {
+    "w": 512,
+    "h": 384
+  },
+  "grid": {
+    "cell_width": 64,
+    "cell_height": 64,
+    "margin": 0,
+    "spacing": 0
+  },
+  "coordinate_origin": "top-left",
+  "projection": "top-down-oblique",
+  "license": "CC0-1.0",
+  "sprites": {
+    "tree_narrow": {
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 128
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 2
+      },
+      "pivot": {
+        "x": 32,
+        "y": 126
+      },
+      "collision": "none",
+      "sort_anchor": "pivot",
+      "suggested_collision": {
+        "shape": "circle",
+        "cx": 32,
+        "cy": 116,
+        "radius": 10
+      }
+    },
+    "tree_oak": {
+      "rect": {
+        "x": 64,
+        "y": 0,
+        "w": 128,
+        "h": 128
+      },
+      "footprint": {
+        "columns": 2,
+        "rows": 2
+      },
+      "pivot": {
+        "x": 64,
+        "y": 126
+      },
+      "collision": "none",
+      "sort_anchor": "pivot",
+      "suggested_collision": {
+        "shape": "circle",
+        "cx": 64,
+        "cy": 116,
+        "radius": 10
+      }
+    },
+    "tree_pine": {
+      "rect": {
+        "x": 192,
+        "y": 0,
+        "w": 64,
+        "h": 128
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 2
+      },
+      "pivot": {
+        "x": 32,
+        "y": 126
+      },
+      "collision": "none",
+      "sort_anchor": "pivot",
+      "suggested_collision": {
+        "shape": "circle",
+        "cx": 32,
+        "cy": 116,
+        "radius": 10
+      }
+    },
+    "tree_apple": {
+      "rect": {
+        "x": 256,
+        "y": 0,
+        "w": 128,
+        "h": 128
+      },
+      "footprint": {
+        "columns": 2,
+        "rows": 2
+      },
+      "pivot": {
+        "x": 64,
+        "y": 126
+      },
+      "collision": "none",
+      "sort_anchor": "pivot",
+      "suggested_collision": {
+        "shape": "circle",
+        "cx": 64,
+        "cy": 116,
+        "radius": 10
+      }
+    },
+    "bush": {
+      "rect": {
+        "x": 0,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 32,
+        "y": 62
+      },
+      "collision": "none",
+      "sort_anchor": "pivot"
+    },
+    "boulder": {
+      "rect": {
+        "x": 64,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 32,
+        "y": 62
+      },
+      "collision": "none",
+      "sort_anchor": "pivot",
+      "suggested_collision": {
+        "shape": "rect",
+        "rect": {
+          "x": 12,
+          "y": 38,
+          "w": 40,
+          "h": 22
+        }
+      }
+    },
+    "crate": {
+      "rect": {
+        "x": 128,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 32,
+        "y": 62
+      },
+      "collision": "none",
+      "sort_anchor": "pivot",
+      "suggested_collision": {
+        "shape": "rect",
+        "rect": {
+          "x": 12,
+          "y": 38,
+          "w": 40,
+          "h": 22
+        }
+      }
+    },
+    "barrel": {
+      "rect": {
+        "x": 192,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 32,
+        "y": 62
+      },
+      "collision": "none",
+      "sort_anchor": "pivot",
+      "suggested_collision": {
+        "shape": "rect",
+        "rect": {
+          "x": 12,
+          "y": 38,
+          "w": 40,
+          "h": 22
+        }
+      }
+    },
+    "sign": {
+      "rect": {
+        "x": 256,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 32,
+        "y": 62
+      },
+      "collision": "none",
+      "sort_anchor": "pivot"
+    },
+    "ladder": {
+      "rect": {
+        "x": 320,
+        "y": 128,
+        "w": 64,
+        "h": 128
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 2
+      },
+      "pivot": {
+        "x": 32,
+        "y": 126
+      },
+      "collision": "none",
+      "sort_anchor": "pivot"
+    },
+    "fence": {
+      "rect": {
+        "x": 384,
+        "y": 128,
+        "w": 128,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 2,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 64,
+        "y": 62
+      },
+      "collision": "none",
+      "sort_anchor": "pivot"
+    },
+    "grass_tuft": {
+      "rect": {
+        "x": 0,
+        "y": 192,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 32,
+        "y": 62
+      },
+      "collision": "none",
+      "sort_anchor": "pivot"
+    },
+    "cave_entrance": {
+      "rect": {
+        "x": 0,
+        "y": 256,
+        "w": 128,
+        "h": 128
+      },
+      "footprint": {
+        "columns": 2,
+        "rows": 2
+      },
+      "pivot": {
+        "x": 64,
+        "y": 126
+      },
+      "collision": "none",
+      "sort_anchor": "pivot",
+      "transition_candidate": true
+    },
+    "stairs_down": {
+      "rect": {
+        "x": 128,
+        "y": 256,
+        "w": 64,
+        "h": 64
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 1
+      },
+      "pivot": {
+        "x": 32,
+        "y": 62
+      },
+      "collision": "none",
+      "sort_anchor": "pivot",
+      "transition_candidate": true
+    },
+    "door_closed": {
+      "rect": {
+        "x": 192,
+        "y": 256,
+        "w": 64,
+        "h": 128
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 2
+      },
+      "pivot": {
+        "x": 32,
+        "y": 126
+      },
+      "collision": "none",
+      "sort_anchor": "pivot"
+    },
+    "door_open": {
+      "rect": {
+        "x": 256,
+        "y": 256,
+        "w": 64,
+        "h": 128
+      },
+      "footprint": {
+        "columns": 1,
+        "rows": 2
+      },
+      "pivot": {
+        "x": 32,
+        "y": 126
+      },
+      "collision": "none",
+      "sort_anchor": "pivot",
+      "transition_candidate": true
+    }
+  }
+}

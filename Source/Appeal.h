@@ -61,7 +61,8 @@ class Appeal
     void Run_Callback(std::string Function);
     void Run_Analog_Callback(std::string Function, int Value);
     void Run_Module_Callback(std::string Module, std::string Command, bool Has_Value, int Value);
-    void Capture_Block(std::string Function);
+    Appeal_Function Capture_Block();
+    void Run_Definition(const Appeal_Function &Definition, const std::string &Name);
     bool Find_Global(std::string Name);
     std::string Get_Global_Value(std::string Name);
     void Run_Function(std::string Function);

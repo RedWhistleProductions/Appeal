@@ -1,0 +1,12 @@
+{
+  "sprites": 80,
+  "grid": [
+    64,
+    64
+  ],
+  "bounds_nonoverlap_occupancy": "passed",
+  "surface_edge_checks": 104,
+  "transition_edge_checks": 384,
+  "wall_edge_checks": 0,
+  "engine_runtime": "not_run"
+}
