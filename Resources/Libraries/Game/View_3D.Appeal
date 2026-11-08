@@ -1,0 +1,53 @@
+// Static 3D presentation adapter. Host loads models/shaders and owns rendering.
+Set_Var View3D_Window Main
+Set_Var View3D_X 0
+Set_Var View3D_Y 0
+Set_Var View3D_Z -6
+Set_Var View3D_Yaw 0
+Set_Var View3D_Pitch 0
+Set_Var View3D_Roll 0
+Set_Var View3D_FOV 45
+Set_Var View3D_Near 0.1
+Set_Var View3D_Far 1000
+Set_Var View3D_Target_X 0
+Set_Var View3D_Target_Y 0
+Set_Var View3D_Target_Z 0
+Set_Var View3D_Offset_X 0
+Set_Var View3D_Offset_Y 0
+Set_Var View3D_Offset_Z -6
+Define_Function View3D_Apply
+    Graphics Set_Perspective Var View3D_Window Var View3D_FOV Var View3D_Near Var View3D_Far
+    Graphics Set_Camera_Location Var View3D_Window Var View3D_X Var View3D_Y Var View3D_Z
+    Graphics Set_Camera_Orientation Var View3D_Window Var View3D_Yaw Var View3D_Pitch Var View3D_Roll
+End_Function
+Define_Function View3D_Follow
+    Set_Var View3D_X (Add Var View3D_Target_X Var View3D_Offset_X)
+    Set_Var View3D_Y (Add Var View3D_Target_Y Var View3D_Offset_Y)
+    Set_Var View3D_Z (Add Var View3D_Target_Z Var View3D_Offset_Z)
+    Call View3D_Apply
+End_Function
+
+Set_Var Model3D_Asset ""
+Set_Var Model3D_Body ""
+Set_Var Model3D_X 0
+Set_Var Model3D_Y 0
+Set_Var Model3D_Z 0
+Set_Var Model3D_Yaw 0
+Set_Var Model3D_Pitch 0
+Set_Var Model3D_Roll 0
+Set_Var Model3D_Scale_X 1
+Set_Var Model3D_Scale_Y 1
+Set_Var Model3D_Scale_Z 1
+Set_Var Model3D_Physics_Units 1
+Define_Function Model3D_Apply
+    Graphics Set_Location Var Model3D_Asset Var Model3D_X Var Model3D_Y Var Model3D_Z
+    Graphics Set_Orientation Var Model3D_Asset Var Model3D_Yaw Var Model3D_Pitch Var Model3D_Roll
+    Graphics Set_Scale Var Model3D_Asset Var Model3D_Scale_X Var Model3D_Scale_Y Var Model3D_Scale_Z
+End_Function
+Define_Function Model3D_From_Body
+    If Var Model3D_Physics_Units <= 0 { Set_Var Model3D_Physics_Units 1 }
+    Set_Var Model3D_X (Divide (Physics Get Var Model3D_Body Position_X) Var Model3D_Physics_Units)
+    Set_Var Model3D_Y (Divide (Physics Get Var Model3D_Body Position_Y) Var Model3D_Physics_Units)
+    Set_Var Model3D_Z (Divide (Physics Get Var Model3D_Body Position_Z) Var Model3D_Physics_Units)
+    Call Model3D_Apply
+End_Function

@@ -216,6 +216,19 @@ expanding the C++ implementation. These are recommendations, not implemented wor
 - **Acceptance:** pause/slow motion affect clip progress consistently and each
   marker fires once at the intended simulation point, including across save/load.
 
+## 17. External skeletal model and clip pipeline (Step 17 blocker)
+
+- **Evidence:** the inspected import path uses aiProcess_PreTransformVertices and
+  imports static vertices/material data; script Load_Animation loads 2D sheets.
+  No exposed bone/skin/clip import/playback contract was established by this pass.
+- **MVP approach:** static OBJ/model transforms and camera helpers plus tested
+  Jolt integration. Keep complete animated 3D readiness explicitly partial.
+- **Recommended change:** preserve hierarchy/bones/weights, expose external clip
+  loading/selection and simulation-clock advancement, then render skinned meshes
+  with defined asset lifetime/save contracts.
+- **Acceptance:** import an external animated character, play two clips, move it
+  against real 3D collision, save/load and repeat scene cleanup in a small game.
+
 ## Performance watch list — no bottleneck established yet
 
 - Native timer collection currently scans every active timer each update.

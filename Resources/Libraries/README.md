@@ -36,3 +36,4 @@ Available libraries:
 - `Game/Combat`: health/armor, protection windows, healing and resource/cooldown gates.
 - `Game/Dialogue`: guarded branching conversations with stale-choice rejection.
 - `Game/Turns` / `Game/Grid`: action budgets, turn order and logical grid moves.
+- `Game/View_3D`: static model/camera/physics-position helpers; animated 3D remains partial.
