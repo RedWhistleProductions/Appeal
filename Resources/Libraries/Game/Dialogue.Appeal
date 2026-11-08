@@ -1,0 +1,88 @@
+// Host supplies node content and recomputes choice availability at dispatch.
+Set_Var Dialogue_Node ""
+Set_Var Dialogue_Next_Node ""
+Set_Var Dialogue_Previous ""
+Set_Var Dialogue_Revision 0
+Set_Var Dialogue_Open 0
+Set_Var Dialogue_Enabled 1
+Set_Var Dialogue_Busy 0
+Set_Var Dialogue_Speaker ""
+Set_Var Dialogue_Text ""
+Set_Var Dialogue_On_Node ""
+Set_Var Dialogue_On_Choice ""
+Set_Var Dialogue_Choice_ID ""
+Set_Var Dialogue_Choice_Next ""
+Set_Var Dialogue_Choice_Available 1
+Set_Var Dialogue_Expected_Revision -1
+Set_Var Dialogue_Accepted 0
+
+Define_Function Dialogue_Load_Content
+    Set_Var Dialogue_Speaker ""
+    Set_Var Dialogue_Text ""
+    Set_Var Dialogue_Open 0
+    If Var Dialogue_Node != ""
+    {
+        Set_Var Dialogue_Open 1
+        If Var Dialogue_On_Node != "" { Call Var Dialogue_On_Node }
+    }
+End_Function
+
+Define_Function Dialogue_Change
+    Set_Var Dialogue_Previous Var Dialogue_Node
+    Set_Var Dialogue_Node Var Dialogue_Next_Node
+    Set_Var Dialogue_Revision (Add Var Dialogue_Revision 1)
+    Call Dialogue_Load_Content
+    If Var Dialogue_Open == 1 { Events Emit Dialogue_Changed Var Dialogue_Node }
+    If Var Dialogue_Open == 0 { Events Emit Dialogue_Ended Var Dialogue_Previous }
+End_Function
+
+Define_Function Dialogue_Start
+    If Var Dialogue_Busy == 0
+    {
+        Set_Var Dialogue_Busy 1
+        Call Dialogue_Change
+        Set_Var Dialogue_Busy 0
+    }
+End_Function
+
+Define_Function Dialogue_Refresh
+    If Var Dialogue_Busy == 0
+    {
+        Set_Var Dialogue_Busy 1
+        Call Dialogue_Load_Content
+        Set_Var Dialogue_Busy 0
+    }
+End_Function
+
+Define_Function Dialogue_Select
+    If Var Dialogue_Busy == 0
+    {
+        Set_Var Dialogue_Accepted 0
+        Set_Var Dialogue_Reason "Choice unavailable or stale."
+        If Var Dialogue_Open == 1
+        {
+            If Var Dialogue_Enabled == 1
+            {
+                If Var Dialogue_Choice_Available == 1
+                {
+                    If Var Dialogue_Choice_ID != ""
+                    {
+                        If Var Dialogue_Expected_Revision == Var Dialogue_Revision
+                        {
+                            Set_Var Dialogue_Busy 1
+                            Set_Var Dialogue_Chosen_ID Var Dialogue_Choice_ID
+                            Set_Var Dialogue_Chosen_Next Var Dialogue_Choice_Next
+                            If Var Dialogue_On_Choice != "" { Call Var Dialogue_On_Choice }
+                            Set_Var Dialogue_Next_Node Var Dialogue_Chosen_Next
+                            Call Dialogue_Change
+                            Set_Var Dialogue_Accepted 1
+                            Set_Var Dialogue_Reason ""
+                            Events Emit Dialogue_Choice_Made Var Dialogue_Chosen_ID
+                            Set_Var Dialogue_Busy 0
+                        }
+                    }
+                }
+            }
+        }
+    }
+End_Function

@@ -34,3 +34,4 @@ Available libraries:
 - `Game/FSM`: simple NPC state/enter/exit/update lifecycle and gameplay-time age.
 - `Game/Inventory`: item stacks, per-owner equipment and saveable snapshots.
 - `Game/Combat`: health/armor, protection windows, healing and resource/cooldown gates.
+- `Game/Dialogue`: guarded branching conversations with stale-choice rejection.
