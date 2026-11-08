@@ -41,3 +41,4 @@ Available libraries:
 - `Game/Generation`: deterministic connected tile layouts and World map construction.
 - `Game/Agents`: bounded round-robin decision scheduling; full crowd simulation remains open.
 - `Game/Vehicle`: arcade forward/reverse acceleration and braking; full vehicle simulation remains partial.
+- `Game/Action_Window`: gameplay-timed windup/active/recovery; precision animation/sports remain partial.

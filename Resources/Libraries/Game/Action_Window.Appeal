@@ -1,0 +1,109 @@
+// Explicit gameplay-time phases. Does not synchronize skeletal/renderer frames.
+Set_Var Window_ID ""
+Set_Var Window_Current_ID ""
+Set_Var Window_Windup_MS 100
+Set_Var Window_Active_MS 100
+Set_Var Window_Recovery_MS 200
+Set_Var Window_Active 0
+Set_Var Window_Phase Idle
+Set_Var Window_Accepted 0
+Set_Var Window_Interruptible 0
+Set_Var Window_Revision 0
+Set_Var Window_Opened 0
+Set_Var Window_Closed 0
+Set_Var Window_Sampled 0
+Set_Var Window_Missed 0
+
+Define_Function Window_Tick
+    If Var Window_Active == 1
+    {
+        If Var Game_Running == 1
+        {
+            If Var Game_Paused == 0
+            {
+                Set_Var Window_Elapsed (Subtract Var Game_Time Var Window_Started_At)
+                Set_Var Window_Active_End (Add Var Window_Windup_MS Var Window_Active_MS)
+                Set_Var Window_Total (Add Var Window_Active_End Var Window_Recovery_MS)
+                Set_Var Window_Phase Windup
+                If Var Window_Elapsed >= Var Window_Windup_MS
+                {
+                    Set_Var Window_Phase Active
+                    If Var Window_Active_MS > 0
+                    {
+                        If Var Window_Opened == 0
+                        {
+                            Set_Var Window_Opened 1
+                            Events Emit Action_Opened Var Window_Current_ID
+                        }
+                    }
+                }
+                If Var Window_Elapsed >= Var Window_Active_End
+                {
+                    Set_Var Window_Phase Recovery
+                    If Var Window_Opened == 1
+                    {
+                        If Var Window_Closed == 0
+                        {
+                            Set_Var Window_Closed 1
+                            Events Emit Action_Closed Var Window_Current_ID
+                            If Var Window_Sampled == 0 { Set_Var Window_Missed 1 }
+                        }
+                    }
+                }
+                If Var Window_Phase == Active { Set_Var Window_Sampled 1 }
+                If Var Window_Elapsed >= Var Window_Total
+                {
+                    Set_Var Window_Phase Finished
+                    Set_Var Window_Active 0
+                    Events Emit Action_Finished Var Window_Current_ID
+                }
+            }
+        }
+    }
+End_Function
+
+Define_Function Window_Start
+    Set_Var Window_Accepted 0
+    Set_Var Window_Allowed 1
+    If Var Game_Running == 0 { Set_Var Window_Allowed 0 }
+    If Var Game_Paused == 1 { Set_Var Window_Allowed 0 }
+    If Var Window_ID == "" { Set_Var Window_Allowed 0 }
+    If Var Window_Windup_MS < 0 { Set_Var Window_Allowed 0 }
+    If Var Window_Active_MS < 0 { Set_Var Window_Allowed 0 }
+    If Var Window_Recovery_MS < 0 { Set_Var Window_Allowed 0 }
+    If Var Window_Active == 1
+    {
+        If Var Window_Interruptible == 0 { Set_Var Window_Allowed 0 }
+    }
+    If Var Window_Allowed == 1
+    {
+        If Var Window_Active == 1 { Call Window_Cancel }
+        Set_Var Window_Current_ID Var Window_ID
+        Set_Var Window_Started_At Var Game_Time
+        Set_Var Window_Active 1
+        Set_Var Window_Opened 0
+        Set_Var Window_Closed 0
+        Set_Var Window_Sampled 0
+        Set_Var Window_Missed 0
+        Set_Var Window_Accepted 1
+        Set_Var Window_Revision (Add Var Window_Revision 1)
+        Events Emit Action_Started Var Window_ID
+        Call Window_Tick
+    }
+End_Function
+Define_Function Window_Cancel
+    If Var Window_Active == 1
+    {
+        Set_Var Window_Active 0
+        Set_Var Window_Phase Cancelled
+        If Var Window_Opened == 1
+        {
+            If Var Window_Closed == 0
+            {
+                Set_Var Window_Closed 1
+                Events Emit Action_Closed Var Window_Current_ID
+            }
+        }
+        Events Emit Action_Cancelled Var Window_Current_ID
+    }
+End_Function
