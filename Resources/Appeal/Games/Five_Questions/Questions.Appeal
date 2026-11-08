@@ -1,0 +1,48 @@
+// Replace this function/data to make another quiz; no native changes required.
+Define_Function Quiz_Question_Data
+    If Var Round_Item == 1
+    {
+        Set_Var Quiz_Question "What is 7 multiplied by 8?"
+        Set_Var Quiz_A "54"
+        Set_Var Quiz_B "56"
+        Set_Var Quiz_C "64"
+        Set_Var Quiz_Correct 2
+        Set_Var Quiz_Correct_Text "56"
+    }
+    If Var Round_Item == 2
+    {
+        Set_Var Quiz_Question "Which planet is closest to the Sun?"
+        Set_Var Quiz_A Mercury
+        Set_Var Quiz_B Venus
+        Set_Var Quiz_C Mars
+        Set_Var Quiz_Correct 1
+        Set_Var Quiz_Correct_Text Mercury
+    }
+    If Var Round_Item == 3
+    {
+        Set_Var Quiz_Question "How many sides does a triangle have?"
+        Set_Var Quiz_A "2"
+        Set_Var Quiz_B "3"
+        Set_Var Quiz_C "4"
+        Set_Var Quiz_Correct 2
+        Set_Var Quiz_Correct_Text "3"
+    }
+    If Var Round_Item == 4
+    {
+        Set_Var Quiz_Question "At standard pressure, water freezes at which Celsius temperature?"
+        Set_Var Quiz_A "0 degrees"
+        Set_Var Quiz_B "10 degrees"
+        Set_Var Quiz_C "100 degrees"
+        Set_Var Quiz_Correct 1
+        Set_Var Quiz_Correct_Text "0 degrees Celsius"
+    }
+    If Var Round_Item == 5
+    {
+        Set_Var Quiz_Question "Which is Earth's largest ocean?"
+        Set_Var Quiz_A Atlantic
+        Set_Var Quiz_B Indian
+        Set_Var Quiz_C Pacific
+        Set_Var Quiz_Correct 3
+        Set_Var Quiz_Correct_Text Pacific
+    }
+End_Function

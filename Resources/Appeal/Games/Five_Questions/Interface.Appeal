@@ -1,0 +1,141 @@
+// Native GUI handles mouse, Tab/arrows and Enter. Callbacks only queue commands.
+Define_Function Quiz_Queue
+    Set_Var Controls_Context UI
+    Set_Var Controls_Value Var Round_Item
+    Call Controls_Queue
+End_Function
+Define_Function Quiz_Click_New
+    Set_Var Controls_Event Quiz_New
+    Call Quiz_Queue
+End_Function
+Define_Function Quiz_Click_Continue
+    Set_Var Controls_Event Quiz_Continue
+    Call Quiz_Queue
+End_Function
+Define_Function Quiz_Click_A
+    Set_Var Controls_Event Quiz_A
+    Call Quiz_Queue
+End_Function
+Define_Function Quiz_Click_B
+    Set_Var Controls_Event Quiz_B
+    Call Quiz_Queue
+End_Function
+Define_Function Quiz_Click_C
+    Set_Var Controls_Event Quiz_C
+    Call Quiz_Queue
+End_Function
+Define_Function Quiz_Click_Next
+    Set_Var Controls_Event Quiz_Next
+    Call Quiz_Queue
+End_Function
+Define_Function Quiz_Click_Pause
+    Set_Var Controls_Event Quiz_Pause
+    Call Quiz_Queue
+End_Function
+Define_Function Quiz_Click_Resume
+    Set_Var Controls_Event Quiz_Resume
+    Call Quiz_Queue
+End_Function
+Define_Function Quiz_Click_Title
+    Set_Var Controls_Event Quiz_Title
+    Call Quiz_Queue
+End_Function
+Define_Function Quiz_Click_Options
+    Set_Var Controls_Event Quiz_Options
+    Call Quiz_Queue
+End_Function
+Define_Function Quiz_Click_Sound
+    Set_Var Controls_Event Quiz_Sound
+    Call Quiz_Queue
+End_Function
+Define_Function Quiz_Click_Quit
+    Set_Var Controls_Event Quiz_Quit
+    Call Quiz_Queue
+End_Function
+
+Define_Function Quiz_Draw
+    Graphics GUI_Begin_Fullscreen Five_Questions
+    Graphics GUI_Separator_Text "FIVE QUESTIONS"
+    If Var Quiz_Page == Title
+    {
+        Graphics GUI_Text Welcome "A little quiz made entirely with Appeal scripts."
+        Graphics GUI_Text Rules "Five questions. Thirty seconds each. Get three right to pass."
+        Graphics GUI_Text Controls "Click an answer, or use Tab/arrows and Enter. Progress saves automatically."
+        Graphics GUI_Separator
+        Graphics GUI_Button New "New game" Quiz_Click_New
+        If Var Quiz_Has_Save == 1 { Graphics GUI_Button Continue Continue Quiz_Click_Continue }
+        Graphics GUI_Button Options Options Quiz_Click_Options
+        Graphics GUI_Button Quit Quit Quiz_Click_Quit
+        Graphics GUI_Separator
+        Graphics GUI_Text Best_Label "Best score:"
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Best Var Quiz_Best
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Best_Total "/ 5"
+    }
+    If Var Quiz_Page == Options
+    {
+        Graphics GUI_Text Option_Title Options
+        If Var Quiz_Sound == 1 { Graphics GUI_Text Sound_Status "Sound effects: on" }
+        If Var Quiz_Sound == 0 { Graphics GUI_Text Sound_Status "Sound effects: off" }
+        Graphics GUI_Button Sound "Toggle sound" Quiz_Click_Sound
+        Graphics GUI_Button Back "Back to title" Quiz_Click_Title
+    }
+    If Var Quiz_Page == Play
+    {
+        Graphics GUI_Text Question_Label "Question"
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Number Var Round_Item
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Total "/ 5"
+        Graphics GUI_Text Score_Label "Score:"
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Score Var Round_Score
+        Graphics GUI_Separator
+        Graphics GUI_Text Question Var Quiz_Question
+        If Var Round_State == Question
+        {
+            Set_Var Quiz_Remaining (Subtract Var Quiz_Deadline Var Game_Time)
+            If Var Quiz_Remaining < 0 { Set_Var Quiz_Remaining 0 }
+            Set_Var Quiz_Time_Fraction (Divide Var Quiz_Remaining Var Quiz_Duration)
+            Graphics GUI_Progress_Bar Time Var Quiz_Time_Fraction "Time remaining"
+            Graphics GUI_Button Answer_A Var Quiz_A Quiz_Click_A
+            Graphics GUI_Button Answer_B Var Quiz_B Quiz_Click_B
+            Graphics GUI_Button Answer_C Var Quiz_C Quiz_Click_C
+        }
+        If Var Round_State == Feedback
+        {
+            Graphics GUI_Text Feedback Var Quiz_Feedback
+            Graphics GUI_Text Correct_Answer Var Quiz_Correct_Text
+            Graphics GUI_Button Next Next Quiz_Click_Next
+        }
+        Graphics GUI_Separator
+        Graphics GUI_Button Pause Pause Quiz_Click_Pause
+    }
+    If Var Quiz_Page == Pause
+    {
+        Graphics GUI_Text Paused "Paused - the question timer is frozen."
+        Graphics GUI_Button Resume Resume Quiz_Click_Resume
+        Graphics GUI_Button Save_Title "Save and return to title" Quiz_Click_Title
+        Graphics GUI_Button Quit Quit Quiz_Click_Quit
+    }
+    If Var Quiz_Page == Results
+    {
+        If Var Round_Outcome == Win { Graphics GUI_Text Outcome "You passed! Well done." }
+        If Var Round_Outcome == Lose { Graphics GUI_Text Outcome "Not this time. Try again!" }
+        Graphics GUI_Text Final_Label "Final score:"
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Final_Score Var Round_Score
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Final_Total "/ 5"
+        Graphics GUI_Text Best_Label "Best score:"
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Best Var Quiz_Best
+        Graphics GUI_Button Again "Play again" Quiz_Click_New
+        Graphics GUI_Button Title "Back to title" Quiz_Click_Title
+        Graphics GUI_Button Quit Quit Quiz_Click_Quit
+    }
+    Graphics GUI_Separator
+    Graphics GUI_Text Status Var Quiz_Status
+    Graphics GUI_End
+End_Function

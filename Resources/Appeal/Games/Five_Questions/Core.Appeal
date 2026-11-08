@@ -1,0 +1,277 @@
+Run Libraries/Game/Runtime
+Run Libraries/Game/Scenes
+Run Libraries/Game/Saves
+Run Libraries/Game/Rules
+Run Libraries/Game/Interactions
+Run Libraries/Game/Controls
+Run Libraries/Game/Rounds
+Run Libraries/Game/Sound
+Run Games/Five_Questions/Questions
+Set_Var Quiz_Page Title
+Set_Var Quiz_Quit 0
+Set_Var Quiz_Status ""
+Set_Var Quiz_Best 0
+Set_Var Quiz_Has_Save 0
+Set_Var Quiz_Feedback ""
+Set_Var Quiz_Deadline 0
+Set_Var Quiz_Duration 30000
+Set_Var Quiz_Audio_Ready 0
+Set_Var Quiz_Answer_Choice 0
+Set_Var Quiz_Remaining 0
+
+Define_Function Quiz_Build
+    World Create_Typed_Entity Session Session 1 0
+    World Set Session Game Five_Questions
+End_Function
+
+Define_Function Quiz_Collect
+    Set_Var Save_Key Item
+    Set_Var Save_Value Var Round_Item
+    Call Save_Put
+    Set_Var Save_Key Answered
+    Set_Var Save_Value Var Round_Answered
+    Call Save_Put
+    Set_Var Save_Key Score
+    Set_Var Save_Value Var Round_Score
+    Call Save_Put
+    Set_Var Save_Key Round_State
+    Set_Var Save_Value Var Round_State
+    Call Save_Put
+    Set_Var Save_Key Outcome
+    Set_Var Save_Value Var Round_Outcome
+    Call Save_Put
+    Set_Var Save_Key Feedback
+    Set_Var Save_Value Var Quiz_Feedback
+    Call Save_Put
+    Set_Var Save_Key Deadline
+    Set_Var Save_Value Var Quiz_Deadline
+    Call Save_Put
+End_Function
+
+Define_Function Quiz_Arm_Timer
+    Set_Var Quiz_Wait (Subtract Var Quiz_Deadline Var Game_Time)
+    If Var Quiz_Wait < 0 { Set_Var Quiz_Wait 0 }
+    Events After Quiz_Deadline Var Quiz_Wait Quiz_Timeout Var Round_Item
+End_Function
+
+Define_Function Quiz_Restore
+    Set_Var Save_Key Item
+    Set_Var Round_Item (Call Save_Get)
+    Set_Var Save_Key Answered
+    Set_Var Round_Answered (Call Save_Get)
+    Set_Var Save_Key Score
+    Set_Var Round_Score (Call Save_Get)
+    Set_Var Save_Key Round_State
+    Set_Var Round_State (Call Save_Get)
+    Set_Var Save_Key Outcome
+    Set_Var Round_Outcome (Call Save_Get)
+    Set_Var Save_Key Feedback
+    Set_Var Quiz_Feedback (Call Save_Get)
+    Set_Var Save_Key Deadline
+    Set_Var Quiz_Deadline (Call Save_Get)
+    Set_Var Round_Total 5
+    Set_Var Round_Pass_Score 3
+    Call Quiz_Question_Data
+    Set_Var Quiz_Page Play
+    If Var Game_Paused == 1 { Set_Var Quiz_Page Pause }
+    If Var Round_State == Question { Call Quiz_Arm_Timer }
+    If Var Round_State == Finished { Set_Var Quiz_Page Results }
+End_Function
+
+Define_Function Quiz_Init
+    Set_Var Scene_On_Enter Quiz_Build
+    Set_Var Save_On_Save Quiz_Collect
+    Set_Var Save_On_Load Quiz_Restore
+    Call Save_Init
+    Set_Var Save_Slot Continue
+    Set_Var Quiz_Has_Save (Storage Get_Field Game_Save_Catalog Slot Continue Present)
+    Set_Var Save_Key Best
+    Set_Var Quiz_Best (Call Save_Setting_Get)
+    If Var Quiz_Best == "" { Set_Var Quiz_Best 0 }
+    Set_Var Save_Key Sound
+    Set_Var Quiz_Sound (Call Save_Setting_Get)
+    If Var Quiz_Sound == "" { Set_Var Quiz_Sound 1 }
+    Set_Var Sound_Enabled Var Quiz_Sound
+    Set_Var Controls_Context UI
+End_Function
+
+Define_Function Quiz_Save
+    Set_Var Save_Slot Continue
+    Call Save_To_Slot
+    Set_Var Quiz_Status Var Save_Status
+    If Var Save_OK == 1 { Set_Var Quiz_Has_Save 1 }
+End_Function
+
+Define_Function Quiz_New
+    Call Game_Start
+    Set_Var Round_Total 5
+    Set_Var Round_Pass_Score 3
+    Call Round_Start
+    Set_Var Quiz_Page Play
+    Set_Var Quiz_Feedback ""
+    Set_Var Quiz_Deadline (Add Var Game_Time Var Quiz_Duration)
+    Set_Var Scene_Next Five_Questions
+    Call Scene_Request
+    If Var Scene_Name == Five_Questions { Call Scene_Request_Reload }
+    Call Scene_Apply
+    Call Quiz_Question_Data
+    Call Quiz_Arm_Timer
+    Call Quiz_Save
+End_Function
+
+Define_Function Quiz_Continue
+    Set_Var Save_Slot Continue
+    Call Save_Load_Slot
+    Set_Var Quiz_Status Var Save_Status
+End_Function
+
+Define_Function Quiz_Check_Answer
+    Set_Var Rule_Left Var Quiz_Page
+    Set_Var Rule_Operator ==
+    Set_Var Rule_Right Play
+    Set_Var Rule_Message "Not accepting answers."
+    Call Rule_Check
+    Set_Var Rule_Left Var Round_State
+    Set_Var Rule_Right Question
+    Call Rule_Check
+    Set_Var Rule_Left Var Event_Value
+    Set_Var Rule_Right Var Round_Item
+    Set_Var Rule_Message "Stale answer ignored."
+    Call Rule_Check
+End_Function
+
+Define_Function Quiz_Apply_Answer
+    Set_Var Round_Correct 0
+    If Var Quiz_Answer_Choice == Var Quiz_Correct { Set_Var Round_Correct 1 }
+    Call Round_Submit
+    Events Cancel Quiz_Deadline
+    Set_Var Quiz_Feedback "Not quite. The correct answer is:"
+    Set_Var Sound_Cue Quiz_Wrong
+    If Var Quiz_Answer_Choice == 0 { Set_Var Quiz_Feedback "Time is up. The correct answer is:" }
+    If Var Round_Correct == 1
+    {
+        Set_Var Quiz_Feedback "Correct!"
+        Set_Var Sound_Cue Quiz_Correct
+    }
+    If Var Quiz_Audio_Ready == 1 { Call Sound_Play_Cue }
+    Call Quiz_Save
+End_Function
+
+Define_Function Quiz_Try_Answer
+    Set_Var Interact_Actor Player
+    Set_Var Interact_Target Session
+    Set_Var Interact_Action Answer
+    Set_Var Interact_Check Quiz_Check_Answer
+    Set_Var Interact_Apply Quiz_Apply_Answer
+    Call Interact_Try
+End_Function
+Define_Function Quiz_Answer_A
+    Set_Var Quiz_Answer_Choice 1
+    Call Quiz_Try_Answer
+End_Function
+Define_Function Quiz_Answer_B
+    Set_Var Quiz_Answer_Choice 2
+    Call Quiz_Try_Answer
+End_Function
+Define_Function Quiz_Answer_C
+    Set_Var Quiz_Answer_Choice 3
+    Call Quiz_Try_Answer
+End_Function
+Define_Function Quiz_Timeout
+    Set_Var Quiz_Answer_Choice 0
+    Call Quiz_Try_Answer
+End_Function
+
+Define_Function Quiz_Next
+    If Var Quiz_Page == Play
+    {
+        If Var Game_Paused == 0
+        {
+            If Var Round_State == Feedback
+            {
+                If Var Event_Value == Var Round_Item
+                {
+                    Call Round_Next
+                    If Var Round_State == Question
+                    {
+                        Set_Var Quiz_Feedback ""
+                        Call Quiz_Question_Data
+                        Set_Var Quiz_Deadline (Add Var Game_Time Var Quiz_Duration)
+                        Call Quiz_Arm_Timer
+                    }
+                    If Var Round_State == Finished
+                    {
+                        Set_Var Quiz_Page Results
+                        Call Game_Stop
+                        Set_Var Game_Next_State Results
+                        Call Game_Set_State
+                        If Var Round_Score > Var Quiz_Best
+                        {
+                            Set_Var Quiz_Best Var Round_Score
+                            Set_Var Save_Key Best
+                            Set_Var Save_Value Var Quiz_Best
+                            Call Save_Setting_Put
+                        }
+                    }
+                    Call Quiz_Save
+                }
+            }
+        }
+    }
+End_Function
+
+Define_Function Quiz_Pause
+    If Var Quiz_Page == Play
+    {
+        Call Game_Pause
+        Set_Var Quiz_Page Pause
+        Call Quiz_Save
+    }
+End_Function
+Define_Function Quiz_Resume
+    If Var Quiz_Page == Pause
+    {
+        Call Game_Resume
+        Set_Var Quiz_Page Play
+        Call Quiz_Save
+    }
+End_Function
+Define_Function Quiz_Title
+    Call Quiz_Save_If_Active
+    Call Game_Stop
+    Set_Var Quiz_Page Title
+End_Function
+Define_Function Quiz_Options
+    Set_Var Quiz_Page Options
+End_Function
+Define_Function Quiz_Sound_Toggle
+    Set_Var Quiz_Sound (Subtract 1 Var Quiz_Sound)
+    Set_Var Sound_Enabled Var Quiz_Sound
+    Set_Var Save_Key Sound
+    Set_Var Save_Value Var Quiz_Sound
+    Call Save_Setting_Put
+End_Function
+Define_Function Quiz_Quit
+    Call Quiz_Save_If_Active
+    Set_Var Quiz_Quit 1
+End_Function
+
+Define_Function Quiz_Save_If_Active
+    If Var Quiz_Page == Play { Call Quiz_Save }
+    If Var Quiz_Page == Pause { Call Quiz_Save }
+    If Var Quiz_Page == Results { Call Quiz_Save }
+End_Function
+
+Events Bind Quiz_New Quiz_New
+Events Bind Quiz_Continue Quiz_Continue
+Events Bind Quiz_A Quiz_Answer_A
+Events Bind Quiz_B Quiz_Answer_B
+Events Bind Quiz_C Quiz_Answer_C
+Events Bind Quiz_Timeout Quiz_Timeout
+Events Bind Quiz_Next Quiz_Next
+Events Bind Quiz_Pause Quiz_Pause
+Events Bind Quiz_Resume Quiz_Resume
+Events Bind Quiz_Title Quiz_Title
+Events Bind Quiz_Options Quiz_Options
+Events Bind Quiz_Sound Quiz_Sound_Toggle
+Events Bind Quiz_Quit Quiz_Quit

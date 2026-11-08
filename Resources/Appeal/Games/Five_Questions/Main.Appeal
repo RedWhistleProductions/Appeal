@@ -1,0 +1,38 @@
+Add_Dynamic_Module Graphics Appeal_SDL2_Legacy_OpenGL_Graphics
+Add_Dynamic_Module Input Appeal_SDL2_Input
+Add_Dynamic_Module World Appeal_Standard_World
+Add_Dynamic_Module Storage Appeal_SQLite_Storage
+Add_Dynamic_Module Audio Appeal_SDL2_Audio
+Run Games/Five_Questions/Core
+Run Games/Five_Questions/Interface
+Set_Var Save_Database Five_Questions
+Call Quiz_Init
+Audio Load_SFX Quiz_Correct "Quiz/Correct.wav"
+Audio Load_SFX Quiz_Wrong "Quiz/Wrong.wav"
+Set_Var Quiz_Audio_Ready 1
+Graphics Add_Window Main "Five Questions - Appeal Quiz" 960 640
+Graphics Set_FPS 60
+Graphics Set_GUI_Docking False
+Graphics Set_GUI_Visible True
+Graphics GUI_Set_Window_Functions Five_Questions Quiz_Click_Quit ""
+Input Set_Focus GUI
+Input Open_Controller -1
+Set_Var Quiz_Window_Open 1
+Loop While Var Quiz_Window_Open == 1
+{
+    Input Update Default
+    Call Game_Update
+    Call Game_Dispatch_Events
+    Call Quiz_Draw
+    Graphics Render
+    Graphics Update
+    Graphics Window_Open Main
+    Set_Var_Global Quiz_Window_Open Graphics.Window.Main.Open
+    If Var Quiz_Quit == 1 { Set_Var Quiz_Window_Open 0 }
+}
+// Window X also saves the latest frame's progress.
+If Var Quiz_Quit == 0 { Call Quiz_Quit }
+Input Close_Controller -1
+Graphics Close_All
+Storage Close Five_Questions
+Done

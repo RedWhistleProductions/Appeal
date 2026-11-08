@@ -55,3 +55,10 @@ See [Interactions](Interactions.md) for pickups, doors and other guarded actions
 
 `Game/Controls` supplies explicit game/UI gates, neutral input reads when blocked,
 and queued commands. See [Controls](Controls.md); the host retains binding/focus ownership.
+
+## Audio and progression
+
+See [Sound](Sound.md) for event-driven effects/music policy and [Rounds](Rounds.md)
+for sequential scoring and win/lose outcomes. The complete
+[Five Questions game](../../Appeal/Games/Five_Questions/README.md) demonstrates these
+components together. Launch with `Appeal.exe Games/Five_Questions/Main`.
