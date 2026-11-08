@@ -1,0 +1,74 @@
+// Reusable sequential rounds/questions. Host owns content and presentation.
+Set_Var Round_Total 1
+Set_Var Round_Pass_Score 1
+Set_Var Round_Points 1
+Set_Var Round_Item 0
+Set_Var Round_Answered 0
+Set_Var Round_Score 0
+Set_Var Round_State Idle
+Set_Var Round_Outcome ""
+Set_Var Round_Correct 0
+Set_Var Round_Accepted 0
+
+Define_Function Round_Start
+    Set_Var Round_Item 0
+    Set_Var Round_Answered 0
+    Set_Var Round_Score 0
+    Set_Var Round_Outcome ""
+    Set_Var Round_Accepted 0
+    Set_Var Round_State Invalid
+    If Var Round_Total > 0
+    {
+        Set_Var Round_Item 1
+        Set_Var Round_State Question
+    }
+End_Function
+
+Define_Function Round_Check
+    Set_Var Round_Allowed 0
+    If Var Game_Running == 1
+    {
+        If Var Game_Paused == 0 { Set_Var Round_Allowed 1 }
+    }
+End_Function
+
+Define_Function Round_Submit
+    Set_Var Round_Accepted 0
+    Call Round_Check
+    If Var Round_Allowed == 1
+    {
+        If Var Round_State == Question
+        {
+            Set_Var Round_Accepted 1
+            Set_Var Round_State Feedback
+            Set_Var Round_Answered (Add Var Round_Answered 1)
+            If Var Round_Correct == 1
+            {
+                Set_Var Round_Score (Add Var Round_Score Var Round_Points)
+            }
+            Events Emit Round_Answered Var Round_Item
+        }
+    }
+End_Function
+
+Define_Function Round_Next
+    Call Round_Check
+    If Var Round_Allowed == 1
+    {
+        If Var Round_State == Feedback
+        {
+            If Var Round_Item >= Var Round_Total
+            {
+                Set_Var Round_State Finished
+                Set_Var Round_Outcome Lose
+                If Var Round_Score >= Var Round_Pass_Score { Set_Var Round_Outcome Win }
+                Events Emit Round_Finished Var Round_Outcome
+            }
+            If Var Round_Item < Var Round_Total
+            {
+                Set_Var Round_Item (Add Var Round_Item 1)
+                Set_Var Round_State Question
+            }
+        }
+    }
+End_Function
