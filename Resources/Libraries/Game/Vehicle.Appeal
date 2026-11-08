@@ -1,0 +1,64 @@
+// Arcade longitudinal motion. Steering supplies a unit forward vector.
+Set_Var Vehicle_Speed 0
+Set_Var Vehicle_Throttle 0
+Set_Var Vehicle_Brake 0
+Set_Var Vehicle_Max_Forward 300
+Set_Var Vehicle_Max_Reverse 120
+Set_Var Vehicle_Acceleration 240
+Set_Var Vehicle_Braking 400
+Set_Var Vehicle_Drag 80
+Set_Var Vehicle_Forward_X 0
+Set_Var Vehicle_Forward_Y 0
+Set_Var Vehicle_Forward_Z 1
+Set_Var Vehicle_Delta_Seconds 0.016666667
+Set_Var Vehicle_Enabled 1
+Set_Var Vehicle_Body ""
+Set_Var Vehicle_Horizontal_Only 1
+
+Define_Function Vehicle_Update
+    Set_Var Vehicle_Velocity_X 0
+    Set_Var Vehicle_Velocity_Y 0
+    Set_Var Vehicle_Velocity_Z 0
+    Set_Var Vehicle_Allowed 1
+    If Var Game_Running == 0 { Set_Var Vehicle_Allowed 0 }
+    If Var Game_Paused == 1 { Set_Var Vehicle_Allowed 0 }
+    If Var Vehicle_Enabled == 0 { Set_Var Vehicle_Allowed 0 }
+    If Var Vehicle_Delta_Seconds <= 0 { Set_Var Vehicle_Allowed 0 }
+    If Var Vehicle_Delta_Seconds > 0.1 { Set_Var Vehicle_Allowed 0 }
+    If Var Vehicle_Allowed == 1
+    {
+        If Var Vehicle_Throttle > 100 { Set_Var Vehicle_Throttle 100 }
+        If Var Vehicle_Throttle < -100 { Set_Var Vehicle_Throttle -100 }
+        If Var Vehicle_Brake > 100 { Set_Var Vehicle_Brake 100 }
+        If Var Vehicle_Brake < 0 { Set_Var Vehicle_Brake 0 }
+        Set_Var Vehicle_Speed (Add Var Vehicle_Speed (Multiply (Multiply (Divide Var Vehicle_Throttle 100) Var Vehicle_Acceleration) Var Vehicle_Delta_Seconds))
+        Set_Var Vehicle_Deceleration 0
+        If Var Vehicle_Brake > 0 { Set_Var Vehicle_Deceleration (Multiply (Divide Var Vehicle_Brake 100) Var Vehicle_Braking) }
+        If Var Vehicle_Brake == 0
+        {
+            If Var Vehicle_Throttle == 0 { Set_Var Vehicle_Deceleration Var Vehicle_Drag }
+        }
+        Set_Var Vehicle_Drop (Multiply Var Vehicle_Deceleration Var Vehicle_Delta_Seconds)
+        If Var Vehicle_Speed > 0
+        {
+            Set_Var Vehicle_Speed (Subtract Var Vehicle_Speed Var Vehicle_Drop)
+            If Var Vehicle_Speed < 0 { Set_Var Vehicle_Speed 0 }
+        }
+        If Var Vehicle_Speed < 0
+        {
+            Set_Var Vehicle_Speed (Add Var Vehicle_Speed Var Vehicle_Drop)
+            If Var Vehicle_Speed > 0 { Set_Var Vehicle_Speed 0 }
+        }
+        If Var Vehicle_Speed > Var Vehicle_Max_Forward { Set_Var Vehicle_Speed Var Vehicle_Max_Forward }
+        If Var Vehicle_Speed < (Multiply Var Vehicle_Max_Reverse -1) { Set_Var Vehicle_Speed (Multiply Var Vehicle_Max_Reverse -1) }
+        Set_Var Vehicle_Velocity_X (Multiply Var Vehicle_Speed Var Vehicle_Forward_X)
+        Set_Var Vehicle_Velocity_Y (Multiply Var Vehicle_Speed Var Vehicle_Forward_Y)
+        Set_Var Vehicle_Velocity_Z (Multiply Var Vehicle_Speed Var Vehicle_Forward_Z)
+    }
+End_Function
+
+Define_Function Vehicle_Apply
+    Set_Var Vehicle_Apply_Y Var Vehicle_Velocity_Y
+    If Var Vehicle_Horizontal_Only == 1 { Set_Var Vehicle_Apply_Y (Physics Get Var Vehicle_Body Velocity_Y) }
+    Physics Set_Velocity Var Vehicle_Body Var Vehicle_Velocity_X Var Vehicle_Apply_Y Var Vehicle_Velocity_Z
+End_Function
