@@ -1,0 +1,65 @@
+// Reusable finite state machine. Per actor, persist State and Entered_At.
+// Entity is hook context; hooks choose transitions, movement and other effects.
+Set_Var FSM_Entity ""
+Set_Var FSM_State ""
+Set_Var FSM_Next_State ""
+Set_Var FSM_Previous ""
+Set_Var FSM_Entered_At 0
+Set_Var FSM_Age 0
+Set_Var FSM_Enabled 1
+Set_Var FSM_Busy 0
+Set_Var FSM_On_Enter ""
+Set_Var FSM_On_Exit ""
+Set_Var FSM_On_Update ""
+
+Define_Function FSM_Change
+    Set_Var FSM_Changing Var FSM_Next_State
+    Set_Var FSM_Previous Var FSM_State
+    If Var FSM_State != ""
+    {
+        If Var FSM_On_Exit != "" { Call Var FSM_On_Exit }
+    }
+    Set_Var FSM_State Var FSM_Changing
+    Set_Var FSM_Entered_At Var Game_Time
+    Set_Var FSM_Age 0
+    If Var FSM_On_Enter != "" { Call Var FSM_On_Enter }
+End_Function
+
+Define_Function FSM_Start
+    If Var FSM_Busy == 0
+    {
+        If Var FSM_Next_State != ""
+        {
+            Set_Var FSM_Busy 1
+            Call FSM_Change
+            Set_Var FSM_Busy 0
+        }
+    }
+End_Function
+
+Define_Function FSM_Tick
+    If Var FSM_Busy == 0
+    {
+        If Var FSM_Enabled == 1
+        {
+            If Var Game_Running == 1
+            {
+                If Var Game_Paused == 0
+                {
+                    If Var FSM_State != ""
+                    {
+                        Set_Var FSM_Busy 1
+                        Set_Var FSM_Age (Subtract Var Game_Time Var FSM_Entered_At)
+                        Set_Var FSM_Next_State Var FSM_State
+                        If Var FSM_On_Update != "" { Call Var FSM_On_Update }
+                        If Var FSM_Next_State != ""
+                        {
+                            If Var FSM_Next_State != Var FSM_State { Call FSM_Change }
+                        }
+                        Set_Var FSM_Busy 0
+                    }
+                }
+            }
+        }
+    }
+End_Function

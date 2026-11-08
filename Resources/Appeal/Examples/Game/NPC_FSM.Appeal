@@ -1,0 +1,37 @@
+Run Libraries/Game/Runtime
+Run Libraries/Game/FSM
+Set_Var NPC_Player_Distance 500
+Set_Var NPC_Health 100
+Define_Function NPC_Enter
+    Print Var FSM_State
+End_Function
+Define_Function NPC_Think
+    If Var FSM_State == Patrol
+    {
+        If Var NPC_Player_Distance < 100 { Set_Var FSM_Next_State Chase }
+    }
+    If Var FSM_State == Chase
+    {
+        If Var NPC_Health < 25 { Set_Var FSM_Next_State Flee }
+        If Var NPC_Player_Distance > 200 { Set_Var FSM_Next_State Patrol }
+    }
+    If Var FSM_State == Flee
+    {
+        If Var NPC_Health >= 50 { Set_Var FSM_Next_State Patrol }
+    }
+End_Function
+Call Game_Start
+Set_Var FSM_Entity Guard
+Set_Var FSM_On_Enter NPC_Enter
+Set_Var FSM_On_Update NPC_Think
+Set_Var FSM_Next_State Patrol
+Call FSM_Start
+Call FSM_Tick
+Set_Var NPC_Player_Distance 50
+Call FSM_Tick
+Set_Var NPC_Health 10
+Call FSM_Tick
+Set_Var NPC_Health 80
+Call FSM_Tick
+Print NPC_FSM_DEMO_PASSED
+Done

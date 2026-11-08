@@ -145,6 +145,8 @@ expanding the C++ implementation. These are recommendations, not implemented wor
   Game/Saves; game-facing use is a database, slot, and short progress hooks.
 - **MVP approach:** retain the tested reusable script; use bound field values,
   avoid string-built SQL, and keep save I/O off the normal per-frame path.
+  FSM actors currently swap two explicit state/time variables; a native script
+  record/map facility could also simplify that without a database registry.
 - **Recommended change:** consider a compatible high-level Storage save-bundle
   API or script record/map facility after evaluating real-game requirements.
   No performance bottleneck has been established for this save path.
