@@ -76,7 +76,11 @@ implemented and demonstrated together: beginning, playable loop, outcomes or
 continuation, restart, and save/load when that game requires it. New requirements
 can still emerge afterward. No genre is being marked 100% in this revision.
 
-Next priority: Step 5, reusable interactions and rules. NPC AI should begin with
+Subsequent progress: Step 5 added reusable rules and guarded interactions, tested
+with key pickups and a locked door. The percentages above remain the Steps 1–4
+assessment; they have not been automatically increased for this addition.
+
+Next priority: Step 6, input-to-gameplay integration. NPC AI should begin with
 a simple finite state machine; genetic algorithms and neural networks are later
 directions.
 

@@ -1,0 +1,58 @@
+// Load after Runtime and Rules. The host checks target/actor state in its hook.
+Set_Var Interact_Actor ""
+Set_Var Interact_Target ""
+Set_Var Interact_Action ""
+Set_Var Interact_Enabled 1
+Set_Var Interact_Check ""
+Set_Var Interact_Apply ""
+Set_Var Interact_On_Result ""
+Set_Var Interact_OK 0
+Set_Var Interact_Reason ""
+Set_Var Interact_Busy 0
+Set_Var Interact_Reentered 0
+Set_Var Interact_Current_Actor ""
+Set_Var Interact_Current_Target ""
+Set_Var Interact_Current_Action ""
+
+Define_Function Interact_Try
+    If Var Interact_Busy == 1 { Set_Var Interact_Reentered 1 }
+    If Var Interact_Busy == 0
+    {
+        Set_Var Interact_Busy 1
+        Set_Var Interact_Reentered 0
+        Set_Var Interact_Current_Actor Var Interact_Actor
+        Set_Var Interact_Current_Target Var Interact_Target
+        Set_Var Interact_Current_Action Var Interact_Action
+        Set_Var Interact_OK 0
+        Set_Var Interact_Reason "Interaction unavailable."
+        Set_Var Interact_Allowed 1
+        If Var Game_Running == 0 { Set_Var Interact_Allowed 0 }
+        If Var Game_Paused == 1 { Set_Var Interact_Allowed 0 }
+        If Var Interact_Enabled == 0 { Set_Var Interact_Allowed 0 }
+        If Var Interact_Current_Target == "" { Set_Var Interact_Allowed 0 }
+        If Var Interact_Current_Action == "" { Set_Var Interact_Allowed 0 }
+        If Var Interact_Apply == "" { Set_Var Interact_Allowed 0 }
+        If Var Interact_Allowed == 1
+        {
+            Call Rule_Begin_All
+            If Var Interact_Check != "" { Call Var Interact_Check }
+            Call Rule_End
+            Set_Var Interact_Reason Var Rule_Reason
+            If Var Rule_Passed == 1
+            {
+                Call Var Interact_Apply
+                Set_Var Interact_OK 1
+            }
+        }
+        If Var Interact_On_Result != "" { Call Var Interact_On_Result }
+        If Var Interact_OK == 1
+        {
+            Events Emit Interaction_Succeeded Var Interact_Current_Target
+        }
+        If Var Interact_OK == 0
+        {
+            Events Emit Interaction_Denied Var Interact_Current_Target
+        }
+        Set_Var Interact_Busy 0
+    }
+End_Function

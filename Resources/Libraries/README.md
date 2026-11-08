@@ -23,3 +23,5 @@ Available libraries:
 - `Game/Menus`: renderer-independent menu selection and action events.
 - `Game/Interface`: optional Graphics GUI adapter for menu entries.
 - `Game/Saves`: named save slots, custom progress values, and settings.
+- `Game/Rules`: reusable All/Any condition groups and failure feedback.
+- `Game/Interactions`: guarded actions and result notifications.

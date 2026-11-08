@@ -1,0 +1,73 @@
+// Reusable single-threaded condition groups. No module dependencies.
+Set_Var Rule_Mode All
+Set_Var Rule_Count 0
+Set_Var Rule_Passed 1
+Set_Var Rule_Reason ""
+Set_Var Rule_Invalid 0
+Set_Var Rule_Left ""
+Set_Var Rule_Operator ==
+Set_Var Rule_Right ""
+Set_Var Rule_Message "Condition not met."
+
+Define_Function Rule_Begin_All
+    Set_Var Rule_Invalid 0
+    Set_Var Rule_Mode All
+    Set_Var Rule_Count 0
+    Set_Var Rule_Passed 1
+    Set_Var Rule_Reason ""
+End_Function
+
+Define_Function Rule_Begin_Any
+    Set_Var Rule_Invalid 0
+    Set_Var Rule_Mode Any
+    Set_Var Rule_Count 0
+    Set_Var Rule_Passed 0
+    Set_Var Rule_Reason "No alternative matched."
+End_Function
+
+Define_Function Rule_Check
+    Set_Var Rule_Count (Add Var Rule_Count 1)
+    Set_Var Rule_Matched 0
+    Set_Var Rule_Valid_Operator 0
+    If Var Rule_Operator == "==" { Set_Var Rule_Valid_Operator 1 }
+    If Var Rule_Operator == "!=" { Set_Var Rule_Valid_Operator 1 }
+    If Var Rule_Operator == "<" { Set_Var Rule_Valid_Operator 1 }
+    If Var Rule_Operator == "<=" { Set_Var Rule_Valid_Operator 1 }
+    If Var Rule_Operator == ">" { Set_Var Rule_Valid_Operator 1 }
+    If Var Rule_Operator == ">=" { Set_Var Rule_Valid_Operator 1 }
+    If Var Rule_Valid_Operator == 1
+    {
+        If Var Rule_Left Var Rule_Operator Var Rule_Right
+        {
+            Set_Var Rule_Matched 1
+        }
+    }
+    If Var Rule_Mode == All
+    {
+        If Var Rule_Matched == 0
+        {
+            If Var Rule_Passed == 1 { Set_Var Rule_Reason Var Rule_Message }
+            Set_Var Rule_Passed 0
+        }
+    }
+    If Var Rule_Mode == Any
+    {
+        If Var Rule_Count == 1 { Set_Var Rule_Reason Var Rule_Message }
+        If Var Rule_Matched == 1 { Set_Var Rule_Passed 1 }
+    }
+    // Invalid syntax invalidates the whole group, even an Any group with a match.
+    If Var Rule_Valid_Operator == 0
+    {
+        Set_Var Rule_Invalid 1
+        Set_Var Rule_Reason "Unsupported rule operator."
+    }
+End_Function
+
+Define_Function Rule_End
+    If Var Rule_Invalid == 1
+    {
+        Set_Var Rule_Passed 0
+        Set_Var Rule_Reason "Unsupported rule operator."
+    }
+    If Var Rule_Passed == 1 { Set_Var Rule_Reason "" }
+End_Function

@@ -44,3 +44,9 @@ See [Menus](Menus.md) for focus handling, host integration, and MVP limitations.
 Load `Game/Saves` after Runtime, Scenes, World and SQLite Storage. Configure a
 per-game/profile database and call Save_Init, then save/load named slots.
 See [Saves](Saves.md) for custom progress hooks, settings, and restoration limits.
+
+## Interactions and rules
+
+Load `Game/Rules` and `Game/Interactions` after Runtime. Games provide condition
+and effect hooks; the libraries handle group evaluation, gating and notifications.
+See [Interactions](Interactions.md) for pickups, doors and other guarded actions.

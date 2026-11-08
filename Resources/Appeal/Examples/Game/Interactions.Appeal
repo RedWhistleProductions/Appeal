@@ -1,0 +1,71 @@
+Add_Dynamic_Module World Appeal_Standard_World
+Run Libraries/Game/Runtime
+Run Libraries/Game/Rules
+Run Libraries/Game/Interactions
+World Create Garden
+World Create_Typed_Entity Key Item 1 0
+World Create_Typed_Entity Door Door 1 0
+Set_Var Demo_Has_Key 0
+Set_Var Demo_Key_Available 1
+Set_Var Demo_Door_Open 0
+
+Define_Function Demo_Check_Key
+    Set_Var Rule_Left Var Demo_Key_Available
+    Set_Var Rule_Operator ==
+    Set_Var Rule_Right 1
+    Set_Var Rule_Message "Key already collected."
+    Call Rule_Check
+End_Function
+Define_Function Demo_Collect_Key
+    World Entity_Destroy Var Interact_Current_Target
+    Set_Var Demo_Key_Available 0
+    Set_Var Demo_Has_Key 1
+End_Function
+Define_Function Demo_Check_Door
+    Set_Var Rule_Left Var Demo_Has_Key
+    Set_Var Rule_Operator ==
+    Set_Var Rule_Right 1
+    Set_Var Rule_Message "You need the key."
+    Call Rule_Check
+    Set_Var Rule_Left Var Demo_Door_Open
+    Set_Var Rule_Right 0
+    Set_Var Rule_Message "Door is already open."
+    Call Rule_Check
+End_Function
+Define_Function Demo_Open_Door
+    Set_Var Demo_Door_Open 1
+    World Set Var Interact_Current_Target Open 1
+End_Function
+Define_Function Demo_Feedback
+    Print Var Interact_Current_Action
+    Print Var Interact_OK
+    Print Var Interact_Reason
+End_Function
+Set_Var Interact_Actor Player
+Set_Var Interact_On_Result Demo_Feedback
+Call Game_Start
+
+// Locked door: denied.
+Set_Var Interact_Target Door
+Set_Var Interact_Action Open
+Set_Var Interact_Check Demo_Check_Door
+Set_Var Interact_Apply Demo_Open_Door
+Call Interact_Try
+
+// Pickup succeeds once; repeat pickup is denied.
+Set_Var Interact_Target Key
+Set_Var Interact_Action Collect
+Set_Var Interact_Check Demo_Check_Key
+Set_Var Interact_Apply Demo_Collect_Key
+Call Interact_Try
+Call Interact_Try
+
+// Now the door opens; opening it again is denied.
+Set_Var Interact_Target Door
+Set_Var Interact_Action Open
+Set_Var Interact_Check Demo_Check_Door
+Set_Var Interact_Apply Demo_Open_Door
+Call Interact_Try
+Call Interact_Try
+Print INTERACTIONS_DEMO_PASSED
+Done

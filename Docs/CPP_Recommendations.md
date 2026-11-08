@@ -151,6 +151,33 @@ expanding the C++ implementation. These are recommendations, not implemented wor
 - **Acceptance:** equivalent atomic replacement/error handling with substantially
   less script plumbing; profile real saves before adding asynchronous/batch APIs.
 
+## 12. Consistent numeric comparison semantics for rules
+
+- **Evidence:** Appeal equality uses text/boolean normalization, while ordering
+  uses Try_Float. Rule_Check deliberately reuses these existing semantics, so
+  differently formatted numeric strings can compare unequal and ordering has
+  the current float precision/validation limitations.
+- **MVP approach:** consistent text/flag representations, valid numeric inputs,
+  and documented condition groups; no alternate numeric parser in scripts.
+- **Recommended change:** define explicit typed/strict numeric comparisons and
+  evaluate double-precision ordering consistently with arithmetic, without
+  silently changing existing string/boolean comparison behavior.
+- **Acceptance:** numeric comparison handles equivalent representations and
+  large/fractional values predictably; invalid inputs have useful diagnostics.
+
+## 13. Structured event payload/context
+
+- **Evidence:** Events Emit carries one string value. Multiple interactions can
+  run before dispatch, so global last-interaction actor/action/reason values
+  cannot safely describe every queued notification.
+- **MVP approach:** queued interaction notices carry only a captured target;
+  a synchronous result hook receives the full current context. No delimiter
+  encoding or duplicate database registry is added.
+- **Recommended change:** consider immutable structured payloads or per-event
+  records with typed fields and clear lifetime/ownership.
+- **Acceptance:** queued results preserve each request's actor, target, action
+  and reason across multiple attempts, scene transitions and deferred delivery.
+
 ## Performance watch list — no bottleneck established yet
 
 - Native timer collection currently scans every active timer each update.
