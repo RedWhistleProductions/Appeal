@@ -1,0 +1,109 @@
+// Load after Libraries/Game/Runtime and a real World plugin.
+// Owns one transient World scene at a time. Host owns the loop and assets.
+Set_Var Scene_Name ""
+Set_Var Scene_Previous ""
+Set_Var Scene_Next ""
+Set_Var Scene_Requested ""
+Set_Var Scene_Pending 0
+Set_Var Scene_Reload 0
+Set_Var Scene_Busy 0
+Set_Var Scene_On_Enter ""
+Set_Var Scene_On_Exit ""
+Set_Var Scene_On_Update ""
+Set_Var Scene_On_Draw ""
+Set_Var Scene_Changing ""
+
+// Safe from event/update hooks: request now, apply at a host frame boundary.
+Define_Function Scene_Request
+    Set_Var Scene_Requested Var Scene_Next
+    Set_Var Scene_Pending 1
+    Set_Var Scene_Reload 0
+End_Function
+
+Define_Function Scene_Request_Reload
+    Set_Var Scene_Requested Var Scene_Name
+    Set_Var Scene_Pending 1
+    Set_Var Scene_Reload 1
+End_Function
+
+// Scene_Next = "" requests closure. Last request wins until applied.
+Define_Function Scene_Apply
+    If Var Scene_Busy == 0
+    {
+        If Var Scene_Pending == 1
+        {
+            Set_Var Scene_Busy 1
+            Set_Var Scene_Changing Var Scene_Requested
+            Set_Var Scene_Pending 0
+            Set_Var Scene_Do_Change Var Scene_Reload
+            Set_Var Scene_Reload 0
+            If Var Scene_Changing != Var Scene_Name
+            {
+                Set_Var Scene_Do_Change 1
+            }
+            If Var Scene_Do_Change == 1
+            {
+                Set_Var Scene_Previous Var Scene_Name
+                If Var Scene_Name != ""
+                {
+                    World Switch Var Scene_Name
+                    If Var Scene_On_Exit != ""
+                    {
+                        Call Var Scene_On_Exit
+                    }
+                    World Close_Scene Var Scene_Name
+                }
+                Set_Var Scene_Name Var Scene_Changing
+                If Var Scene_Name != ""
+                {
+                    World Create Var Scene_Name
+                    World Clear_Scene Var Scene_Name
+                    If Var Scene_On_Enter != ""
+                    {
+                        Call Var Scene_On_Enter
+                    }
+                }
+                Events Emit Scene_Changed Var Scene_Name
+            }
+            Set_Var Scene_Busy 0
+        }
+    }
+End_Function
+
+Define_Function Scene_Update
+    If Var Scene_Busy == 0
+    {
+        If Var Scene_Name != ""
+        {
+            If Var Game_Running == 1
+            {
+                If Var Game_Paused == 0
+                {
+                    Set_Var Scene_Busy 1
+                    World Switch Var Scene_Name
+                    If Var Scene_On_Update != ""
+                    {
+                        Call Var Scene_On_Update
+                    }
+                    Set_Var Scene_Busy 0
+                }
+            }
+        }
+    }
+End_Function
+
+Define_Function Scene_Draw
+    If Var Scene_Busy == 0
+    {
+        If Var Scene_Name != ""
+        {
+            Set_Var Scene_Busy 1
+            World Switch Var Scene_Name
+            If Var Scene_On_Draw != ""
+            {
+                Call Var Scene_On_Draw
+            }
+            Set_Var Scene_Busy 0
+        }
+    }
+End_Function

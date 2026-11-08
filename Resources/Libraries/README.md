@@ -19,3 +19,4 @@ prefix to avoid collisions in Appeal's shared function/variable namespace.
 Available libraries:
 
 - `Game/Runtime`: game state, timing, events, and timers.
+- `Game/Scenes`: scene transitions, reload/cleanup, and update/draw hooks.

@@ -24,3 +24,11 @@ Example: `Appeal.exe Examples/Game/State_Timing_Events`
 
 Tests: `python Tests/Game_Runtime_Tests.py`
 
+## Scene lifecycle
+
+Load `Run Libraries/Game/Scenes` after Runtime and a World plugin for reusable
+scene enter/exit/update/draw hooks and deferred transitions.
+See [Scenes](Scenes.md) for usage, object commands, and ownership limitations.
+
+Deferred native improvements are tracked in
+[C++ recommendations](../../../Docs/CPP_Recommendations.md).

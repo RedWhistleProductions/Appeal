@@ -1,0 +1,44 @@
+Add_Dynamic_Module World Appeal_Standard_World
+Run Libraries/Game/Runtime
+Run Libraries/Game/Scenes
+Set_Var Demo_Steps 0
+
+Define_Function Demo_Enter
+    World Create_Typed_Entity Player Character 1 0
+    World Set_Position Player 0 0 0
+    Print Var Scene_Name
+End_Function
+Define_Function Demo_Update
+    World Move Player 5 0 0
+    Set_Var Demo_Steps (Add Var Demo_Steps 1)
+    If Var Demo_Steps == 3
+    {
+        Set_Var Scene_Next Second_Level
+        Call Scene_Request
+    }
+End_Function
+Define_Function Demo_Exit
+    // Release this scene's Graphics/Physics/etc. resources here when used.
+    World Get Player Transform.X
+End_Function
+Set_Var Scene_On_Enter Demo_Enter
+Set_Var Scene_On_Update Demo_Update
+Set_Var Scene_On_Exit Demo_Exit
+
+Call Game_Start
+Set_Var Scene_Next First_Level
+Call Scene_Request
+Loop While Var Demo_Steps < 5
+{
+    Call Game_Update
+    Call Game_Dispatch_Events
+    Call Scene_Apply
+    Call Scene_Update
+    Call Scene_Draw
+}
+Set_Var Scene_Next ""
+Call Scene_Request
+Call Scene_Apply
+Call Game_Stop
+Print SCENE_LIFECYCLE_DEMO_PASSED
+Done
