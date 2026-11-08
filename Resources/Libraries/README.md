@@ -30,3 +30,4 @@ Available libraries:
 - `Game/Rounds`: sequential round scoring, feedback and win/lose outcomes.
 - `Game/Camera_2D`: follow/bounds, coordinate conversion and zoomed 2D drawing.
 - `Game/Bodies`: fixed physics stepping, World/Mechanics sync and contact callbacks.
+- `Game/Poses`: animation selection from gameplay state without per-frame resets.

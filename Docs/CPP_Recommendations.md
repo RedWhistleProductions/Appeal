@@ -202,6 +202,18 @@ expanding the C++ implementation. These are recommendations, not implemented wor
 - **Acceptance:** partial objects stay inside their viewport and mixed primitive/
   sprite/text layers preserve the requested order.
 
+## 16. Animation clock, completion and markers
+
+- **Evidence:** pose selection can reuse per-asset Graphics playback, but exposed
+  commands do not provide an explicit gameplay-delta advance, per-instance pause,
+  completion/marker events or hit-frame ownership contract.
+- **MVP approach:** state-to-clip selection only, native clip FPS/mode and explicit
+  gameplay flags. Do not derive deterministic combat timing from renderer time.
+- **Recommended change:** explicit animation advancement/pause/time-scale,
+  completion and markers with actor-local ownership and save/load support.
+- **Acceptance:** pause/slow motion affect clip progress consistently and each
+  marker fires once at the intended simulation point, including across save/load.
+
 ## Performance watch list — no bottleneck established yet
 
 - Native timer collection currently scans every active timer each update.

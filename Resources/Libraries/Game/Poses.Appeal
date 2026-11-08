@@ -1,0 +1,42 @@
+// Per-call flags/config, with per-asset playback owned by Graphics.
+Set_Var Pose_Asset ""
+Set_Var Pose_Idle Idle
+Set_Var Pose_Walk Walk
+Set_Var Pose_Run Run
+Set_Var Pose_Jump Jump
+Set_Var Pose_Attack Attack
+Set_Var Pose_Hurt Hurt
+Set_Var Pose_Dead Dead
+Set_Var Pose_Moving 0
+Set_Var Pose_Running 0
+Set_Var Pose_Airborne 0
+Set_Var Pose_Attacking 0
+Set_Var Pose_Hurting 0
+Set_Var Pose_Dying 0
+Set_Var Pose_Selected Idle
+Set_Var Pose_OK 0
+
+Define_Function Pose_Choose
+    Set_Var Pose_Selected Var Pose_Idle
+    If Var Pose_Moving == 1 { Set_Var Pose_Selected Var Pose_Walk }
+    If Var Pose_Running == 1 { Set_Var Pose_Selected Var Pose_Run }
+    If Var Pose_Airborne == 1 { Set_Var Pose_Selected Var Pose_Jump }
+    If Var Pose_Attacking == 1 { Set_Var Pose_Selected Var Pose_Attack }
+    If Var Pose_Hurting == 1 { Set_Var Pose_Selected Var Pose_Hurt }
+    If Var Pose_Dying == 1 { Set_Var Pose_Selected Var Pose_Dead }
+    If Var Pose_Selected == "" { Set_Var Pose_Selected Var Pose_Idle }
+End_Function
+
+Define_Function Pose_Apply
+    Call Pose_Choose
+    Set_Var Pose_OK 0
+    If Var Pose_Selected != ""
+    {
+        Set_Var Pose_Current (Graphics Current_Animation Var Pose_Asset)
+        If Var Pose_Current == Var Pose_Selected { Set_Var Pose_OK 1 }
+        If Var Pose_Current != Var Pose_Selected
+        {
+            Set_Var Pose_OK (Graphics Set_Animation Var Pose_Asset Var Pose_Selected)
+        }
+    }
+End_Function
