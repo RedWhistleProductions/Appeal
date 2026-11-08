@@ -62,3 +62,12 @@ See [Sound](Sound.md) for event-driven effects/music policy and [Rounds](Rounds.
 for sequential scoring and win/lose outcomes. The complete
 [Five Questions game](../../Appeal/Games/Five_Questions/README.md) demonstrates these
 components together. Launch with `Appeal.exe Games/Five_Questions/Main`.
+
+## Further runtime components
+
+The [library catalog](../README.md) links the camera, collision bridge, pose
+selection, FSM, inventory, combat, dialogue, turn/grid, static 3D, crafting,
+generation, scheduling, vehicle and action-window helpers. Read each adjacent
+guide for inputs, ownership, save hooks, tests and remaining native boundaries.
+The [component progress checklist](../../../Docs/Game_Component_Progress.md)
+keeps MVP work separate from advanced capabilities that remain partial.

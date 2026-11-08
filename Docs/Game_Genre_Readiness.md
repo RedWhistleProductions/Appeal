@@ -84,8 +84,10 @@ can still emerge afterward. Trivia/quiz reaches this threshold for the basic
 single-player game defined in [Five Questions](../Resources/Appeal/Games/Five_Questions/README.md).
 This is a demonstrated capability, not a claim that every trivia feature exists.
 
-The first playable genre goal is met. Next broad priority is Step 9, 2D camera/
-presentation integration; Steps 6–8 also retain the advanced limitations listed above.
+The first playable genre goal is met. Subsequent work added tested foundations
+through Step 22, with animation/3D/crowd/vehicle/sports gaps explicitly partial.
+See [component progress](Game_Component_Progress.md) for commits, tests and scope;
+other genre percentages have not been automatically raised by that work.
 NPC AI should begin with
 a simple finite state machine; genetic algorithms and neural networks are later
 directions.

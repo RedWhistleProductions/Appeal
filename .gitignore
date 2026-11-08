@@ -21,3 +21,6 @@ Resources/Extensions/*
 
 # Separate legacy Files module checkout.
 /Appeal_Module_Files/
+
+# Python integration-test bytecode.
+/Tests/__pycache__/

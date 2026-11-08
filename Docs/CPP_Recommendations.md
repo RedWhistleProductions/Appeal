@@ -225,11 +225,50 @@ expanding the C++ implementation. These are recommendations, not implemented wor
   Jolt integration. Keep complete animated 3D readiness explicitly partial.
 - **Recommended change:** preserve hierarchy/bones/weights, expose external clip
   loading/selection and simulation-clock advancement, then render skinned meshes
-  with defined asset lifetime/save contracts.
+  with defined asset lifetime/save contracts. Also distinguish a successful import
+  from fallback geometry through script-visible asset/load status.
 - **Acceptance:** import an external animated character, play two clips, move it
   against real 3D collision, save/load and repeat scene cleanup in a small game.
 
-## Performance watch list — no bottleneck established yet
+## 18. Music-clock timing and input timestamps (Step 23 prerequisite)
+
+- **Evidence:** the Audio module exposes native video frame counters to other
+  native code, but this pass found no ordinary script command for a music playback
+  sample/position clock, scheduled audio onset, or input-event timestamps.
+- **MVP approach:** keep gameplay action windows separate from rhythm precision;
+  do not substitute Game_Time for the sound device clock.
+- **Recommended change:** expose stable playback position/sample counters,
+  timestamped input and latency/calibration primitives before implementing rhythm
+  judgment. Verify audio/video/native exports separately from script commands.
+- **Acceptance:** a rhythm test stays aligned with playback over long sessions
+  and produces repeatable judgments across frame rates with measured latency.
+
+## 19. Streaming/load lifetime and cancellation (Step 24 follow-up)
+
+- **Evidence:** script APIs provide scene load/close and asset free commands;
+  this pass did not establish an asynchronous load/status/cancellation or
+  generation-safe ownership contract for large-world streaming.
+- **MVP approach:** bounded generated scenes at deliberate loading boundaries.
+  Existing scene exit hooks manage their own resources.
+- **Recommended change:** profile real chunk loads, then define bounded loading,
+  readiness/error status, cancellation and owner-scoped cleanup as needed.
+- **Acceptance:** moving repeatedly between chunks keeps memory bounded and does
+  not allow late loads/callbacks to resurrect unloaded content or stall play.
+
+## 20. Script-friendly message transport for multiplayer (Steps 25–26)
+
+- **Evidence:** Network Send/Receive exist, but Receive is forwarded through a
+  void plugin function rather than returning structured per-peer messages to a
+  game loop. No complete replication/session/authority contract was established.
+- **MVP approach:** do not claim transport examples prove multiplayer games or
+  a persistent world. Existing game-state snapshots are not network replication.
+- **Recommended change:** first define message polling/events, peer/session IDs,
+  framing/status and bounded delivery; then implement and test authoritative
+  synchronization, reconnect behavior and server persistence/scalability.
+- **Acceptance:** two actual clients share authoritative gameplay through join,
+  updates, disconnect/reconnect and server restart without stale/duplicate actions.
+
+## Performance watch list — no general bottleneck established yet
 
 - Native timer collection currently scans every active timer each update.
   A deadline-based structure may help if actual game profiles show timer cost.
@@ -242,6 +281,9 @@ expanding the C++ implementation. These are recommendations, not implemented wor
   about 0.13 seconds, both including interpreter process startup. Keep generation
   off the per-frame path. Profile native recursive-query connectivity and per-cell
   World calls separately before considering a native generator or bulk tile API.
+- A scheduler-only sample selected 3,200 slots in about 0.27 seconds including
+  interpreter startup. It includes no perception/pathfinding/actor workload and
+  does not certify many-NPC simulation performance.
 
 Add measured scene/object costs and new recommendations as implementation and
 full games expose them. Keep utilities and packaging work on separate lists.
