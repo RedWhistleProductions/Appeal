@@ -190,6 +190,18 @@ expanding the C++ implementation. These are recommendations, not implemented wor
 - **Acceptance:** group volume and scene cleanup affect the intended sounds
   without changing unrelated playback; errors and lifecycle states are queryable.
 
+## 15. Unified 2D viewport clipping and draw ordering
+
+- **Evidence:** float Draw_Rect/Paste_Rect can implement camera mapping without
+  new native code, but fully off-screen culling does not clip partial objects.
+  Sprite, rectangle and text rendering are separate native command passes.
+- **MVP approach:** full-window camera viewports, explicit coordinate conversion,
+  host-owned presentation and floating-point rectangle/sprite drawing.
+- **Recommended change:** explicit 2D viewport/scissor and a predictable unified
+  draw layer/order path if split-screen, embedded views or mixed layers require it.
+- **Acceptance:** partial objects stay inside their viewport and mixed primitive/
+  sprite/text layers preserve the requested order.
+
 ## Performance watch list — no bottleneck established yet
 
 - Native timer collection currently scans every active timer each update.

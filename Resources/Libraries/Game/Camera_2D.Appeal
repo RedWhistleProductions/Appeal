@@ -1,0 +1,93 @@
+// World coordinates use screen-style +X right, +Y down. X/Y are top-left.
+Set_Var Camera_X 0
+Set_Var Camera_Y 0
+Set_Var Camera_Zoom 1
+Set_Var Camera_Width 800
+Set_Var Camera_Height 600
+Set_Var Camera_Viewport_X 0
+Set_Var Camera_Viewport_Y 0
+Set_Var Camera_Bounded 0
+Set_Var Camera_Left 0
+Set_Var Camera_Top 0
+Set_Var Camera_Right 800
+Set_Var Camera_Bottom 600
+Set_Var Camera_Target_X 0
+Set_Var Camera_Target_Y 0
+Set_Var Camera_World_X 0
+Set_Var Camera_World_Y 0
+Set_Var Camera_Object_Width 1
+Set_Var Camera_Object_Height 1
+Set_Var Camera_Screen_X 0
+Set_Var Camera_Screen_Y 0
+Set_Var Camera_Asset ""
+Set_Var Camera_R 255
+Set_Var Camera_G 255
+Set_Var Camera_B 255
+Set_Var Camera_A 255
+
+Define_Function Camera_Clamp
+    If Var Camera_Zoom <= 0 { Set_Var Camera_Zoom 1 }
+    If Var Camera_Width <= 0 { Set_Var Camera_Width 1 }
+    If Var Camera_Height <= 0 { Set_Var Camera_Height 1 }
+    If Var Camera_Bounded == 1
+    {
+        Set_Var Camera_Max_X (Subtract Var Camera_Right (Divide Var Camera_Width Var Camera_Zoom))
+        Set_Var Camera_Max_Y (Subtract Var Camera_Bottom (Divide Var Camera_Height Var Camera_Zoom))
+        If Var Camera_Max_X < Var Camera_Left { Set_Var Camera_Max_X Var Camera_Left }
+        If Var Camera_Max_Y < Var Camera_Top { Set_Var Camera_Max_Y Var Camera_Top }
+        If Var Camera_X < Var Camera_Left { Set_Var Camera_X Var Camera_Left }
+        If Var Camera_Y < Var Camera_Top { Set_Var Camera_Y Var Camera_Top }
+        If Var Camera_X > Var Camera_Max_X { Set_Var Camera_X Var Camera_Max_X }
+        If Var Camera_Y > Var Camera_Max_Y { Set_Var Camera_Y Var Camera_Max_Y }
+    }
+End_Function
+
+Define_Function Camera_Follow
+    Call Camera_Clamp
+    Set_Var Camera_X (Subtract Var Camera_Target_X (Divide Var Camera_Width (Multiply 2 Var Camera_Zoom)))
+    Set_Var Camera_Y (Subtract Var Camera_Target_Y (Divide Var Camera_Height (Multiply 2 Var Camera_Zoom)))
+    Call Camera_Clamp
+End_Function
+
+Define_Function Camera_To_Screen
+    Call Camera_Clamp
+    Set_Var Camera_Screen_X (Add Var Camera_Viewport_X (Multiply (Subtract Var Camera_World_X Var Camera_X) Var Camera_Zoom))
+    Set_Var Camera_Screen_Y (Add Var Camera_Viewport_Y (Multiply (Subtract Var Camera_World_Y Var Camera_Y) Var Camera_Zoom))
+End_Function
+
+Define_Function Camera_To_World
+    Call Camera_Clamp
+    Set_Var Camera_World_X (Add Var Camera_X (Divide (Subtract Var Camera_Screen_X Var Camera_Viewport_X) Var Camera_Zoom))
+    Set_Var Camera_World_Y (Add Var Camera_Y (Divide (Subtract Var Camera_Screen_Y Var Camera_Viewport_Y) Var Camera_Zoom))
+End_Function
+
+Define_Function Camera_Object_Rect
+    Call Camera_To_Screen
+    Set_Var Camera_Draw_Width (Multiply Var Camera_Object_Width Var Camera_Zoom)
+    Set_Var Camera_Draw_Height (Multiply Var Camera_Object_Height Var Camera_Zoom)
+    Set_Var Camera_Draw_Right (Add Var Camera_Screen_X Var Camera_Draw_Width)
+    Set_Var Camera_Draw_Bottom (Add Var Camera_Screen_Y Var Camera_Draw_Height)
+    Set_Var Camera_Visible 1
+    If Var Camera_Draw_Right <= Var Camera_Viewport_X { Set_Var Camera_Visible 0 }
+    If Var Camera_Draw_Bottom <= Var Camera_Viewport_Y { Set_Var Camera_Visible 0 }
+    If Var Camera_Screen_X >= (Add Var Camera_Viewport_X Var Camera_Width) { Set_Var Camera_Visible 0 }
+    If Var Camera_Screen_Y >= (Add Var Camera_Viewport_Y Var Camera_Height) { Set_Var Camera_Visible 0 }
+    If Var Camera_Draw_Width <= 0 { Set_Var Camera_Visible 0 }
+    If Var Camera_Draw_Height <= 0 { Set_Var Camera_Visible 0 }
+End_Function
+
+Define_Function Camera_Draw_Rect
+    Call Camera_Object_Rect
+    If Var Camera_Visible == 1
+    {
+        Graphics Draw_Rect Camera_Object Var Camera_Screen_X Var Camera_Screen_Y Var Camera_Draw_Width Var Camera_Draw_Height Var Camera_R Var Camera_G Var Camera_B Var Camera_A
+    }
+End_Function
+
+Define_Function Camera_Draw_Sprite
+    Call Camera_Object_Rect
+    If Var Camera_Visible == 1
+    {
+        Graphics Paste_Rect Var Camera_Asset Var Camera_Screen_X Var Camera_Screen_Y Var Camera_Draw_Right Var Camera_Draw_Bottom
+    }
+End_Function

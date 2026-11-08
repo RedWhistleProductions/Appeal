@@ -28,3 +28,4 @@ Available libraries:
 - `Game/Controls`: game/UI input gating and queued commands.
 - `Game/Sound`: event-driven sound cues and explicit music selection.
 - `Game/Rounds`: sequential round scoring, feedback and win/lose outcomes.
+- `Game/Camera_2D`: follow/bounds, coordinate conversion and zoomed 2D drawing.
