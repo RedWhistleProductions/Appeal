@@ -1,0 +1,132 @@
+// SQLite-backed in-memory inventory records. Host selects a dedicated connection.
+Set_Var Inventory_Database ""
+Set_Var Inventory_Owner Player
+Set_Var Inventory_Item ""
+Set_Var Inventory_Amount 1
+Set_Var Inventory_Limit 99
+Set_Var Inventory_Slot ""
+Set_Var Inventory_OK 0
+Set_Var Inventory_Status "Not initialized."
+Set_Var Inventory_Snapshot ""
+
+Define_Function Inventory_Init
+    Storage Use Var Inventory_Database
+    Storage Execute_SQL "CREATE TEMP TABLE IF NOT EXISTS Inv_Items (Item TEXT PRIMARY KEY, Stack_Limit INTEGER NOT NULL DEFAULT 99 CHECK(typeof(Stack_Limit)='integer' AND Stack_Limit>0 AND Stack_Limit<=1000000), Slot TEXT NOT NULL DEFAULT ''); CREATE TEMP TABLE IF NOT EXISTS Inv_Stacks (Owner TEXT NOT NULL,Item TEXT NOT NULL,Quantity INTEGER NOT NULL CHECK(typeof(Quantity)='integer' AND Quantity>=0 AND Quantity<=1000000),PRIMARY KEY(Owner,Item)); CREATE TEMP TABLE IF NOT EXISTS Inv_Equipment (Owner TEXT NOT NULL,Slot TEXT NOT NULL,Item TEXT NOT NULL,PRIMARY KEY(Owner,Slot)); CREATE TEMP TABLE IF NOT EXISTS Inv_Context (Key TEXT PRIMARY KEY,Value TEXT NOT NULL DEFAULT ''); CREATE TEMP VIEW IF NOT EXISTS Inv_Current AS SELECT i.Item,i.Stack_Limit,i.Slot,COALESCE(s.Quantity,0) AS Quantity FROM Inv_Items i LEFT JOIN Inv_Stacks s ON s.Item=i.Item AND s.Owner=(SELECT Value FROM Inv_Context WHERE Key='Owner'); CREATE TEMP VIEW IF NOT EXISTS Inv_Equipped AS SELECT 'Current' AS Key,Item FROM Inv_Equipment WHERE Owner=(SELECT Value FROM Inv_Context WHERE Key='Owner') AND Slot=(SELECT Value FROM Inv_Context WHERE Key='Slot'); CREATE TEMP VIEW IF NOT EXISTS Inv_Snapshot_View AS SELECT 'All' AS Key,json_object('version',1,'stacks',json(COALESCE((SELECT json_group_array(json_object('owner',Owner,'item',Item,'quantity',Quantity)) FROM Inv_Stacks),'[]')),'equipment',json(COALESCE((SELECT json_group_array(json_object('owner',Owner,'slot',Slot,'item',Item)) FROM Inv_Equipment),'[]'))) AS Data; CREATE TEMP TABLE IF NOT EXISTS Inv_Stage_Stacks (Owner TEXT NOT NULL,Item TEXT NOT NULL,Quantity INTEGER NOT NULL CHECK(typeof(Quantity)='integer' AND Quantity>=0 AND Quantity<=1000000),PRIMARY KEY(Owner,Item)); CREATE TEMP TABLE IF NOT EXISTS Inv_Stage_Equipment (Owner TEXT NOT NULL,Slot TEXT NOT NULL,Item TEXT NOT NULL,PRIMARY KEY(Owner,Slot)); CREATE TEMP TABLE IF NOT EXISTS Inv_Validate (Valid INTEGER CHECK(Valid=1)); CREATE TEMP VIEW IF NOT EXISTS Inv_Amount AS SELECT 'Current' AS Key,CASE WHEN CAST(Value AS REAL)>=0 AND CAST(Value AS REAL)<=1000000 AND CAST(Value AS INTEGER)=CAST(Value AS REAL) THEN '1' ELSE '0' END AS Valid FROM Inv_Context WHERE Key='Amount';"
+    Set_Var Inventory_Status Ready
+End_Function
+
+Define_Function Inventory_Define
+    Storage Use Var Inventory_Database
+    Storage Set_Field Inv_Items Item Var Inventory_Item Stack_Limit Var Inventory_Limit
+    Storage Set_Field Inv_Items Item Var Inventory_Item Slot Var Inventory_Slot
+End_Function
+
+Define_Function Inventory_Read
+    Storage Use Var Inventory_Database
+    Storage Set_Field Inv_Context Key Owner Value Var Inventory_Owner
+    Storage Set_Field Inv_Context Key Item Value Var Inventory_Item
+    Set_Var Inventory_Quantity (Storage Get_Field Inv_Current Item Var Inventory_Item Quantity)
+    Set_Var Inventory_Stack_Limit (Storage Get_Field Inv_Current Item Var Inventory_Item Stack_Limit)
+    Set_Var Inventory_Item_Slot (Storage Get_Field Inv_Current Item Var Inventory_Item Slot)
+    Set_Var Inventory_Known 1
+    If Var Inventory_Quantity == ""
+    {
+        Set_Var Inventory_Known 0
+        Set_Var Inventory_Quantity 0
+        Set_Var Inventory_Stack_Limit 0
+    }
+End_Function
+
+Define_Function Inventory_Check_Amount
+    Set_Var Inventory_Amount (Add Var Inventory_Amount 0)
+    Storage Set_Field Inv_Context Key Amount Value Var Inventory_Amount
+    Set_Var Inventory_Valid (Storage Get_Field Inv_Amount Key Current Valid)
+End_Function
+
+Define_Function Inventory_Write
+    Storage Set_Field Inv_Context Key Quantity Value Var Inventory_New_Quantity
+    Set_Var Inventory_Status (Storage Try_SQL "SAVEPOINT Inv_Write; INSERT INTO Inv_Stacks SELECT (SELECT Value FROM Inv_Context WHERE Key='Owner'),(SELECT Value FROM Inv_Context WHERE Key='Item'),CAST((SELECT Value FROM Inv_Context WHERE Key='Quantity') AS INTEGER) WHERE true ON CONFLICT(Owner,Item) DO UPDATE SET Quantity=excluded.Quantity; DELETE FROM Inv_Equipment WHERE Owner=(SELECT Value FROM Inv_Context WHERE Key='Owner') AND Item=(SELECT Value FROM Inv_Context WHERE Key='Item') AND NOT EXISTS(SELECT 1 FROM Inv_Stacks WHERE Owner=Inv_Equipment.Owner AND Item=Inv_Equipment.Item AND Quantity>0); RELEASE Inv_Write;")
+    If Var Inventory_Status != "" { Storage Try_SQL "ROLLBACK TO Inv_Write; RELEASE Inv_Write;" }
+    If Var Inventory_Status == ""
+    {
+        Set_Var Inventory_OK 1
+        Set_Var Inventory_Quantity Var Inventory_New_Quantity
+        Set_Var Inventory_Status Updated
+    }
+End_Function
+
+Define_Function Inventory_Change
+    Call Inventory_Read
+    Call Inventory_Check_Amount
+    Set_Var Inventory_OK 0
+    Set_Var Inventory_Status "Unknown item, invalid quantity, or stack limit exceeded."
+    If Var Inventory_Known == 1
+    {
+        If Var Inventory_Valid == 1
+        {
+            Set_Var Inventory_New_Quantity Var Inventory_Amount
+            If Var Inventory_Operation == Add { Set_Var Inventory_New_Quantity (Add Var Inventory_Quantity Var Inventory_Amount) }
+            If Var Inventory_Operation == Take { Set_Var Inventory_New_Quantity (Subtract Var Inventory_Quantity Var Inventory_Amount) }
+            If Var Inventory_New_Quantity >= 0
+            {
+                If Var Inventory_New_Quantity <= Var Inventory_Stack_Limit { Call Inventory_Write }
+            }
+        }
+    }
+End_Function
+Define_Function Inventory_Add
+    Set_Var Inventory_Operation Add
+    Call Inventory_Change
+End_Function
+Define_Function Inventory_Take
+    Set_Var Inventory_Operation Take
+    Call Inventory_Change
+End_Function
+Define_Function Inventory_Set
+    Set_Var Inventory_Operation Set
+    Call Inventory_Change
+End_Function
+
+Define_Function Inventory_Equip
+    Call Inventory_Read
+    Set_Var Inventory_OK 0
+    Set_Var Inventory_Status "Item not owned or has no equipment slot."
+    If Var Inventory_Quantity > 0
+    {
+        If Var Inventory_Item_Slot != ""
+        {
+            Storage Set_Field Inv_Context Key Slot Value Var Inventory_Item_Slot
+            Storage Execute_SQL "INSERT INTO Inv_Equipment SELECT (SELECT Value FROM Inv_Context WHERE Key='Owner'),(SELECT Value FROM Inv_Context WHERE Key='Slot'),(SELECT Value FROM Inv_Context WHERE Key='Item') WHERE true ON CONFLICT(Owner,Slot) DO UPDATE SET Item=excluded.Item;"
+            Set_Var Inventory_OK 1
+            Set_Var Inventory_Status Equipped
+        }
+    }
+End_Function
+Define_Function Inventory_Equipped
+    Storage Use Var Inventory_Database
+    Storage Set_Field Inv_Context Key Owner Value Var Inventory_Owner
+    Storage Set_Field Inv_Context Key Slot Value Var Inventory_Slot
+    Return_Value (Storage Get_Field Inv_Equipped Key Current Item)
+End_Function
+Define_Function Inventory_Unequip
+    Storage Use Var Inventory_Database
+    Storage Set_Field Inv_Context Key Owner Value Var Inventory_Owner
+    Storage Set_Field Inv_Context Key Slot Value Var Inventory_Slot
+    Storage Execute_SQL "DELETE FROM Inv_Equipment WHERE Owner=(SELECT Value FROM Inv_Context WHERE Key='Owner') AND Slot=(SELECT Value FROM Inv_Context WHERE Key='Slot');"
+End_Function
+Define_Function Inventory_Export
+    Storage Use Var Inventory_Database
+    Return_Value (Storage Get_Field Inv_Snapshot_View Key All Data)
+End_Function
+Define_Function Inventory_Import
+    Storage Use Var Inventory_Database
+    Storage Set_Field Inv_Context Key Snapshot Value Var Inventory_Snapshot
+    Set_Var Inventory_OK 0
+    Set_Var Inventory_Status (Storage Try_SQL "SAVEPOINT Inv_Import; DELETE FROM Inv_Stage_Stacks; DELETE FROM Inv_Stage_Equipment; DELETE FROM Inv_Validate; INSERT INTO Inv_Validate SELECT CASE WHEN json_extract(Value,'$.version')=1 AND json_type(Value,'$.stacks')='array' AND json_type(Value,'$.equipment')='array' THEN 1 ELSE 0 END FROM Inv_Context WHERE Key='Snapshot'; INSERT INTO Inv_Stage_Stacks SELECT json_extract(j.value,'$.owner'),json_extract(j.value,'$.item'),json_extract(j.value,'$.quantity') FROM Inv_Context c,json_each(c.Value,'$.stacks') j WHERE c.Key='Snapshot'; INSERT INTO Inv_Stage_Equipment SELECT json_extract(j.value,'$.owner'),json_extract(j.value,'$.slot'),json_extract(j.value,'$.item') FROM Inv_Context c,json_each(c.Value,'$.equipment') j WHERE c.Key='Snapshot'; INSERT INTO Inv_Validate SELECT CASE WHEN NOT EXISTS(SELECT 1 FROM Inv_Stage_Stacks s LEFT JOIN Inv_Items i ON i.Item=s.Item WHERE i.Item IS NULL OR s.Quantity>i.Stack_Limit) AND NOT EXISTS(SELECT 1 FROM Inv_Stage_Equipment e LEFT JOIN Inv_Items i ON i.Item=e.Item LEFT JOIN Inv_Stage_Stacks s ON s.Owner=e.Owner AND s.Item=e.Item WHERE i.Item IS NULL OR e.Slot='' OR e.Slot!=i.Slot OR s.Quantity IS NULL OR s.Quantity<=0) THEN 1 ELSE 0 END; DELETE FROM Inv_Stacks; INSERT INTO Inv_Stacks SELECT * FROM Inv_Stage_Stacks; DELETE FROM Inv_Equipment; INSERT INTO Inv_Equipment SELECT * FROM Inv_Stage_Equipment; RELEASE Inv_Import;")
+    If Var Inventory_Status != "" { Storage Try_SQL "ROLLBACK TO Inv_Import; RELEASE Inv_Import;" }
+    If Var Inventory_Status == ""
+    {
+        Set_Var Inventory_OK 1
+        Set_Var Inventory_Status Imported
+    }
+End_Function
