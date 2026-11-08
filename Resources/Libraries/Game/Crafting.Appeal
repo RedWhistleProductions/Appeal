@@ -1,0 +1,53 @@
+// Extension of Game/Inventory on the same SQLite connection and TEMP records.
+Set_Var Craft_Recipe ""
+Set_Var Craft_Output_Item ""
+Set_Var Craft_Output_Quantity 1
+Set_Var Craft_Ingredient_Item ""
+Set_Var Craft_Ingredient_Quantity 1
+Set_Var Craft_Enabled 1
+Set_Var Craft_OK 0
+
+Define_Function Craft_Init
+    Storage Use Var Inventory_Database
+    Storage Execute_SQL "CREATE TEMP TABLE IF NOT EXISTS Craft_Recipes (Recipe TEXT PRIMARY KEY,Output_Item TEXT NOT NULL DEFAULT '',Output_Quantity INTEGER NOT NULL DEFAULT 1 CHECK(typeof(Output_Quantity)='integer' AND Output_Quantity BETWEEN 1 AND 1000000)); CREATE TEMP TABLE IF NOT EXISTS Craft_Ingredients (Recipe TEXT NOT NULL,Item TEXT NOT NULL,Quantity INTEGER NOT NULL CHECK(typeof(Quantity)='integer' AND Quantity BETWEEN 1 AND 1000000),PRIMARY KEY(Recipe,Item)); CREATE TEMP TABLE IF NOT EXISTS Craft_Context (Key TEXT PRIMARY KEY,Value TEXT NOT NULL DEFAULT ''); CREATE TEMP TABLE IF NOT EXISTS Craft_Validate (Valid INTEGER CHECK(Valid=1)); CREATE TEMP VIEW IF NOT EXISTS Craft_Available AS SELECT r.Recipe,CASE WHEN i.Item IS NOT NULL AND COALESCE(s.Quantity,0)-COALESCE((SELECT Quantity FROM Craft_Ingredients WHERE Recipe=r.Recipe AND Item=r.Output_Item),0)+r.Output_Quantity<=i.Stack_Limit AND NOT EXISTS(SELECT 1 FROM Craft_Ingredients n LEFT JOIN Inv_Items d ON d.Item=n.Item LEFT JOIN Inv_Stacks v ON v.Owner=(SELECT Value FROM Craft_Context WHERE Key='Owner') AND v.Item=n.Item WHERE n.Recipe=r.Recipe AND (d.Item IS NULL OR COALESCE(v.Quantity,0)<n.Quantity)) THEN '1' ELSE '0' END AS Ready FROM Craft_Recipes r LEFT JOIN Inv_Items i ON i.Item=r.Output_Item LEFT JOIN Inv_Stacks s ON s.Owner=(SELECT Value FROM Craft_Context WHERE Key='Owner') AND s.Item=r.Output_Item;"
+End_Function
+Define_Function Craft_Define
+    Storage Use Var Inventory_Database
+    Storage Set_Field Craft_Recipes Recipe Var Craft_Recipe Output_Item Var Craft_Output_Item
+    Storage Set_Field Craft_Recipes Recipe Var Craft_Recipe Output_Quantity Var Craft_Output_Quantity
+End_Function
+Define_Function Craft_Bind
+    Storage Use Var Inventory_Database
+    Storage Set_Field Craft_Context Key Owner Value Var Inventory_Owner
+    Storage Set_Field Craft_Context Key Recipe Value Var Craft_Recipe
+End_Function
+Define_Function Craft_Ingredient
+    Call Craft_Bind
+    Storage Set_Field Craft_Context Key Item Value Var Craft_Ingredient_Item
+    Storage Set_Field Craft_Context Key Quantity Value Var Craft_Ingredient_Quantity
+    Storage Execute_SQL "INSERT INTO Craft_Ingredients SELECT (SELECT Value FROM Craft_Context WHERE Key='Recipe'),(SELECT Value FROM Craft_Context WHERE Key='Item'),(SELECT Value FROM Craft_Context WHERE Key='Quantity') WHERE true ON CONFLICT(Recipe,Item) DO UPDATE SET Quantity=excluded.Quantity;"
+End_Function
+Define_Function Craft_Read
+    Call Craft_Bind
+    Set_Var Craft_Ready (Storage Get_Field Craft_Available Recipe Var Craft_Recipe Ready)
+    If Var Craft_Ready == "" { Set_Var Craft_Ready 0 }
+End_Function
+Define_Function Craft_Run
+    Call Craft_Read
+    Set_Var Craft_OK 0
+    Set_Var Craft_Status "Recipe unavailable, ingredients missing, or output stack full."
+    If Var Craft_Enabled == 1
+    {
+        If Var Craft_Ready == 1
+        {
+            Set_Var Craft_Status (Storage Try_SQL "SAVEPOINT Craft_Write; DELETE FROM Craft_Validate; INSERT INTO Craft_Validate SELECT CASE WHEN (SELECT Ready FROM Craft_Available WHERE Recipe=(SELECT Value FROM Craft_Context WHERE Key='Recipe'))='1' THEN 1 ELSE 0 END; UPDATE Inv_Stacks SET Quantity=Quantity-(SELECT Quantity FROM Craft_Ingredients WHERE Recipe=(SELECT Value FROM Craft_Context WHERE Key='Recipe') AND Item=Inv_Stacks.Item) WHERE Owner=(SELECT Value FROM Craft_Context WHERE Key='Owner') AND Item IN(SELECT Item FROM Craft_Ingredients WHERE Recipe=(SELECT Value FROM Craft_Context WHERE Key='Recipe')); DELETE FROM Inv_Equipment WHERE Owner=(SELECT Value FROM Craft_Context WHERE Key='Owner') AND NOT EXISTS(SELECT 1 FROM Inv_Stacks s WHERE s.Owner=Inv_Equipment.Owner AND s.Item=Inv_Equipment.Item AND s.Quantity>0); INSERT INTO Inv_Stacks SELECT (SELECT Value FROM Craft_Context WHERE Key='Owner'),Output_Item,Output_Quantity FROM Craft_Recipes WHERE Recipe=(SELECT Value FROM Craft_Context WHERE Key='Recipe') ON CONFLICT(Owner,Item) DO UPDATE SET Quantity=Quantity+excluded.Quantity; RELEASE Craft_Write;")
+            If Var Craft_Status != "" { Storage Try_SQL "ROLLBACK TO Craft_Write; RELEASE Craft_Write;" }
+            If Var Craft_Status == ""
+            {
+                Set_Var Craft_OK 1
+                Set_Var Craft_Status Crafted
+                Events Emit Craft_Completed Var Craft_Recipe
+            }
+        }
+    }
+End_Function
