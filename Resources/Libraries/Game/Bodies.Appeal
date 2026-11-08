@@ -1,0 +1,69 @@
+// Load after Runtime, World and Physics. Mechanics synchronization is opt-in.
+Set_Var Body_Entity ""
+Set_Var Body_Delta_Seconds 0.016666667
+Set_Var Body_With_Mechanics 0
+Set_Var Body_Foot_Offset 0
+Set_Var Body_On_Event ""
+Set_Var Body_Busy 0
+Set_Var Body_Stepped 0
+Set_Var Body_Status Ready
+
+Define_Function Bodies_Step
+    Set_Var Body_Stepped 0
+    Set_Var Body_Status "Simulation paused or stopped."
+    If Var Game_Running == 1
+    {
+        If Var Game_Paused == 0
+        {
+            Set_Var Body_Status "Use a fixed delta in (0, 0.1] seconds."
+            If Var Body_Delta_Seconds > 0
+            {
+                If Var Body_Delta_Seconds <= 0.1
+                {
+                    Physics Step Var Body_Delta_Seconds
+                    Set_Var Body_Stepped 1
+                    Set_Var Body_Status Stepped
+                }
+            }
+        }
+    }
+End_Function
+
+Define_Function Body_Sync
+    Set_Var Body_X (Physics Get Var Body_Entity Position_X)
+    Set_Var Body_Y (Physics Get Var Body_Entity Position_Y)
+    Set_Var Body_Z (Physics Get Var Body_Entity Position_Z)
+    Set_Var Body_Grounded (Physics Get Var Body_Entity Grounded)
+    World Set_Position Var Body_Entity Var Body_X Var Body_Y Var Body_Z
+    If Var Body_With_Mechanics == 1
+    {
+        Mechanics Set Var Body_Entity Position_X Var Body_X
+        Mechanics Set Var Body_Entity Position_Y (Subtract Var Body_Y Var Body_Foot_Offset)
+        Mechanics Set Var Body_Entity Position_Z Var Body_Z
+        Mechanics Set Var Body_Entity Grounded Var Body_Grounded
+    }
+End_Function
+
+Define_Function Body_Send_Velocity
+    Physics Set_Velocity Var Body_Entity (Mechanics Get Var Body_Entity Velocity_X) (Physics Get Var Body_Entity Velocity_Y) (Mechanics Get Var Body_Entity Velocity_Z)
+End_Function
+
+Define_Function Body_Read_Events
+    If Var Body_Busy == 0
+    {
+        Set_Var Body_Busy 1
+        Set_Var Body_Event_Entity Var Body_Entity
+        Set_Var Body_Event_Count (Physics Get Var Body_Event_Entity Event_Count)
+        Set_Var Body_Event_Index 0
+        Loop While Var Body_Event_Index < Var Body_Event_Count
+        {
+            Set_Var Body_Event_Type (Physics Event Var Body_Event_Entity Var Body_Event_Index Type)
+            Set_Var Body_Event_Other (Physics Event Var Body_Event_Entity Var Body_Event_Index Other)
+            Set_Var Body_Event_Tag (Physics Event Var Body_Event_Entity Var Body_Event_Index Tag)
+            Set_Var Body_Event_Sensor (Physics Event Var Body_Event_Entity Var Body_Event_Index Sensor)
+            If Var Body_On_Event != "" { Call Var Body_On_Event }
+            Set_Var Body_Event_Index (Add Var Body_Event_Index 1)
+        }
+        Set_Var Body_Busy 0
+    }
+End_Function
