@@ -1,0 +1,386 @@
+Define_Function Tactics_Setup
+    Set_Var A_Map 1
+    Set_Var A_Button1 "Move east"
+    Set_Var A_Button2 "Move west"
+    Set_Var A_Button3 "Strike adjacent foe"
+    Set_Var A_Button4 "Defend"
+End_Function
+Define_Function Tactics_Act
+    If Var A_Command == 1 { If Var A_X < 5 { Set_Var A_X (Add Var A_X 1) } }
+    If Var A_Command == 2 { If Var A_X > 1 { Set_Var A_X (Subtract Var A_X 1) } }
+    Set_Var A_Distance (Subtract Var A_EX Var A_X)
+    If Var A_Distance < 0 { Set_Var A_Distance (Subtract 0 Var A_Distance) }
+    If Var A_Command == 3
+    {
+        If Var A_Distance <= 1
+        {
+            Set_Var A_Damage 3
+            Call Arcade_Hit
+        }
+    }
+    Set_Var A_Branch26 0
+    If Var A_Enemy <= 0 { Set_Var A_Branch26 1 }
+    If Var A_Branch26 == 1
+    { Call Arcade_Win }
+    If Var A_Branch26 == 0 {
+        Set_Var A_Branch27 0
+        If Var A_Distance <= 1 { Set_Var A_Branch27 1 }
+        If Var A_Branch27 == 1
+        {
+            If Var A_Command != 4 { Set_Var A_HP (Subtract Var A_HP 2) }
+        }
+        If Var A_Branch27 == 0 {
+            Set_Var A_Branch28 0
+            If Var A_EX > Var A_X { Set_Var A_Branch28 1 }
+            If Var A_Branch28 == 1
+            { Set_Var A_EX (Subtract Var A_EX 1) }
+            If Var A_Branch28 == 0 { Set_Var A_EX (Add Var A_EX 1) }
+        }
+    }
+End_Function
+
+Define_Function Tower_Setup
+    Set_Var A_Map 1
+    Set_Var A_Resource 3
+    Set_Var A_Enemy 6
+    Set_Var A_EX 1
+    Set_Var A_X 0
+    Set_Var A_Button1 "Build tower (one coin)"
+    Set_Var A_Button2 "Launch next wave"
+    Set_Var A_Button3 "Inspect road"
+    Set_Var A_Button4 "Sell tower"
+    Set_Var A_Live 1
+    Set_Var A_Interval 900
+End_Function
+Define_Function Tower_Act
+    If Var A_Command == 1
+    {
+        If Var A_Resource > 0
+        {
+            Set_Var A_Resource (Subtract Var A_Resource 1)
+            Set_Var A_Flag (Add Var A_Flag 1)
+        }
+    }
+    If Var A_Command == 2 { If Var A_Flag2 == 0 { Set_Var A_Flag2 1 } }
+    If Var A_Command == 4
+    {
+        If Var A_Flag > 0
+        {
+            Set_Var A_Flag (Subtract Var A_Flag 1)
+            Set_Var A_Resource (Add Var A_Resource 1)
+        }
+    }
+End_Function
+Define_Function Tower_Tick
+    If Var A_Flag2 == 1
+    {
+        Set_Var A_Enemy (Subtract Var A_Enemy Var A_Flag)
+        Set_Var A_Branch29 0
+        If Var A_Enemy <= 0 { Set_Var A_Branch29 1 }
+        If Var A_Branch29 == 1
+        {
+            Set_Var A_Score (Add Var A_Score 1)
+            Set_Var A_Resource (Add Var A_Resource 1)
+            Set_Var A_Enemy (Add 6 Var A_Score)
+            Set_Var A_EX 1
+            Set_Var A_Flag2 0
+            Set_Var A_Status "Wave cleared. Build or sell towers, then launch the next wave."
+            If Var A_Score >= 3 { Call Arcade_Win }
+        }
+        If Var A_Branch29 == 0 {
+            Set_Var A_EX (Add Var A_EX 1)
+            If Var A_EX >= 6 { Call Arcade_Lose }
+        }
+    }
+End_Function
+
+Define_Function RPG_Setup
+    Set_Var A_Enemy 18
+    Set_Var A_HP 12
+    Set_Var A_Resource 6
+    Set_Var A_Button1 "Sword attack (3 damage)"
+    Set_Var A_Button2 "Spell (6 damage, 3 mana)"
+    Set_Var A_Button3 "Drink one potion"
+    Set_Var A_Button4 "Defend"
+End_Function
+Define_Function RPG_Act
+    Set_Var A_Damage 0
+    If Var A_Command == 1 { Set_Var A_Damage 3 }
+    If Var A_Command == 2
+    {
+        Set_Var A_Branch30 0
+        If Var A_Resource >= 3 { Set_Var A_Branch30 1 }
+        If Var A_Branch30 == 1
+        {
+            Set_Var A_Resource (Subtract Var A_Resource 3)
+            Set_Var A_Damage 6
+        }
+        If Var A_Branch30 == 0 { Set_Var A_Status "Not enough mana. Use the sword or potion." }
+    }
+    If Var A_Command == 3
+    {
+        If Var A_Flag == 0
+        {
+            Set_Var A_Flag 1
+            Set_Var A_HP (Add Var A_HP 6)
+            If Var A_HP > 12 { Set_Var A_HP 12 }
+        }
+    }
+    Call Arcade_Hit
+    Set_Var A_Branch31 0
+    If Var A_Enemy <= 0 { Set_Var A_Branch31 1 }
+    If Var A_Branch31 == 1
+    { Call Arcade_Win }
+    If Var A_Branch31 == 0 {
+        Set_Var A_Branch32 0
+        If Var A_Command == 4 { Set_Var A_Branch32 1 }
+        If Var A_Branch32 == 1
+        { Set_Var A_HP (Subtract Var A_HP 1) }
+        If Var A_Branch32 == 0 { Set_Var A_HP (Subtract Var A_HP 3) }
+    }
+End_Function
+
+Define_Function Rogue_Setup
+    Set_Var A_Map 1
+    Set_Var A_X 1
+    Set_Var A_Y 1
+    Set_Var A_EX 5
+    Set_Var A_EY 3
+    Set_Var A_HP 20
+    Set_Var A_Button1 East
+    Set_Var A_Button2 West
+    Set_Var A_Button3 North
+    Set_Var A_Button4 South
+    Set_Var A_Seed (Add Var A_Seed 1)
+    Set_Var Generation_Seed Var A_Seed
+    Set_Var Generation_Width 7
+    Set_Var Generation_Height 5
+    Set_Var Generation_Density 35
+    Call Generation_Create
+    If Var Generation_OK != 1
+    {
+        Call Arcade_Lose
+        Set_Var A_Status Var Generation_Status
+    }
+    Call Arcade_Cache_Map
+End_Function
+Define_Function Rogue_Act
+    Set_Var A_NX Var A_X
+    Set_Var A_NY Var A_Y
+    If Var A_Command == 1 { Set_Var A_NX (Add Var A_X 1) }
+    If Var A_Command == 2 { Set_Var A_NX (Subtract Var A_X 1) }
+    If Var A_Command == 3 { Set_Var A_NY (Subtract Var A_Y 1) }
+    If Var A_Command == 4 { Set_Var A_NY (Add Var A_Y 1) }
+    Set_Var Generation_Cell_Index (Add (Multiply Var A_NY 7) Var A_NX)
+    Call Generation_Read
+    Set_Var A_Branch33 0
+    If Var Generation_Walkable == 1 { Set_Var A_Branch33 1 }
+    If Var A_Branch33 == 1
+    {
+        Set_Var A_X Var A_NX
+        Set_Var A_Y Var A_NY
+        Set_Var A_HP (Subtract Var A_HP 1)
+        If Var A_X == 5 { If Var A_Y == 3 { Call Arcade_Win } }
+    }
+    If Var A_Branch33 == 0 { Set_Var A_Status "Stone blocks that direction. Find a different route." }
+End_Function
+
+Define_Function RTS_Setup
+    Set_Var A_Live 1
+    Set_Var A_Interval 1000
+    Set_Var A_Resource 3
+    Set_Var A_Enemy 15
+    Set_Var A_Button1 "Train soldier (3 supplies)"
+    Set_Var A_Button2 "Order assault"
+    Set_Var A_Button3 "Recall / defend"
+    Set_Var A_Button4 "Hire worker (2 supplies)"
+    Set_Var A_Flag2 1
+End_Function
+Define_Function RTS_Act
+    If Var A_Command == 1
+    {
+        If Var A_Resource >= 3
+        {
+            Set_Var A_Resource (Subtract Var A_Resource 3)
+            Set_Var A_Flag (Add Var A_Flag 1)
+        }
+    }
+    If Var A_Command == 2 { Set_Var A_VX 1 }
+    If Var A_Command == 3 { Set_Var A_VX 0 }
+    If Var A_Command == 4
+    {
+        If Var A_Resource >= 2
+        {
+            Set_Var A_Resource (Subtract Var A_Resource 2)
+            Set_Var A_Flag2 (Add Var A_Flag2 1)
+        }
+    }
+End_Function
+Define_Function RTS_Tick
+    Set_Var A_Resource (Add Var A_Resource Var A_Flag2)
+    If Var A_VX == 1
+    {
+        Set_Var A_Enemy (Subtract Var A_Enemy Var A_Flag)
+        If Var A_Enemy <= 0 { Call Arcade_Win }
+    }
+    // Periodic raids give the economy a deadline.
+    If Var A_Phase >= 3
+    {
+        Set_Var A_Phase 0
+        Set_Var A_Branch34 0
+        If Var A_Flag < 2 { Set_Var A_Branch34 1 }
+        If Var A_Branch34 == 1
+        { Set_Var A_HP (Subtract Var A_HP 3) }
+        If Var A_Branch34 == 0 { Set_Var A_HP (Subtract Var A_HP 1) }
+    }
+End_Function
+
+Define_Function Town_Setup
+    Set_Var A_Live 1
+    Set_Var A_Interval 2000
+    Set_Var A_Resource 6
+    Set_Var A_Button1 "Build farm (2 coins)"
+    Set_Var A_Button2 "Build home (3 coins)"
+    Set_Var A_Button3 "Advance season now"
+    Set_Var A_Button4 "Inspect town"
+End_Function
+Define_Function Town_Act
+    If Var A_Command == 1
+    {
+        If Var A_Resource >= 2
+        {
+            Set_Var A_Resource (Subtract Var A_Resource 2)
+            Set_Var A_Flag (Add Var A_Flag 1)
+        }
+    }
+    If Var A_Command == 2
+    {
+        If Var A_Resource >= 3
+        {
+            Set_Var A_Resource (Subtract Var A_Resource 3)
+            Set_Var A_Flag2 (Add Var A_Flag2 1)
+        }
+    }
+    If Var A_Command == 3
+    {
+        Set_Var A_Phase (Add Var A_Phase 1)
+        Call Town_Tick
+        Set_Var A_Next_Tick (Add Var Game_Time Var A_Interval)
+    }
+End_Function
+Define_Function Town_Tick
+    Set_Var A_Resource (Add Var A_Resource (Multiply Var A_Flag 2))
+    Set_Var A_Branch35 0
+    If Var A_Flag >= Var A_Flag2 { Set_Var A_Branch35 1 }
+    If Var A_Branch35 == 1
+    {
+        Set_Var A_Score (Add Var A_Score Var A_Flag2)
+        Set_Var A_Status "Harvest supplied the homes. New residents arrived. Reach six residents."
+    }
+    If Var A_Branch35 == 0 {
+        Set_Var A_HP (Subtract Var A_HP 3)
+        Set_Var A_Status "Food shortage! Build a farm for every home."
+    }
+    If Var A_Score >= 6 { Call Arcade_Win }
+    If Var A_Phase >= 10 { Call Arcade_Lose }
+End_Function
+
+Define_Function Survival_Setup
+    Set_Var A_Live 1
+    Set_Var A_Interval 1800
+    Set_Var A_Resource 3
+    Set_Var A_Button1 "Gather one wood"
+    Set_Var A_Button2 "Craft shelter (3 wood)"
+    Set_Var A_Button3 "Eat one ration (+4 health)"
+    Set_Var A_Button4 "Inspect shelter"
+    Set_Var Inventory_Owner Camper
+    Set_Var Inventory_Item Wood
+    Set_Var Inventory_Amount 0
+    Call Inventory_Set
+    Set_Var Inventory_Item Shelter
+    Call Inventory_Set
+End_Function
+Define_Function Survival_Act
+    If Var A_Command == 1
+    {
+        Set_Var Inventory_Item Wood
+        Set_Var Inventory_Amount 1
+        Call Inventory_Add
+        Set_Var A_Flag Var Inventory_Quantity
+    }
+    If Var A_Command == 2
+    {
+        Set_Var Craft_Recipe Shelter
+        Call Craft_Run
+        Set_Var A_Branch36 0
+        If Var Craft_OK == 1 { Set_Var A_Branch36 1 }
+        If Var A_Branch36 == 1
+        {
+            Set_Var A_Flag2 1
+            Set_Var Inventory_Item Wood
+            Call Inventory_Read
+            Set_Var A_Flag Var Inventory_Quantity
+            Set_Var A_Status "Shelter built. Save your rations and survive eight night beats."
+        }
+        If Var A_Branch36 == 0 { Set_Var A_Status "You need three wood to craft a shelter." }
+    }
+    If Var A_Command == 3
+    {
+        If Var A_Resource > 0
+        {
+            Set_Var A_Resource (Subtract Var A_Resource 1)
+            Set_Var A_HP (Add Var A_HP 4)
+            If Var A_HP > 10 { Set_Var A_HP 10 }
+        }
+    }
+End_Function
+Define_Function Survival_Tick
+    Set_Var A_Branch37 0
+    If Var A_Flag2 == 1 { Set_Var A_Branch37 1 }
+    If Var A_Branch37 == 1
+    { Set_Var A_HP (Subtract Var A_HP 1) }
+    If Var A_Branch37 == 0 { Set_Var A_HP (Subtract Var A_HP 2) }
+    If Var A_Phase >= 8
+    {
+        If Var A_HP > 0
+        {
+            Set_Var A_Branch38 0
+            If Var A_Flag2 == 1 { Set_Var A_Branch38 1 }
+            If Var A_Branch38 == 1
+            { Call Arcade_Win }
+            If Var A_Branch38 == 0 { Call Arcade_Lose }
+        }
+    }
+End_Function
+
+Define_Function Sandbox_Setup
+    Set_Var A_Map 1
+    Set_Var A_EX -1
+    Set_Var A_Button1 "Explore east"
+    Set_Var A_Button2 "Explore west"
+    Set_Var A_Button3 "Place camp marker"
+    Set_Var A_Button4 "Finish expedition"
+    Set_Var A_Status "Bounded prototype: mark three distinct columns. No large-world or streaming claim."
+    Set_Var A_Markers ""
+    Storage Use Var A_Profile
+    Storage Execute_SQL "CREATE TEMP TABLE IF NOT EXISTS Arcade_Markers (Position INTEGER PRIMARY KEY, Value TEXT); DELETE FROM Arcade_Markers;"
+End_Function
+Define_Function Sandbox_Act
+    If Var A_Command == 1 { If Var A_X < 5 { Set_Var A_X (Add Var A_X 1) } }
+    If Var A_Command == 2 { If Var A_X > 1 { Set_Var A_X (Subtract Var A_X 1) } }
+    If Var A_Command == 3
+    {
+        Storage Use Var A_Profile
+        Storage Set_Field Arcade_Markers Position Var A_X Value Camp
+        Storage Execute_SQL "CREATE TEMP VIEW IF NOT EXISTS Arcade_Marker_Count AS SELECT 'Current' AS Key,COUNT(*) AS Total FROM Arcade_Markers;"
+        Set_Var A_Score (Storage Get_Field Arcade_Marker_Count Key Current Total)
+    }
+    If Var A_Command == 4
+    {
+        Set_Var A_Branch39 0
+        If Var A_Score >= 3 { Set_Var A_Branch39 1 }
+        If Var A_Branch39 == 1
+        { Call Arcade_Win }
+        If Var A_Branch39 == 0 { Set_Var A_Status "Place markers in three different columns before finishing." }
+    }
+End_Function

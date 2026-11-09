@@ -1,0 +1,232 @@
+Run Libraries/Game/Runtime
+Run Libraries/Game/Scenes
+Run Libraries/Game/Saves
+Run Libraries/Game/Combat
+Run Libraries/Game/FSM
+Run Libraries/Game/Inventory
+Run Libraries/Game/Crafting
+Run Libraries/Game/Generation
+Run Games/Genre_Arcade/Board
+Run Games/Genre_Arcade/Catalog
+Run Games/Genre_Arcade/Story
+Run Games/Genre_Arcade/Strategy
+Run Games/Genre_Arcade/Action
+Set_Var A_Page Hub
+Set_Var A_Index 1
+Set_Var A_Hub_Page 0
+Set_Var A_Epoch 0
+Set_Var A_Quit 0
+Set_Var A_Audio 0
+Set_Var A_Seed 17
+Set_Var A_Profile Genre_Arcade
+Set_Var A_Status "Welcome to the Bananas Genre Arcade. Choose a challenge."
+
+Define_Function Arcade_Init
+    Set_Var Save_Database Var A_Profile
+    Call Save_Init
+    Storage Execute_SQL "CREATE VIEW IF NOT EXISTS Arcade_Medal_Count AS SELECT 'Current' AS Key,COUNT(*) AS Total FROM Game_Save_Settings WHERE Value='Medal';"
+    Set_Var A_Medals (Storage Get_Field Arcade_Medal_Count Key Current Total)
+    Set_Var Save_Key Sound
+    Set_Var A_Sound (Call Save_Setting_Get)
+    If Var A_Sound == "" { Set_Var A_Sound 1 }
+    Set_Var Inventory_Database Var A_Profile
+    Call Inventory_Init
+    Set_Var Inventory_Item Wood
+    Call Inventory_Define
+    Set_Var Inventory_Item Shelter
+    Call Inventory_Define
+    Call Craft_Init
+    Set_Var Craft_Recipe Shelter
+    Set_Var Craft_Output_Item Shelter
+    Call Craft_Define
+    Set_Var Craft_Ingredient_Item Wood
+    Set_Var Craft_Ingredient_Quantity 3
+    Call Craft_Ingredient
+    Set_Var Generation_Database Var A_Profile
+    Call Generation_Init
+    Events Bind Arcade_Action1 Arcade_Receive
+    Events Bind Arcade_Action2 Arcade_Receive
+    Events Bind Arcade_Action3 Arcade_Receive
+    Events Bind Arcade_Action4 Arcade_Receive
+    Events Bind Arcade_Open Arcade_Receive_Open
+End_Function
+
+Define_Function Arcade_Select
+    Call Arcade_Catalog
+    Set_Var Save_Key Var A_Index
+    Set_Var A_Medal (Call Save_Setting_Get)
+End_Function
+
+Define_Function Arcade_Start
+    Call Arcade_Select
+    Set_Var A_Page Gap
+    If Var A_Available == 1
+    {
+        Call Game_Start
+        Set_Var A_Epoch (Add Var A_Epoch 1)
+        Set_Var A_Page Play
+        Set_Var A_Result ""
+        Set_Var A_Status Var A_Help
+        Set_Var A_HP 10
+        Set_Var A_Enemy 8
+        Set_Var A_Resource 0
+        Set_Var A_Score 0
+        Set_Var A_Step 0
+        Set_Var A_X 1
+        Set_Var A_Y 2
+        Set_Var A_EX 5
+        Set_Var A_EY 2
+        Set_Var A_Phase 0
+        Set_Var A_Flag 0
+        Set_Var A_Flag2 0
+        Set_Var A_VX 0
+        Set_Var A_VY 0
+        Set_Var A_Next_Tick 800
+        Set_Var A_Ready 0
+        Set_Var A_Interval 800
+        Set_Var A_Live 0
+        Set_Var A_Map 0
+        Set_Var A_Button1 "Act"
+        Set_Var A_Button2 "Wait"
+        Set_Var A_Button3 "Inspect"
+        Set_Var A_Button4 "Rest"
+        Set_Var FSM_On_Update ""
+        Set_Var FSM_On_Enter ""
+        Set_Var FSM_On_Exit ""
+        Call Var A_Setup
+        Set_Var A_Next_Tick Var A_Interval
+        // Clear previous challenge's combat parameters explicitly.
+        Set_Var Combat_Protected_Until 0
+        Set_Var Combat_On_Hit ""
+        Set_Var Combat_Armor 0
+        Set_Var Combat_Grace_MS 0
+        Set_Var Combat_Active 1
+    }
+End_Function
+
+Define_Function Arcade_Win
+    If Var A_Page == Play
+    {
+        Set_Var A_Page Result
+        Set_Var A_Result Win
+        Set_Var A_Medal Medal
+        Set_Var A_Status "Challenge complete! Your medal has been saved."
+        Set_Var Save_Key Var A_Index
+        Set_Var Save_Value Medal
+        Call Save_Setting_Put
+        Set_Var A_Medals (Storage Get_Field Arcade_Medal_Count Key Current Total)
+        If Var A_Audio == 1
+        {
+            If Var A_Sound == 1 { Audio Play_SFX_Name Arcade_Win }
+        }
+    }
+End_Function
+
+Define_Function Arcade_Lose
+    If Var A_Page == Play
+    {
+        Set_Var A_Page Result
+        Set_Var A_Result Lose
+        Set_Var A_Status "Challenge failed. Replay to try a different approach."
+        If Var A_Audio == 1
+        {
+            If Var A_Sound == 1 { Audio Play_SFX_Name Arcade_Lose }
+        }
+    }
+End_Function
+
+Define_Function Arcade_Hit
+    Set_Var Combat_Target Foe
+    Set_Var Combat_Health Var A_Enemy
+    Set_Var Combat_Max_Health 20
+    Set_Var Combat_Damage Var A_Damage
+    Call Combat_Hit
+    Set_Var A_Enemy Var Combat_Health
+End_Function
+
+Define_Function Arcade_Command
+    If Var A_Page == Play
+    {
+        If Var Game_Paused == 0
+        {
+            If Var A_Command >= 1
+            {
+                If Var A_Command <= 4
+                {
+                    Set_Var A_Step (Add Var A_Step 1)
+                    Call Var A_Act
+                    If Var A_HP <= 0 { Call Arcade_Lose }
+                }
+            }
+        }
+    }
+End_Function
+
+Define_Function Arcade_Receive
+    If Var Event_Value == Var A_Epoch
+    {
+        If Var Event_Name == Arcade_Action1 { Set_Var A_Command 1 }
+        If Var Event_Name == Arcade_Action2 { Set_Var A_Command 2 }
+        If Var Event_Name == Arcade_Action3 { Set_Var A_Command 3 }
+        If Var Event_Name == Arcade_Action4 { Set_Var A_Command 4 }
+        Call Arcade_Command
+    }
+End_Function
+
+Define_Function Arcade_Receive_Open
+    Set_Var A_Index Var Event_Value
+    Call Arcade_Start
+End_Function
+
+Define_Function Arcade_Tick
+    If Var A_Page == Play
+    {
+        If Var Game_Paused == 0
+        {
+            If Var A_Live == 1
+            {
+                If Var Game_Time >= Var A_Next_Tick
+                {
+                    // One update per frame; no burst damage after a stall.
+                    Set_Var A_Next_Tick (Add Var Game_Time Var A_Interval)
+                    Set_Var A_Phase (Add Var A_Phase 1)
+                    Call Var A_Tick
+                    If Var A_HP <= 0 { Call Arcade_Lose }
+                }
+            }
+        }
+    }
+End_Function
+
+Define_Function Arcade_Hub
+    Set_Var A_Page Hub
+    Set_Var A_Epoch (Add Var A_Epoch 1)
+    Call Game_Stop
+    Events Reset
+End_Function
+
+Define_Function Arcade_Pause
+    If Var A_Page == Play
+    {
+        Set_Var A_Branch11 0
+        If Var Game_Paused == 0 { Set_Var A_Branch11 1 }
+        If Var A_Branch11 == 1
+        { Call Game_Pause }
+        If Var A_Branch11 == 0 { Call Game_Resume }
+    }
+End_Function
+
+Define_Function Arcade_Sound
+    Set_Var A_Branch12 0
+    If Var A_Sound == 1 { Set_Var A_Branch12 1 }
+    If Var A_Branch12 == 1
+    { Set_Var A_Sound 0 }
+    If Var A_Branch12 == 0 { Set_Var A_Sound 1 }
+    Set_Var Save_Key Sound
+    Set_Var Save_Value Var A_Sound
+    Call Save_Setting_Put
+End_Function
+
+Define_Function Arcade_Quit
+    Set_Var A_Quit 1
+End_Function

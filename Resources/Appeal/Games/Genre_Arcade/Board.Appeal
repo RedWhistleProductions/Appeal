@@ -1,0 +1,298 @@
+// Small fixed board view. Generated cell calls cache the procedural map once.
+Define_Function Arcade_Cache_Map
+    Set_Var Generation_Cell_Index 0
+    Call Generation_Read
+    Set_Var A_Cell0 Var Generation_Walkable
+    Set_Var Generation_Cell_Index 1
+    Call Generation_Read
+    Set_Var A_Cell1 Var Generation_Walkable
+    Set_Var Generation_Cell_Index 2
+    Call Generation_Read
+    Set_Var A_Cell2 Var Generation_Walkable
+    Set_Var Generation_Cell_Index 3
+    Call Generation_Read
+    Set_Var A_Cell3 Var Generation_Walkable
+    Set_Var Generation_Cell_Index 4
+    Call Generation_Read
+    Set_Var A_Cell4 Var Generation_Walkable
+    Set_Var Generation_Cell_Index 5
+    Call Generation_Read
+    Set_Var A_Cell5 Var Generation_Walkable
+    Set_Var Generation_Cell_Index 6
+    Call Generation_Read
+    Set_Var A_Cell6 Var Generation_Walkable
+    Set_Var Generation_Cell_Index 7
+    Call Generation_Read
+    Set_Var A_Cell7 Var Generation_Walkable
+    Set_Var Generation_Cell_Index 8
+    Call Generation_Read
+    Set_Var A_Cell8 Var Generation_Walkable
+    Set_Var Generation_Cell_Index 9
+    Call Generation_Read
+    Set_Var A_Cell9 Var Generation_Walkable
+    Set_Var Generation_Cell_Index 10
+    Call Generation_Read
+    Set_Var A_Cell10 Var Generation_Walkable
+    Set_Var Generation_Cell_Index 11
+    Call Generation_Read
+    Set_Var A_Cell11 Var Generation_Walkable
+    Set_Var Generation_Cell_Index 12
+    Call Generation_Read
+    Set_Var A_Cell12 Var Generation_Walkable
+    Set_Var Generation_Cell_Index 13
+    Call Generation_Read
+    Set_Var A_Cell13 Var Generation_Walkable
+    Set_Var Generation_Cell_Index 14
+    Call Generation_Read
+    Set_Var A_Cell14 Var Generation_Walkable
+    Set_Var Generation_Cell_Index 15
+    Call Generation_Read
+    Set_Var A_Cell15 Var Generation_Walkable
+    Set_Var Generation_Cell_Index 16
+    Call Generation_Read
+    Set_Var A_Cell16 Var Generation_Walkable
+    Set_Var Generation_Cell_Index 17
+    Call Generation_Read
+    Set_Var A_Cell17 Var Generation_Walkable
+    Set_Var Generation_Cell_Index 18
+    Call Generation_Read
+    Set_Var A_Cell18 Var Generation_Walkable
+    Set_Var Generation_Cell_Index 19
+    Call Generation_Read
+    Set_Var A_Cell19 Var Generation_Walkable
+    Set_Var Generation_Cell_Index 20
+    Call Generation_Read
+    Set_Var A_Cell20 Var Generation_Walkable
+    Set_Var Generation_Cell_Index 21
+    Call Generation_Read
+    Set_Var A_Cell21 Var Generation_Walkable
+    Set_Var Generation_Cell_Index 22
+    Call Generation_Read
+    Set_Var A_Cell22 Var Generation_Walkable
+    Set_Var Generation_Cell_Index 23
+    Call Generation_Read
+    Set_Var A_Cell23 Var Generation_Walkable
+    Set_Var Generation_Cell_Index 24
+    Call Generation_Read
+    Set_Var A_Cell24 Var Generation_Walkable
+    Set_Var Generation_Cell_Index 25
+    Call Generation_Read
+    Set_Var A_Cell25 Var Generation_Walkable
+    Set_Var Generation_Cell_Index 26
+    Call Generation_Read
+    Set_Var A_Cell26 Var Generation_Walkable
+    Set_Var Generation_Cell_Index 27
+    Call Generation_Read
+    Set_Var A_Cell27 Var Generation_Walkable
+    Set_Var Generation_Cell_Index 28
+    Call Generation_Read
+    Set_Var A_Cell28 Var Generation_Walkable
+    Set_Var Generation_Cell_Index 29
+    Call Generation_Read
+    Set_Var A_Cell29 Var Generation_Walkable
+    Set_Var Generation_Cell_Index 30
+    Call Generation_Read
+    Set_Var A_Cell30 Var Generation_Walkable
+    Set_Var Generation_Cell_Index 31
+    Call Generation_Read
+    Set_Var A_Cell31 Var Generation_Walkable
+    Set_Var Generation_Cell_Index 32
+    Call Generation_Read
+    Set_Var A_Cell32 Var Generation_Walkable
+    Set_Var Generation_Cell_Index 33
+    Call Generation_Read
+    Set_Var A_Cell33 Var Generation_Walkable
+    Set_Var Generation_Cell_Index 34
+    Call Generation_Read
+    Set_Var A_Cell34 Var Generation_Walkable
+End_Function
+Define_Function Arcade_Draw_Board
+    Set_Var A_BX 0
+    Set_Var A_BY 0
+    Set_Var A_Walkable 1
+    If Var A_Index == 18 { Set_Var A_Walkable Var A_Cell0 }
+    Set_Var A_Cell_ID 0
+    Call Arcade_Draw_Cell
+    Set_Var A_Walkable 1
+    If Var A_Index == 18 { Set_Var A_Walkable Var A_Cell1 }
+    Set_Var A_Cell_ID 1
+    Call Arcade_Draw_Cell
+    Set_Var A_Walkable 1
+    If Var A_Index == 18 { Set_Var A_Walkable Var A_Cell2 }
+    Set_Var A_Cell_ID 2
+    Call Arcade_Draw_Cell
+    Set_Var A_Walkable 1
+    If Var A_Index == 18 { Set_Var A_Walkable Var A_Cell3 }
+    Set_Var A_Cell_ID 3
+    Call Arcade_Draw_Cell
+    Set_Var A_Walkable 1
+    If Var A_Index == 18 { Set_Var A_Walkable Var A_Cell4 }
+    Set_Var A_Cell_ID 4
+    Call Arcade_Draw_Cell
+    Set_Var A_Walkable 1
+    If Var A_Index == 18 { Set_Var A_Walkable Var A_Cell5 }
+    Set_Var A_Cell_ID 5
+    Call Arcade_Draw_Cell
+    Set_Var A_Walkable 1
+    If Var A_Index == 18 { Set_Var A_Walkable Var A_Cell6 }
+    Set_Var A_Cell_ID 6
+    Call Arcade_Draw_Cell
+    Set_Var A_Walkable 1
+    If Var A_Index == 18 { Set_Var A_Walkable Var A_Cell7 }
+    Set_Var A_Cell_ID 7
+    Call Arcade_Draw_Cell
+    Set_Var A_Walkable 1
+    If Var A_Index == 18 { Set_Var A_Walkable Var A_Cell8 }
+    Set_Var A_Cell_ID 8
+    Call Arcade_Draw_Cell
+    Set_Var A_Walkable 1
+    If Var A_Index == 18 { Set_Var A_Walkable Var A_Cell9 }
+    Set_Var A_Cell_ID 9
+    Call Arcade_Draw_Cell
+    Set_Var A_Walkable 1
+    If Var A_Index == 18 { Set_Var A_Walkable Var A_Cell10 }
+    Set_Var A_Cell_ID 10
+    Call Arcade_Draw_Cell
+    Set_Var A_Walkable 1
+    If Var A_Index == 18 { Set_Var A_Walkable Var A_Cell11 }
+    Set_Var A_Cell_ID 11
+    Call Arcade_Draw_Cell
+    Set_Var A_Walkable 1
+    If Var A_Index == 18 { Set_Var A_Walkable Var A_Cell12 }
+    Set_Var A_Cell_ID 12
+    Call Arcade_Draw_Cell
+    Set_Var A_Walkable 1
+    If Var A_Index == 18 { Set_Var A_Walkable Var A_Cell13 }
+    Set_Var A_Cell_ID 13
+    Call Arcade_Draw_Cell
+    Set_Var A_Walkable 1
+    If Var A_Index == 18 { Set_Var A_Walkable Var A_Cell14 }
+    Set_Var A_Cell_ID 14
+    Call Arcade_Draw_Cell
+    Set_Var A_Walkable 1
+    If Var A_Index == 18 { Set_Var A_Walkable Var A_Cell15 }
+    Set_Var A_Cell_ID 15
+    Call Arcade_Draw_Cell
+    Set_Var A_Walkable 1
+    If Var A_Index == 18 { Set_Var A_Walkable Var A_Cell16 }
+    Set_Var A_Cell_ID 16
+    Call Arcade_Draw_Cell
+    Set_Var A_Walkable 1
+    If Var A_Index == 18 { Set_Var A_Walkable Var A_Cell17 }
+    Set_Var A_Cell_ID 17
+    Call Arcade_Draw_Cell
+    Set_Var A_Walkable 1
+    If Var A_Index == 18 { Set_Var A_Walkable Var A_Cell18 }
+    Set_Var A_Cell_ID 18
+    Call Arcade_Draw_Cell
+    Set_Var A_Walkable 1
+    If Var A_Index == 18 { Set_Var A_Walkable Var A_Cell19 }
+    Set_Var A_Cell_ID 19
+    Call Arcade_Draw_Cell
+    Set_Var A_Walkable 1
+    If Var A_Index == 18 { Set_Var A_Walkable Var A_Cell20 }
+    Set_Var A_Cell_ID 20
+    Call Arcade_Draw_Cell
+    Set_Var A_Walkable 1
+    If Var A_Index == 18 { Set_Var A_Walkable Var A_Cell21 }
+    Set_Var A_Cell_ID 21
+    Call Arcade_Draw_Cell
+    Set_Var A_Walkable 1
+    If Var A_Index == 18 { Set_Var A_Walkable Var A_Cell22 }
+    Set_Var A_Cell_ID 22
+    Call Arcade_Draw_Cell
+    Set_Var A_Walkable 1
+    If Var A_Index == 18 { Set_Var A_Walkable Var A_Cell23 }
+    Set_Var A_Cell_ID 23
+    Call Arcade_Draw_Cell
+    Set_Var A_Walkable 1
+    If Var A_Index == 18 { Set_Var A_Walkable Var A_Cell24 }
+    Set_Var A_Cell_ID 24
+    Call Arcade_Draw_Cell
+    Set_Var A_Walkable 1
+    If Var A_Index == 18 { Set_Var A_Walkable Var A_Cell25 }
+    Set_Var A_Cell_ID 25
+    Call Arcade_Draw_Cell
+    Set_Var A_Walkable 1
+    If Var A_Index == 18 { Set_Var A_Walkable Var A_Cell26 }
+    Set_Var A_Cell_ID 26
+    Call Arcade_Draw_Cell
+    Set_Var A_Walkable 1
+    If Var A_Index == 18 { Set_Var A_Walkable Var A_Cell27 }
+    Set_Var A_Cell_ID 27
+    Call Arcade_Draw_Cell
+    Set_Var A_Walkable 1
+    If Var A_Index == 18 { Set_Var A_Walkable Var A_Cell28 }
+    Set_Var A_Cell_ID 28
+    Call Arcade_Draw_Cell
+    Set_Var A_Walkable 1
+    If Var A_Index == 18 { Set_Var A_Walkable Var A_Cell29 }
+    Set_Var A_Cell_ID 29
+    Call Arcade_Draw_Cell
+    Set_Var A_Walkable 1
+    If Var A_Index == 18 { Set_Var A_Walkable Var A_Cell30 }
+    Set_Var A_Cell_ID 30
+    Call Arcade_Draw_Cell
+    Set_Var A_Walkable 1
+    If Var A_Index == 18 { Set_Var A_Walkable Var A_Cell31 }
+    Set_Var A_Cell_ID 31
+    Call Arcade_Draw_Cell
+    Set_Var A_Walkable 1
+    If Var A_Index == 18 { Set_Var A_Walkable Var A_Cell32 }
+    Set_Var A_Cell_ID 32
+    Call Arcade_Draw_Cell
+    Set_Var A_Walkable 1
+    If Var A_Index == 18 { Set_Var A_Walkable Var A_Cell33 }
+    Set_Var A_Cell_ID 33
+    Call Arcade_Draw_Cell
+    Set_Var A_Walkable 1
+    If Var A_Index == 18 { Set_Var A_Walkable Var A_Cell34 }
+    Set_Var A_Cell_ID 34
+    Call Arcade_Draw_Cell
+End_Function
+Define_Function Arcade_Draw_Cell
+    Set_Var A_Art "Examples/Terrain/Terrain_Tiles_Top_Down.png"
+    Set_Var A_Frame 0
+    If Var A_Walkable == 0 { Set_Var A_Frame 12 }
+    If Var A_BX == 0 { Set_Var A_Frame 12 }
+    If Var A_BX == 6 { Set_Var A_Frame 12 }
+    If Var A_BY == 0 { Set_Var A_Frame 12 }
+    If Var A_BY == 4 { Set_Var A_Frame 12 }
+    If Var A_Index == 8
+    {
+        If Var A_BX == 3 { Set_Var A_Frame 8 }
+        If Var A_BX == 5 { Set_Var A_Frame 8 }
+    }
+    If Var A_BX == Var A_EX
+    {
+        If Var A_BY == Var A_EY
+        {
+            If Var A_Enemy > 0
+            {
+                Set_Var A_Art "Examples/Characters/Slime/Slime.png"
+                Set_Var A_Frame 0
+            }
+            If Var A_Index == 18
+            {
+                Set_Var A_Art "Examples/Terrain/Terrain_Tiles_Top_Down.png"
+                Set_Var A_Frame 4
+            }
+        }
+    }
+    If Var A_BX == Var A_X
+    {
+        If Var A_BY == Var A_Y
+        {
+            Set_Var A_Art "Examples/Characters/Villager_Female/Villager_Female_Top_Down.png"
+            Set_Var A_Frame 0
+        }
+    }
+    Graphics GUI_Image Var A_Cell_ID Var A_Art 64 64 Var A_Frame 1 56
+    If Var A_BX < 6 { Graphics GUI_Same_Line }
+    Set_Var A_BX (Add Var A_BX 1)
+    If Var A_BX > 6
+    {
+        Set_Var A_BX 0
+        Set_Var A_BY (Add Var A_BY 1)
+    }
+End_Function

@@ -1,0 +1,380 @@
+Define_Function Lanes_Setup
+    Set_Var A_Map 1
+    Set_Var A_Live 1
+    Set_Var A_X 3
+    Set_Var A_Y 3
+    Set_Var A_EX 1
+    Set_Var A_EY 0
+    Set_Var A_HP 3
+    Set_Var A_Button1 "Lane left"
+    Set_Var A_Button2 "Lane right"
+    Set_Var A_Button3 "Action"
+    Set_Var A_Button4 "Inspect"
+End_Function
+Define_Function Lanes_Move
+    If Var A_Command == 1 { If Var A_X > 1 { Set_Var A_X (Subtract Var A_X 2) } }
+    If Var A_Command == 2 { If Var A_X < 5 { Set_Var A_X (Add Var A_X 2) } }
+End_Function
+Define_Function Lanes_Next
+    Set_Var A_EY 0
+    Set_Var A_EX (Add Var A_EX 2)
+    If Var A_EX > 5 { Set_Var A_EX 1 }
+End_Function
+Define_Function Dodge_Setup
+    Call Lanes_Setup
+    Set_Var A_Button3 "Watch approach"
+    Set_Var A_Button4 "Read rules"
+End_Function
+Define_Function Dodge_Act
+    Call Lanes_Move
+End_Function
+Define_Function Dodge_Tick
+    Set_Var A_EY (Add Var A_EY 1)
+    If Var A_EY >= 3
+    {
+        If Var A_X == Var A_EX { Set_Var A_HP (Subtract Var A_HP 1) }
+        Call Lanes_Next
+        Set_Var A_Score (Add Var A_Score 1)
+    }
+    If Var A_Score >= 12 { If Var A_HP > 0 { Call Arcade_Win } }
+End_Function
+
+Define_Function Platform_Setup
+    Set_Var A_Map 1
+    Set_Var A_EX -1
+    Set_Var A_Y 3
+    Set_Var A_Button1 "Step right"
+    Set_Var A_Button2 "Step left"
+    Set_Var A_Button3 "Jump right (two columns)"
+    Set_Var A_Button4 "Inspect bridge"
+End_Function
+Define_Function Platform_Act
+    Set_Var A_Move 0
+    If Var A_Command == 1 { Set_Var A_Move 1 }
+    If Var A_Command == 2 { Set_Var A_Move -1 }
+    If Var A_Command == 3 { Set_Var A_Move 2 }
+    If Var A_Move != 0
+    {
+        Set_Var A_X (Add Var A_X Var A_Move)
+        If Var A_X < 1 { Set_Var A_X 1 }
+        If Var A_X > 6 { Set_Var A_X 6 }
+        If Var A_X == 3 { Call Arcade_Lose }
+        If Var A_X == 5 { Call Arcade_Lose }
+        If Var A_X == 6 { Call Arcade_Win }
+    }
+End_Function
+
+Define_Function Shooter_Setup
+    Call Lanes_Setup
+    Set_Var A_Button3 "Fire"
+End_Function
+Define_Function Shooter_Act
+    Call Lanes_Move
+    If Var A_Command == 3
+    {
+        If Var Game_Time >= Var A_Ready
+        {
+            Set_Var A_Ready (Add Var Game_Time 250)
+            Set_Var A_Branch1 0
+            If Var A_X == Var A_EX { Set_Var A_Branch1 1 }
+            If Var A_Branch1 == 1
+            {
+                Set_Var A_Score (Add Var A_Score 1)
+                Call Lanes_Next
+                If Var A_Score >= 6 { Call Arcade_Win }
+            }
+            If Var A_Branch1 == 0 { Set_Var A_Status "Shot missed. Move into the approaching slime's lane." }
+        }
+    }
+End_Function
+Define_Function Shooter_Tick
+    Set_Var A_EY (Add Var A_EY 1)
+    If Var A_EY >= 4
+    {
+        Set_Var A_HP (Subtract Var A_HP 1)
+        Call Lanes_Next
+    }
+End_Function
+
+Define_Function Adventure_Setup
+    Set_Var A_Map 1
+    Set_Var A_Button1 East
+    Set_Var A_Button2 West
+    Set_Var A_Button3 "Strike guard"
+    Set_Var A_Button4 "Collect relic"
+End_Function
+Define_Function Adventure_Act
+    If Var A_Command == 1 { If Var A_X < 5 { Set_Var A_X (Add Var A_X 1) } }
+    If Var A_Command == 2 { If Var A_X > 1 { Set_Var A_X (Subtract Var A_X 1) } }
+    If Var A_Command == 3
+    {
+        If Var A_X >= 4
+        {
+            Set_Var A_Damage 3
+            Call Arcade_Hit
+            If Var A_Enemy > 0 { Set_Var A_HP (Subtract Var A_HP 2) }
+        }
+    }
+    If Var A_Command == 4
+    {
+        If Var A_X == 5
+        {
+            Set_Var A_Branch2 0
+            If Var A_Enemy <= 0 { Set_Var A_Branch2 1 }
+            If Var A_Branch2 == 1
+            { Call Arcade_Win }
+            If Var A_Branch2 == 0 { Set_Var A_Status "The guard still protects the relic. Strike from the adjacent tile." }
+        }
+    }
+End_Function
+
+Define_Function Drive_Setup
+    Call Lanes_Setup
+    Set_Var A_Interval 700
+    Set_Var A_Button3 Accelerate
+    Set_Var A_Button4 Brake
+    Set_Var A_VX 0
+End_Function
+Define_Function Drive_Act
+    Call Lanes_Move
+    If Var A_Command == 3
+    {
+        Set_Var A_VX (Add Var A_VX 1)
+        If Var A_VX > 3 { Set_Var A_VX 3 }
+    }
+    If Var A_Command == 4
+    {
+        Set_Var A_VX (Subtract Var A_VX 1)
+        If Var A_VX < 0 { Set_Var A_VX 0 }
+    }
+End_Function
+Define_Function Drive_Tick
+    Set_Var A_Score (Add Var A_Score Var A_VX)
+    Set_Var A_EY (Add Var A_EY 1)
+    If Var A_EY >= 3
+    {
+        If Var A_X == Var A_EX
+        {
+            If Var A_VX > 0
+            {
+                Set_Var A_HP (Subtract Var A_HP 1)
+                Set_Var A_VX 0
+            }
+        }
+        Call Lanes_Next
+    }
+    If Var A_Score >= 20 { If Var A_HP > 0 { Call Arcade_Win } }
+End_Function
+
+Define_Function Fighter_Setup
+    Set_Var A_Enemy 12
+    Set_Var A_Button1 Attack
+    Set_Var A_Button2 Block
+    Set_Var A_Button3 "Counter (after a block)"
+    Set_Var A_Button4 "Recover stamina"
+    Set_Var A_Resource 4
+    Set_Var A_Status "Rival: Guard. Attack now. Rival will Strike on the next turn."
+    Set_Var FSM_Next_State Guard
+    Set_Var FSM_On_Update Fighter_Brain
+    Call FSM_Start
+End_Function
+Define_Function Fighter_Brain
+    Set_Var A_Branch3 0
+    If Var FSM_State == Guard { Set_Var A_Branch3 1 }
+    If Var A_Branch3 == 1
+    { Set_Var FSM_Next_State Strike }
+    If Var A_Branch3 == 0 { Set_Var FSM_Next_State Guard }
+End_Function
+Define_Function Fighter_Act
+    Set_Var A_Damage 0
+    If Var A_Command == 1
+    {
+        If Var A_Resource > 0
+        {
+            Set_Var A_Resource (Subtract Var A_Resource 1)
+            If Var FSM_State == Guard { Set_Var A_Damage 3 }
+        }
+    }
+    If Var A_Command == 3
+    {
+        If Var A_Flag == 1
+        {
+            Set_Var A_Flag 0
+            Set_Var A_Damage 5
+        }
+    }
+    If Var A_Command == 4
+    {
+        Set_Var A_Resource (Add Var A_Resource 2)
+        If Var A_Resource > 4 { Set_Var A_Resource 4 }
+    }
+    Call Arcade_Hit
+    Set_Var A_Branch4 0
+    If Var A_Enemy <= 0 { Set_Var A_Branch4 1 }
+    If Var A_Branch4 == 1
+    { Call Arcade_Win }
+    If Var A_Branch4 == 0 {
+        If Var FSM_State == Strike
+        {
+            Set_Var A_Branch5 0
+            If Var A_Command == 2 { Set_Var A_Branch5 1 }
+            If Var A_Branch5 == 1
+            {
+                Set_Var A_Flag 1
+                Set_Var A_Resource (Add Var A_Resource 1)
+            }
+            If Var A_Branch5 == 0 { Set_Var A_HP (Subtract Var A_HP 4) }
+        }
+        Call FSM_Tick
+        Set_Var A_Branch6 0
+        If Var FSM_State == Guard { Set_Var A_Branch6 1 }
+        If Var A_Branch6 == 1
+        { Set_Var A_Status "Rival: Guard. Attack or use your earned counter." }
+        If Var A_Branch6 == 0 { Set_Var A_Status "Rival: Strike. Block to earn a counter." }
+    }
+End_Function
+
+Define_Function Brawl_Setup
+    Set_Var A_Map 1
+    Set_Var A_Live 1
+    Set_Var A_Interval 1200
+    Set_Var A_Enemy 6
+    Set_Var A_Button1 "Move toward rival"
+    Set_Var A_Button2 Retreat
+    Set_Var A_Button3 Strike
+    Set_Var A_Button4 "Read distance"
+End_Function
+Define_Function Brawl_Act
+    If Var A_Command == 1 { If Var A_X < 4 { Set_Var A_X (Add Var A_X 1) } }
+    If Var A_Command == 2 { If Var A_X > 1 { Set_Var A_X (Subtract Var A_X 1) } }
+    If Var A_Command == 3
+    {
+        If Var Game_Time >= Var A_Ready
+        {
+            Set_Var A_Ready (Add Var Game_Time 300)
+            If Var A_X >= (Subtract Var A_EX 1)
+            {
+                Set_Var A_Damage 3
+                Call Arcade_Hit
+                If Var A_Enemy <= 0
+                {
+                    Set_Var A_Score (Add Var A_Score 1)
+                    Set_Var A_Branch7 0
+                    If Var A_Score >= 3 { Set_Var A_Branch7 1 }
+                    If Var A_Branch7 == 1
+                    { Call Arcade_Win }
+                    If Var A_Branch7 == 0 {
+                        Set_Var A_Enemy 6
+                        Set_Var A_EX 5
+                        Set_Var A_X 1
+                    }
+                }
+            }
+        }
+    }
+End_Function
+Define_Function Brawl_Tick
+    Set_Var A_Branch8 0
+    If Var A_EX > (Add Var A_X 1) { Set_Var A_Branch8 1 }
+    If Var A_Branch8 == 1
+    { Set_Var A_EX (Subtract Var A_EX 1) }
+    If Var A_Branch8 == 0 { Set_Var A_HP (Subtract Var A_HP 2) }
+End_Function
+
+Define_Function ARPG_Setup
+    Set_Var A_Live 1
+    Set_Var A_Interval 1100
+    Set_Var A_Enemy 20
+    Set_Var A_Button1 "Equip blade"
+    Set_Var A_Button2 Attack
+    Set_Var A_Button3 "Drink potion (once)"
+    Set_Var A_Button4 Dodge
+End_Function
+Define_Function ARPG_Act
+    If Var A_Command == 1 { Set_Var A_Flag 1 }
+    If Var A_Command == 2
+    {
+        If Var Game_Time >= Var A_Ready
+        {
+            Set_Var A_Ready (Add Var Game_Time 500)
+            Set_Var A_Damage 1
+            If Var A_Flag == 1 { Set_Var A_Damage 5 }
+            Call Arcade_Hit
+            If Var A_Enemy <= 0 { Call Arcade_Win }
+        }
+    }
+    If Var A_Command == 3
+    {
+        If Var A_Flag2 == 0
+        {
+            Set_Var A_Flag2 1
+            Set_Var A_HP 10
+        }
+    }
+    If Var A_Command == 4
+    {
+        If Var Game_Time >= Var A_VY
+        {
+            Set_Var A_VY (Add Var Game_Time 2000)
+            Set_Var A_VX (Add Var Game_Time 500)
+        }
+    }
+End_Function
+Define_Function ARPG_Tick
+    If Var Game_Time >= Var A_VX { Set_Var A_HP (Subtract Var A_HP 3) }
+End_Function
+
+Define_Function Space_Setup
+    Set_Var A_Live 1
+    Set_Var A_Interval 900
+    Set_Var A_Resource 10
+    Set_Var A_Enemy 0
+    Set_Var A_Button1 "Increase thrust"
+    Set_Var A_Button2 "Cut thrust"
+    Set_Var A_Button3 "Vent heat (one fuel)"
+    Set_Var A_Button4 "Inspect instruments"
+    Set_Var A_Status "Distance target 20. Thrust 0..3 consumes fuel and adds heat each beat. Heat above 6 damages hull."
+End_Function
+Define_Function Space_Act
+    If Var A_Command == 1
+    {
+        Set_Var A_VX (Add Var A_VX 1)
+        If Var A_VX > 3 { Set_Var A_VX 3 }
+    }
+    If Var A_Command == 2
+    {
+        Set_Var A_VX (Subtract Var A_VX 1)
+        If Var A_VX < 0 { Set_Var A_VX 0 }
+    }
+    If Var A_Command == 3
+    {
+        If Var A_Resource > 0
+        {
+            Set_Var A_Resource (Subtract Var A_Resource 1)
+            Set_Var A_Enemy (Subtract Var A_Enemy 4)
+            If Var A_Enemy < 0 { Set_Var A_Enemy 0 }
+        }
+    }
+End_Function
+Define_Function Space_Tick
+    Set_Var A_Branch10 0
+    If Var A_VX > 0 { Set_Var A_Branch10 1 }
+    If Var A_Branch10 == 1
+    {
+        Set_Var A_Branch9 0
+        If Var A_Resource > 0 { Set_Var A_Branch9 1 }
+        If Var A_Branch9 == 1
+        {
+            Set_Var A_Resource (Subtract Var A_Resource 1)
+            Set_Var A_Score (Add Var A_Score Var A_VX)
+            Set_Var A_Enemy (Add Var A_Enemy Var A_VX)
+        }
+        If Var A_Branch9 == 0 { Set_Var A_HP (Subtract Var A_HP 2) }
+    }
+    If Var A_Branch10 == 0 {
+        Set_Var A_Enemy (Subtract Var A_Enemy 1)
+        If Var A_Enemy < 0 { Set_Var A_Enemy 0 }
+    }
+    If Var A_Enemy > 6 { Set_Var A_HP (Subtract Var A_HP 3) }
+    If Var A_Score >= 20 { If Var A_HP > 0 { Call Arcade_Win } }
+End_Function

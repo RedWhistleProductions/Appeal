@@ -1,0 +1,179 @@
+Define_Function Arcade_Click1
+    Events Emit Arcade_Action1 Var A_Epoch
+End_Function
+Define_Function Arcade_Click2
+    Events Emit Arcade_Action2 Var A_Epoch
+End_Function
+Define_Function Arcade_Click3
+    Events Emit Arcade_Action3 Var A_Epoch
+End_Function
+Define_Function Arcade_Click4
+    Events Emit Arcade_Action4 Var A_Epoch
+End_Function
+Define_Function Arcade_Next_Page
+    Set_Var A_Hub_Page (Add Var A_Hub_Page 1)
+    If Var A_Hub_Page > 3 { Set_Var A_Hub_Page 0 }
+End_Function
+Define_Function Arcade_Previous_Page
+    Set_Var A_Hub_Page (Subtract Var A_Hub_Page 1)
+    If Var A_Hub_Page < 0 { Set_Var A_Hub_Page 3 }
+End_Function
+Define_Function Arcade_Draw
+    Graphics GUI_Begin_Fullscreen Genre_Arcade
+    Graphics GUI_Separator_Text "BANANAS GENRE ARCADE"
+    Set_Var A_Branch13 0
+    If Var A_Page == Hub { Set_Var A_Branch13 1 }
+    If Var A_Branch13 == 1
+    {
+        Graphics GUI_Text Welcome "A collection of short challenges using existing Appeal assets and libraries."
+        Graphics GUI_Text Scope "23 basic challenges + a bounded sandbox prototype. Seven genre demos still have open work."
+        Graphics GUI_Text Control "Mouse, or Tab/arrows and Enter. Challenge medals save automatically; attempts restart on exit."
+        Graphics GUI_Text Medals_Label "Challenge medals:"
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Medals Var A_Medals
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Medals_Total "/ 24 (includes the bounded sandbox challenge)"
+        Graphics GUI_Separator
+        Call Arcade_Draw_Catalog
+        Graphics GUI_Separator
+        Graphics GUI_Button Prev "Previous page" Arcade_Previous_Page
+        Graphics GUI_Same_Line
+        Graphics GUI_Button Next "Next page" Arcade_Next_Page
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Page_Number Var A_Hub_Page
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Page_Total "(pages 0..3)"
+        Graphics GUI_Button Sound "Toggle sound" Arcade_Sound
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Sound_Value Var A_Sound
+        Graphics GUI_Button Quit Quit Arcade_Quit
+        Graphics GUI_Separator_Text "THE EXPEDITION"
+        Graphics GUI_Image Host "Examples/Characters/Villager_Female/Villager_Female_Top_Down.png" 64 64 0 1 100
+        Graphics GUI_Same_Line
+        Graphics GUI_Image Friend "Examples/Characters/Villager_Male/Villager_Male_Top_Down.png" 64 64 0 1 100
+        Graphics GUI_Same_Line
+        Graphics GUI_Image Foe "Examples/Characters/Slime/Slime.png" 64 64 0 1 100
+    }
+    If Var A_Branch13 == 0 {
+        Graphics GUI_Separator_Text Var A_Title
+        Graphics GUI_Text Genre Var A_Genre
+        Graphics GUI_Text Help Var A_Help
+        Set_Var A_Branch14 0
+        If Var A_Page == Gap { Set_Var A_Branch14 1 }
+        If Var A_Branch14 == 1
+        {
+            Graphics GUI_Text Gap "This room is not playable yet. Its prerequisite is recorded in the roadmap."
+            Graphics GUI_Text Honest "A local or timer-based imitation would not demonstrate the required engine capability."
+        }
+        If Var A_Branch14 == 0 {
+            Set_Var A_Branch15 0
+            If Var A_Map == 1 { Set_Var A_Branch15 1 }
+            If Var A_Branch15 == 1
+            { Call Arcade_Draw_Board }
+            If Var A_Branch15 == 0 {
+                Graphics GUI_Image Speaker "Examples/Characters/Villager_Female/Villager_Female_Top_Down.png" 64 64 0 1 88
+                Graphics GUI_Same_Line
+                Graphics GUI_Image Listener "Examples/Characters/Villager_Male/Villager_Male_Top_Down.png" 64 64 0 1 88
+            }
+            Graphics GUI_Text Health_Label "Health / hull:"
+            Graphics GUI_Same_Line
+            Graphics GUI_Text Health Var A_HP
+            Graphics GUI_Same_Line
+            If Var A_Resource_Label != ""
+            {
+                Graphics GUI_Text Resource_Label Var A_Resource_Label
+                Graphics GUI_Same_Line
+                Graphics GUI_Text Resource Var A_Resource
+            }
+            Graphics GUI_Same_Line
+            If Var A_Enemy_Label != ""
+            {
+                Graphics GUI_Text Enemy_Label Var A_Enemy_Label
+                Graphics GUI_Same_Line
+                Graphics GUI_Text Enemy Var A_Enemy
+            }
+            If Var A_Score_Label != ""
+            {
+                Graphics GUI_Text Score_Label Var A_Score_Label
+                Graphics GUI_Same_Line
+                Graphics GUI_Text Score Var A_Score
+            }
+            Graphics GUI_Same_Line
+            If Var A_Flag_Label != ""
+            {
+                Graphics GUI_Text Flag_Label Var A_Flag_Label
+                Graphics GUI_Same_Line
+                Graphics GUI_Text Flag Var A_Flag
+            }
+            Graphics GUI_Same_Line
+            If Var A_Flag2_Label != ""
+            {
+                Graphics GUI_Text Flag2_Label Var A_Flag2_Label
+                Graphics GUI_Same_Line
+                Graphics GUI_Text Flag2 Var A_Flag2
+            }
+            If Var A_Live == 1
+            {
+                Graphics GUI_Text Phase_Label "Beat / season:"
+                Graphics GUI_Same_Line
+                Graphics GUI_Text Phase Var A_Phase
+            }
+            If Var A_Index == 5
+            {
+                Graphics GUI_Text Question_Label "Question:"
+                Graphics GUI_Same_Line
+                Graphics GUI_Text Question Var A_Phase
+            }
+            If Var A_Index == 13
+            {
+                Graphics GUI_Text Speed_Label "Speed:"
+                Graphics GUI_Same_Line
+                Graphics GUI_Text Speed Var A_VX
+            }
+            If Var A_Index == 28
+            {
+                Graphics GUI_Text Thrust_Label "Thrust:"
+                Graphics GUI_Same_Line
+                Graphics GUI_Text Thrust Var A_VX
+            }
+            If Var A_Index == 18
+            {
+                Graphics GUI_Text Seed_Label "Ruin seed:"
+                Graphics GUI_Same_Line
+                Graphics GUI_Text Seed Var A_Seed
+            }
+            If Var A_Index == 22
+            {
+                Graphics GUI_Text Shot_Label "Last shot distance:"
+                Graphics GUI_Same_Line
+                Graphics GUI_Text Shot Var A_Last_Shot
+            }
+            Graphics GUI_Separator
+            Graphics GUI_Text Status Var A_Status
+            If Var A_Page == Play
+            {
+                Set_Var A_Branch16 0
+                If Var Game_Paused == 0 { Set_Var A_Branch16 1 }
+                If Var A_Branch16 == 1
+                {
+                    Graphics GUI_Button Action1 Var A_Button1 Arcade_Click1
+                    Graphics GUI_Button Action2 Var A_Button2 Arcade_Click2
+                    Graphics GUI_Button Action3 Var A_Button3 Arcade_Click3
+                    Graphics GUI_Button Action4 Var A_Button4 Arcade_Click4
+                }
+                If Var A_Branch16 == 0 { Graphics GUI_Text Paused "PAUSED - time and actions are frozen." }
+                Graphics GUI_Button Pause "Pause / resume" Arcade_Pause
+            }
+            If Var A_Page == Result
+            {
+                Graphics GUI_Text Result Var A_Result
+                Graphics GUI_Button Replay Replay Arcade_Start
+            }
+            If Var A_Medal == Medal { Graphics GUI_Text Medal "Previously earned: challenge medal" }
+        }
+        Graphics GUI_Button Hub "Return to hub" Arcade_Hub
+        Graphics GUI_Same_Line
+        Graphics GUI_Button Quit Quit Arcade_Quit
+    }
+    Graphics GUI_End
+End_Function

@@ -1,5 +1,18 @@
 # Game component progress
 
+## Game integration checkpoint — 2026-11-09
+
+[Bananas Genre Arcade](../Resources/Appeal/Games/Genre_Arcade/README.md) combines
+existing runtime, profile/settings, combat, FSM, inventory/crafting and generation
+libraries with current art/audio in a hub of 24 short challenges. Every challenge
+has a tested completion and replay path, and medals persist across processes.
+The native UI suite renders all 31 catalog entries and exercises keyboard/mouse
+launch, story completion, lane movement/fire, pause, replay and hub navigation.
+Its [coverage table](../Resources/Appeal/Games/Genre_Arcade/Coverage.md) distinguishes
+23 basic ruleset challenges, a bounded sandbox prototype and seven unimplemented
+genre demos. Simplified challenge rules do not close the open native/game-system
+requirements below. No production C++ changed and no readiness score was raised.
+
 Updated 2026-11-08. This is the living, breadth-first runtime roadmap. Utilities
 and packaging/selling remain separate. **MVP** means a tested reusable foundation
 with the linked scope, not every feature in a broad category or every genre.

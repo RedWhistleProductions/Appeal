@@ -1,0 +1,734 @@
+// Catalog IDs remain stable because medals use them as profile keys.
+Define_Function Arcade_Catalog
+    Set_Var A_Available 0
+    Set_Var A_Resource_Label "Resource:"
+    Set_Var A_Enemy_Label "Enemy:"
+    Set_Var A_Score_Label "Score:"
+    Set_Var A_Flag_Label "Flag:"
+    Set_Var A_Flag2_Label "Flag 2:"
+    If Var A_Index == 1
+    {
+        Set_Var A_Resource_Label "Key:"
+        Set_Var A_Enemy_Label "Door:"
+        Set_Var A_Score_Label "Progress:"
+        Set_Var A_Flag_Label "Note read:"
+        Set_Var A_Flag2_Label ""
+        Set_Var A_Genre "Text adventure / interactive fiction"
+        Set_Var A_Title "The Signal"
+        Set_Var A_Help "Read the note, find the brass key, unlock the lighthouse. Choices advance the story."
+        Set_Var A_Available 1
+        Set_Var A_Setup Story_Setup
+        Set_Var A_Act Story_Act
+        Set_Var A_Tick Story_Tick
+    }
+    If Var A_Index == 2
+    {
+        Set_Var A_Resource_Label ""
+        Set_Var A_Enemy_Label ""
+        Set_Var A_Score_Label ""
+        Set_Var A_Flag_Label "Eve heard:"
+        Set_Var A_Flag2_Label "Adam heard:"
+        Set_Var A_Genre "Visual novel"
+        Set_Var A_Title "A Promise at Dawn"
+        Set_Var A_Help "Listen to both friends before deciding who should lead the expedition."
+        Set_Var A_Available 1
+        Set_Var A_Setup Novel_Setup
+        Set_Var A_Act Novel_Act
+        Set_Var A_Tick Novel_Tick
+    }
+    If Var A_Index == 3
+    {
+        Set_Var A_Resource_Label "Stones:"
+        Set_Var A_Enemy_Label ""
+        Set_Var A_Score_Label ""
+        Set_Var A_Flag_Label ""
+        Set_Var A_Flag2_Label ""
+        Set_Var A_Genre "Board / card / dice games"
+        Set_Var A_Title "Last Stone"
+        Set_Var A_Help "Take one or two stones. Whoever takes the last wins. The opponent plays to win."
+        Set_Var A_Available 1
+        Set_Var A_Setup Stones_Setup
+        Set_Var A_Act Stones_Act
+        Set_Var A_Tick Stones_Tick
+    }
+    If Var A_Index == 4
+    {
+        Set_Var A_Resource_Label "Lantern A:"
+        Set_Var A_Enemy_Label "Lantern B:"
+        Set_Var A_Score_Label "Lantern C:"
+        Set_Var A_Flag_Label ""
+        Set_Var A_Flag2_Label ""
+        Set_Var A_Genre "2D puzzle"
+        Set_Var A_Title "Three Lanterns"
+        Set_Var A_Help "Switches flip pairs of lanterns. Light all three. You have six moves."
+        Set_Var A_Available 1
+        Set_Var A_Setup Puzzle_Setup
+        Set_Var A_Act Puzzle_Act
+        Set_Var A_Tick Puzzle_Tick
+    }
+    If Var A_Index == 5
+    {
+        Set_Var A_Resource_Label ""
+        Set_Var A_Enemy_Label ""
+        Set_Var A_Score_Label "Correct:"
+        Set_Var A_Flag_Label ""
+        Set_Var A_Flag2_Label ""
+        Set_Var A_Genre "Trivia / quiz"
+        Set_Var A_Title "Trail Knowledge"
+        Set_Var A_Help "Three questions, three answers each. Answer at least two correctly."
+        Set_Var A_Available 1
+        Set_Var A_Setup Quiz_Setup
+        Set_Var A_Act Quiz_Act
+        Set_Var A_Tick Quiz_Tick
+    }
+    If Var A_Index == 6
+    {
+        Set_Var A_Resource_Label ""
+        Set_Var A_Enemy_Label ""
+        Set_Var A_Score_Label ""
+        Set_Var A_Flag_Label "Key:"
+        Set_Var A_Flag2_Label "Flower:"
+        Set_Var A_Genre "Point-and-click adventure"
+        Set_Var A_Title "The Locked Garden"
+        Set_Var A_Help "Inspect the fountain for a key, collect a flower, then open the garden gate."
+        Set_Var A_Available 1
+        Set_Var A_Setup Hotspot_Setup
+        Set_Var A_Act Hotspot_Act
+        Set_Var A_Tick Hotspot_Tick
+    }
+    If Var A_Index == 7
+    {
+        Set_Var A_Resource_Label ""
+        Set_Var A_Enemy_Label ""
+        Set_Var A_Score_Label "Avoided:"
+        Set_Var A_Flag_Label ""
+        Set_Var A_Flag2_Label ""
+        Set_Var A_Genre "2D arcade action"
+        Set_Var A_Title "Slime Slalom"
+        Set_Var A_Help "Move between three lanes. Avoid the approaching slime; avoid twelve slimes."
+        Set_Var A_Available 1
+        Set_Var A_Setup Dodge_Setup
+        Set_Var A_Act Dodge_Act
+        Set_Var A_Tick Dodge_Tick
+    }
+    If Var A_Index == 8
+    {
+        Set_Var A_Resource_Label ""
+        Set_Var A_Enemy_Label ""
+        Set_Var A_Score_Label ""
+        Set_Var A_Flag_Label ""
+        Set_Var A_Flag2_Label ""
+        Set_Var A_Genre "2D platformer"
+        Set_Var A_Title "Broken Bridge"
+        Set_Var A_Help "Move right to the exit. Jump before crossing the pits at columns 3 and 5."
+        Set_Var A_Available 1
+        Set_Var A_Setup Platform_Setup
+        Set_Var A_Act Platform_Act
+        Set_Var A_Tick Platform_Tick
+    }
+    If Var A_Index == 9
+    {
+        Set_Var A_Resource_Label ""
+        Set_Var A_Enemy_Label ""
+        Set_Var A_Score_Label "Destroyed:"
+        Set_Var A_Flag_Label ""
+        Set_Var A_Flag2_Label ""
+        Set_Var A_Genre "2D shoot 'em up"
+        Set_Var A_Title "Lane Patrol"
+        Set_Var A_Help "Line up with the slime and fire. Destroy six before three reach your ship."
+        Set_Var A_Available 1
+        Set_Var A_Setup Shooter_Setup
+        Set_Var A_Act Shooter_Act
+        Set_Var A_Tick Shooter_Tick
+    }
+    If Var A_Index == 10
+    {
+        Set_Var A_Resource_Label ""
+        Set_Var A_Enemy_Label "Guard HP:"
+        Set_Var A_Score_Label ""
+        Set_Var A_Flag_Label ""
+        Set_Var A_Flag2_Label ""
+        Set_Var A_Genre "2D top-down action / adventure"
+        Set_Var A_Title "Relic Guard"
+        Set_Var A_Help "Move to the relic at column 5, row 2. Defeat the guard using adjacent attacks."
+        Set_Var A_Available 1
+        Set_Var A_Setup Adventure_Setup
+        Set_Var A_Act Adventure_Act
+        Set_Var A_Tick Adventure_Tick
+    }
+    If Var A_Index == 11
+    {
+        Set_Var A_Resource_Label ""
+        Set_Var A_Enemy_Label "Foe HP:"
+        Set_Var A_Score_Label ""
+        Set_Var A_Flag_Label ""
+        Set_Var A_Flag2_Label ""
+        Set_Var A_Genre "Turn-based strategy / tactics"
+        Set_Var A_Title "Grid Duel"
+        Set_Var A_Help "Move adjacent and strike. Each action lets the enemy move or retaliate."
+        Set_Var A_Available 1
+        Set_Var A_Setup Tactics_Setup
+        Set_Var A_Act Tactics_Act
+        Set_Var A_Tick Tactics_Tick
+    }
+    If Var A_Index == 12
+    {
+        Set_Var A_Resource_Label "Coins:"
+        Set_Var A_Enemy_Label "Slime HP:"
+        Set_Var A_Score_Label "Waves:"
+        Set_Var A_Flag_Label "Towers:"
+        Set_Var A_Flag2_Label "Wave active:"
+        Set_Var A_Genre "Tower defense"
+        Set_Var A_Title "The Orchard Road"
+        Set_Var A_Help "Build towers with three coins, then launch waves. Towers attack as slimes advance."
+        Set_Var A_Available 1
+        Set_Var A_Setup Tower_Setup
+        Set_Var A_Act Tower_Act
+        Set_Var A_Tick Tower_Tick
+    }
+    If Var A_Index == 13
+    {
+        Set_Var A_Resource_Label ""
+        Set_Var A_Enemy_Label ""
+        Set_Var A_Score_Label "Distance:"
+        Set_Var A_Flag_Label ""
+        Set_Var A_Flag2_Label ""
+        Set_Var A_Genre "2D racing / driving"
+        Set_Var A_Title "Orchard Sprint"
+        Set_Var A_Help "Accelerate along three lanes. Avoid obstacles on every third tick. Finish twenty distance."
+        Set_Var A_Available 1
+        Set_Var A_Setup Drive_Setup
+        Set_Var A_Act Drive_Act
+        Set_Var A_Tick Drive_Tick
+    }
+    If Var A_Index == 14
+    {
+        Set_Var A_Resource_Label "Stamina:"
+        Set_Var A_Enemy_Label "Rival HP:"
+        Set_Var A_Score_Label ""
+        Set_Var A_Flag_Label "Counter:"
+        Set_Var A_Flag2_Label ""
+        Set_Var A_Genre "2D fighting"
+        Set_Var A_Title "Read the Rival"
+        Set_Var A_Help "Rival telegraphs Guard or Strike. Attack during Guard; block Strike to earn a counter."
+        Set_Var A_Available 1
+        Set_Var A_Setup Fighter_Setup
+        Set_Var A_Act Fighter_Act
+        Set_Var A_Tick Fighter_Tick
+    }
+    If Var A_Index == 15
+    {
+        Set_Var A_Resource_Label ""
+        Set_Var A_Enemy_Label "Rival HP:"
+        Set_Var A_Score_Label "Defeated:"
+        Set_Var A_Flag_Label ""
+        Set_Var A_Flag2_Label ""
+        Set_Var A_Genre "2D beat 'em up"
+        Set_Var A_Title "Orchard Brawl"
+        Set_Var A_Help "Defeat three approaching rivals. Move into reach and strike; retreat to avoid retaliation."
+        Set_Var A_Available 1
+        Set_Var A_Setup Brawl_Setup
+        Set_Var A_Act Brawl_Act
+        Set_Var A_Tick Brawl_Tick
+    }
+    If Var A_Index == 16
+    {
+        Set_Var A_Resource_Label "Mana:"
+        Set_Var A_Enemy_Label "Warden HP:"
+        Set_Var A_Score_Label ""
+        Set_Var A_Flag_Label "Potion used:"
+        Set_Var A_Flag2_Label ""
+        Set_Var A_Genre "Turn-based RPG"
+        Set_Var A_Title "The Root Warden"
+        Set_Var A_Help "Fight the warden with attacks, mana spells and one healing potion."
+        Set_Var A_Available 1
+        Set_Var A_Setup RPG_Setup
+        Set_Var A_Act RPG_Act
+        Set_Var A_Tick RPG_Tick
+    }
+    If Var A_Index == 17
+    {
+        Set_Var A_Resource_Label ""
+        Set_Var A_Enemy_Label "Warden HP:"
+        Set_Var A_Score_Label ""
+        Set_Var A_Flag_Label "Blade:"
+        Set_Var A_Flag2_Label "Potion used:"
+        Set_Var A_Genre "Action RPG"
+        Set_Var A_Title "Warden Assault"
+        Set_Var A_Help "Equip the blade, attack at a controlled pace, and use your one potion before the warden wins."
+        Set_Var A_Available 1
+        Set_Var A_Setup ARPG_Setup
+        Set_Var A_Act ARPG_Act
+        Set_Var A_Tick ARPG_Tick
+    }
+    If Var A_Index == 18
+    {
+        Set_Var A_Resource_Label ""
+        Set_Var A_Enemy_Label ""
+        Set_Var A_Score_Label ""
+        Set_Var A_Flag_Label ""
+        Set_Var A_Flag2_Label ""
+        Set_Var A_Genre "Roguelike / roguelite"
+        Set_Var A_Title "Seeded Ruins"
+        Set_Var A_Help "Explore a generated 7 by 5 ruin. Reach the lower-right interior exit before hunger runs out."
+        Set_Var A_Available 1
+        Set_Var A_Setup Rogue_Setup
+        Set_Var A_Act Rogue_Act
+        Set_Var A_Tick Rogue_Tick
+    }
+    If Var A_Index == 19
+    {
+        Set_Var A_Resource_Label "Supplies:"
+        Set_Var A_Enemy_Label "Rival base:"
+        Set_Var A_Score_Label ""
+        Set_Var A_Flag_Label "Soldiers:"
+        Set_Var A_Flag2_Label "Workers:"
+        Set_Var A_Genre "Real-time strategy"
+        Set_Var A_Title "Orchard Command"
+        Set_Var A_Help "Workers gather each beat. Train soldiers for three resources; order an assault to break the rival base."
+        Set_Var A_Available 1
+        Set_Var A_Setup RTS_Setup
+        Set_Var A_Act RTS_Act
+        Set_Var A_Tick RTS_Tick
+    }
+    If Var A_Index == 20
+    {
+        Set_Var A_Resource_Label "Coins:"
+        Set_Var A_Enemy_Label ""
+        Set_Var A_Score_Label "Residents:"
+        Set_Var A_Flag_Label "Farms:"
+        Set_Var A_Flag2_Label "Homes:"
+        Set_Var A_Genre "Management / tycoon / city builder"
+        Set_Var A_Title "Orchard Town"
+        Set_Var A_Help "Build farms for two coins and homes for three. Farms earn coins; homes feed residents each season."
+        Set_Var A_Available 1
+        Set_Var A_Setup Town_Setup
+        Set_Var A_Act Town_Act
+        Set_Var A_Tick Town_Tick
+    }
+    If Var A_Index == 21
+    {
+        Set_Var A_Genre "Rhythm / music game"
+        Set_Var A_Title "Audio Clock Required"
+        Set_Var A_Help "Blocked: music playback clock, timestamped input and latency calibration are still required."
+        Set_Var A_Available 0
+    Set_Var A_Resource_Label "Resource:"
+    Set_Var A_Enemy_Label "Enemy:"
+    Set_Var A_Score_Label "Score:"
+    Set_Var A_Flag_Label "Flag:"
+    Set_Var A_Flag2_Label "Flag 2:"
+    }
+    If Var A_Index == 22
+    {
+        Set_Var A_Resource_Label "Power:"
+        Set_Var A_Enemy_Label "Wind:"
+        Set_Var A_Score_Label "Goals:"
+        Set_Var A_Flag_Label "Aim:"
+        Set_Var A_Flag2_Label ""
+        Set_Var A_Genre "Sports"
+        Set_Var A_Title "Wind Golf"
+        Set_Var A_Help "Set power and aim against the wind. Land three shots near the cup in five attempts."
+        Set_Var A_Available 1
+        Set_Var A_Setup Golf_Setup
+        Set_Var A_Act Golf_Act
+        Set_Var A_Tick Golf_Tick
+    }
+    If Var A_Index == 23
+    {
+        Set_Var A_Genre "3D platformer / adventure"
+        Set_Var A_Title "3D Adventure Required"
+        Set_Var A_Help "Open: a complete 3D controller, camera and playable scene still need integration."
+        Set_Var A_Available 0
+    Set_Var A_Resource_Label "Resource:"
+    Set_Var A_Enemy_Label "Enemy:"
+    Set_Var A_Score_Label "Score:"
+    Set_Var A_Flag_Label "Flag:"
+    Set_Var A_Flag2_Label "Flag 2:"
+    }
+    If Var A_Index == 24
+    {
+        Set_Var A_Genre "First-person shooter"
+        Set_Var A_Title "First Person Required"
+        Set_Var A_Help "Open: first-person movement, aiming, enemy encounters and weapon integration need a complete game test."
+        Set_Var A_Available 0
+    Set_Var A_Resource_Label "Resource:"
+    Set_Var A_Enemy_Label "Enemy:"
+    Set_Var A_Score_Label "Score:"
+    Set_Var A_Flag_Label "Flag:"
+    Set_Var A_Flag2_Label "Flag 2:"
+    }
+    If Var A_Index == 25
+    {
+        Set_Var A_Genre "Third-person action / shooter"
+        Set_Var A_Title "Third Person Required"
+        Set_Var A_Help "Open: character animation, camera obstruction, aiming and encounters still need integration."
+        Set_Var A_Available 0
+    Set_Var A_Resource_Label "Resource:"
+    Set_Var A_Enemy_Label "Enemy:"
+    Set_Var A_Score_Label "Score:"
+    Set_Var A_Flag_Label "Flag:"
+    Set_Var A_Flag2_Label "Flag 2:"
+    }
+    If Var A_Index == 26
+    {
+        Set_Var A_Genre "3D racing"
+        Set_Var A_Title "3D Driving Required"
+        Set_Var A_Help "Open: steering, track contact, chase camera and a complete 3D race still need integration."
+        Set_Var A_Available 0
+    Set_Var A_Resource_Label "Resource:"
+    Set_Var A_Enemy_Label "Enemy:"
+    Set_Var A_Score_Label "Score:"
+    Set_Var A_Flag_Label "Flag:"
+    Set_Var A_Flag2_Label "Flag 2:"
+    }
+    If Var A_Index == 27
+    {
+        Set_Var A_Resource_Label "Rations:"
+        Set_Var A_Enemy_Label ""
+        Set_Var A_Score_Label ""
+        Set_Var A_Flag_Label "Wood:"
+        Set_Var A_Flag2_Label "Shelter:"
+        Set_Var A_Genre "Survival / crafting"
+        Set_Var A_Title "Night Shelter"
+        Set_Var A_Help "Gather three wood, craft a shelter and eat to survive until morning. Crafting uses the shared inventory library."
+        Set_Var A_Available 1
+        Set_Var A_Setup Survival_Setup
+        Set_Var A_Act Survival_Act
+        Set_Var A_Tick Survival_Tick
+    }
+    If Var A_Index == 28
+    {
+        Set_Var A_Resource_Label "Fuel:"
+        Set_Var A_Enemy_Label "Heat:"
+        Set_Var A_Score_Label "Distance:"
+        Set_Var A_Flag_Label ""
+        Set_Var A_Flag2_Label ""
+        Set_Var A_Genre "Flight / space simulation"
+        Set_Var A_Title "Orbital Courier"
+        Set_Var A_Help "Balance thrust, heat and cooling. Deliver twenty distance before fuel or hull runs out. A simple 2D space challenge."
+        Set_Var A_Available 1
+        Set_Var A_Setup Space_Setup
+        Set_Var A_Act Space_Act
+        Set_Var A_Tick Space_Tick
+    }
+    If Var A_Index == 29
+    {
+        Set_Var A_Resource_Label ""
+        Set_Var A_Enemy_Label ""
+        Set_Var A_Score_Label "Markers:"
+        Set_Var A_Flag_Label ""
+        Set_Var A_Flag2_Label ""
+        Set_Var A_Genre "Open-world sandbox"
+        Set_Var A_Title "Pocket Sandbox"
+        Set_Var A_Help "Bounded prototype only: explore and place three camp markers on a small map. This does not demonstrate streaming."
+        Set_Var A_Available 1
+        Set_Var A_Setup Sandbox_Setup
+        Set_Var A_Act Sandbox_Act
+        Set_Var A_Tick Sandbox_Tick
+    }
+    If Var A_Index == 30
+    {
+        Set_Var A_Genre "Online competitive / cooperative game"
+        Set_Var A_Title "Network Session Required"
+        Set_Var A_Help "Blocked: authoritative sessions, per-peer messages, replication and reconnect tests remain open."
+        Set_Var A_Available 0
+    Set_Var A_Resource_Label "Resource:"
+    Set_Var A_Enemy_Label "Enemy:"
+    Set_Var A_Score_Label "Score:"
+    Set_Var A_Flag_Label "Flag:"
+    Set_Var A_Flag2_Label "Flag 2:"
+    }
+    If Var A_Index == 31
+    {
+        Set_Var A_Genre "MMORPG / persistent online world"
+        Set_Var A_Title "Persistent Server Required"
+        Set_Var A_Help "Blocked: a persistent authoritative server and concurrent clients are not implemented."
+        Set_Var A_Available 0
+    Set_Var A_Resource_Label "Resource:"
+    Set_Var A_Enemy_Label "Enemy:"
+    Set_Var A_Score_Label "Score:"
+    Set_Var A_Flag_Label "Flag:"
+    Set_Var A_Flag2_Label "Flag 2:"
+    }
+End_Function
+Define_Function Arcade_Open_1
+    Events Emit Arcade_Open 1
+End_Function
+Define_Function Arcade_Open_2
+    Events Emit Arcade_Open 2
+End_Function
+Define_Function Arcade_Open_3
+    Events Emit Arcade_Open 3
+End_Function
+Define_Function Arcade_Open_4
+    Events Emit Arcade_Open 4
+End_Function
+Define_Function Arcade_Open_5
+    Events Emit Arcade_Open 5
+End_Function
+Define_Function Arcade_Open_6
+    Events Emit Arcade_Open 6
+End_Function
+Define_Function Arcade_Open_7
+    Events Emit Arcade_Open 7
+End_Function
+Define_Function Arcade_Open_8
+    Events Emit Arcade_Open 8
+End_Function
+Define_Function Arcade_Open_9
+    Events Emit Arcade_Open 9
+End_Function
+Define_Function Arcade_Open_10
+    Events Emit Arcade_Open 10
+End_Function
+Define_Function Arcade_Open_11
+    Events Emit Arcade_Open 11
+End_Function
+Define_Function Arcade_Open_12
+    Events Emit Arcade_Open 12
+End_Function
+Define_Function Arcade_Open_13
+    Events Emit Arcade_Open 13
+End_Function
+Define_Function Arcade_Open_14
+    Events Emit Arcade_Open 14
+End_Function
+Define_Function Arcade_Open_15
+    Events Emit Arcade_Open 15
+End_Function
+Define_Function Arcade_Open_16
+    Events Emit Arcade_Open 16
+End_Function
+Define_Function Arcade_Open_17
+    Events Emit Arcade_Open 17
+End_Function
+Define_Function Arcade_Open_18
+    Events Emit Arcade_Open 18
+End_Function
+Define_Function Arcade_Open_19
+    Events Emit Arcade_Open 19
+End_Function
+Define_Function Arcade_Open_20
+    Events Emit Arcade_Open 20
+End_Function
+Define_Function Arcade_Open_21
+    Events Emit Arcade_Open 21
+End_Function
+Define_Function Arcade_Open_22
+    Events Emit Arcade_Open 22
+End_Function
+Define_Function Arcade_Open_23
+    Events Emit Arcade_Open 23
+End_Function
+Define_Function Arcade_Open_24
+    Events Emit Arcade_Open 24
+End_Function
+Define_Function Arcade_Open_25
+    Events Emit Arcade_Open 25
+End_Function
+Define_Function Arcade_Open_26
+    Events Emit Arcade_Open 26
+End_Function
+Define_Function Arcade_Open_27
+    Events Emit Arcade_Open 27
+End_Function
+Define_Function Arcade_Open_28
+    Events Emit Arcade_Open 28
+End_Function
+Define_Function Arcade_Open_29
+    Events Emit Arcade_Open 29
+End_Function
+Define_Function Arcade_Open_30
+    Events Emit Arcade_Open 30
+End_Function
+Define_Function Arcade_Open_31
+    Events Emit Arcade_Open 31
+End_Function
+Define_Function Arcade_Draw_Catalog
+    If Var A_Hub_Page == 0
+    {
+        Graphics GUI_Button Room_1 "01  The Signal" Arcade_Open_1
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Genre_1 "Text adventure / interactive fiction"
+    }
+    If Var A_Hub_Page == 0
+    {
+        Graphics GUI_Button Room_2 "02  A Promise at Dawn" Arcade_Open_2
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Genre_2 "Visual novel"
+    }
+    If Var A_Hub_Page == 0
+    {
+        Graphics GUI_Button Room_3 "03  Last Stone" Arcade_Open_3
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Genre_3 "Board / card / dice games"
+    }
+    If Var A_Hub_Page == 0
+    {
+        Graphics GUI_Button Room_4 "04  Three Lanterns" Arcade_Open_4
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Genre_4 "2D puzzle"
+    }
+    If Var A_Hub_Page == 0
+    {
+        Graphics GUI_Button Room_5 "05  Trail Knowledge" Arcade_Open_5
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Genre_5 "Trivia / quiz"
+    }
+    If Var A_Hub_Page == 0
+    {
+        Graphics GUI_Button Room_6 "06  The Locked Garden" Arcade_Open_6
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Genre_6 "Point-and-click adventure"
+    }
+    If Var A_Hub_Page == 0
+    {
+        Graphics GUI_Button Room_7 "07  Slime Slalom" Arcade_Open_7
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Genre_7 "2D arcade action"
+    }
+    If Var A_Hub_Page == 0
+    {
+        Graphics GUI_Button Room_8 "08  Broken Bridge" Arcade_Open_8
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Genre_8 "2D platformer"
+    }
+    If Var A_Hub_Page == 1
+    {
+        Graphics GUI_Button Room_9 "09  Lane Patrol" Arcade_Open_9
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Genre_9 "2D shoot 'em up"
+    }
+    If Var A_Hub_Page == 1
+    {
+        Graphics GUI_Button Room_10 "10  Relic Guard" Arcade_Open_10
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Genre_10 "2D top-down action / adventure"
+    }
+    If Var A_Hub_Page == 1
+    {
+        Graphics GUI_Button Room_11 "11  Grid Duel" Arcade_Open_11
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Genre_11 "Turn-based strategy / tactics"
+    }
+    If Var A_Hub_Page == 1
+    {
+        Graphics GUI_Button Room_12 "12  The Orchard Road" Arcade_Open_12
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Genre_12 "Tower defense"
+    }
+    If Var A_Hub_Page == 1
+    {
+        Graphics GUI_Button Room_13 "13  Orchard Sprint" Arcade_Open_13
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Genre_13 "2D racing / driving"
+    }
+    If Var A_Hub_Page == 1
+    {
+        Graphics GUI_Button Room_14 "14  Read the Rival" Arcade_Open_14
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Genre_14 "2D fighting"
+    }
+    If Var A_Hub_Page == 1
+    {
+        Graphics GUI_Button Room_15 "15  Orchard Brawl" Arcade_Open_15
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Genre_15 "2D beat 'em up"
+    }
+    If Var A_Hub_Page == 1
+    {
+        Graphics GUI_Button Room_16 "16  The Root Warden" Arcade_Open_16
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Genre_16 "Turn-based RPG"
+    }
+    If Var A_Hub_Page == 2
+    {
+        Graphics GUI_Button Room_17 "17  Warden Assault" Arcade_Open_17
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Genre_17 "Action RPG"
+    }
+    If Var A_Hub_Page == 2
+    {
+        Graphics GUI_Button Room_18 "18  Seeded Ruins" Arcade_Open_18
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Genre_18 "Roguelike / roguelite"
+    }
+    If Var A_Hub_Page == 2
+    {
+        Graphics GUI_Button Room_19 "19  Orchard Command" Arcade_Open_19
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Genre_19 "Real-time strategy"
+    }
+    If Var A_Hub_Page == 2
+    {
+        Graphics GUI_Button Room_20 "20  Orchard Town" Arcade_Open_20
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Genre_20 "Management / tycoon / city builder"
+    }
+    If Var A_Hub_Page == 2
+    {
+        Graphics GUI_Button Room_21 "21  Audio Clock Required [open work]" Arcade_Open_21
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Genre_21 "Rhythm / music game"
+    }
+    If Var A_Hub_Page == 2
+    {
+        Graphics GUI_Button Room_22 "22  Wind Golf" Arcade_Open_22
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Genre_22 "Sports"
+    }
+    If Var A_Hub_Page == 2
+    {
+        Graphics GUI_Button Room_23 "23  3D Adventure Required [open work]" Arcade_Open_23
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Genre_23 "3D platformer / adventure"
+    }
+    If Var A_Hub_Page == 2
+    {
+        Graphics GUI_Button Room_24 "24  First Person Required [open work]" Arcade_Open_24
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Genre_24 "First-person shooter"
+    }
+    If Var A_Hub_Page == 3
+    {
+        Graphics GUI_Button Room_25 "25  Third Person Required [open work]" Arcade_Open_25
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Genre_25 "Third-person action / shooter"
+    }
+    If Var A_Hub_Page == 3
+    {
+        Graphics GUI_Button Room_26 "26  3D Driving Required [open work]" Arcade_Open_26
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Genre_26 "3D racing"
+    }
+    If Var A_Hub_Page == 3
+    {
+        Graphics GUI_Button Room_27 "27  Night Shelter" Arcade_Open_27
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Genre_27 "Survival / crafting"
+    }
+    If Var A_Hub_Page == 3
+    {
+        Graphics GUI_Button Room_28 "28  Orbital Courier" Arcade_Open_28
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Genre_28 "Flight / space simulation"
+    }
+    If Var A_Hub_Page == 3
+    {
+        Graphics GUI_Button Room_29 "29  Pocket Sandbox [bounded prototype]" Arcade_Open_29
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Genre_29 "Open-world sandbox"
+    }
+    If Var A_Hub_Page == 3
+    {
+        Graphics GUI_Button Room_30 "30  Network Session Required [open work]" Arcade_Open_30
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Genre_30 "Online competitive / cooperative game"
+    }
+    If Var A_Hub_Page == 3
+    {
+        Graphics GUI_Button Room_31 "31  Persistent Server Required [open work]" Arcade_Open_31
+        Graphics GUI_Same_Line
+        Graphics GUI_Text Genre_31 "MMORPG / persistent online world"
+    }
+End_Function

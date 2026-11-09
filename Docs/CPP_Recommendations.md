@@ -285,5 +285,20 @@ expanding the C++ implementation. These are recommendations, not implemented wor
   interpreter startup. It includes no perception/pathfinding/actor workload and
   does not certify many-NPC simulation performance.
 
+### Genre Arcade integration note (2026-11-09)
+
+The fixed 7x5 board caches generated cells when a room starts. It avoids per-tile
+SQL reads during rendering; profile writes occur on victory/settings changes and
+inventory/crafting SQL runs on player actions. No measured gameplay bottleneck was
+established by the small challenge collection. Do not extrapolate its success to
+large crowds or maps.
+
+The scripts also expose an ergonomics issue: the current interpreter has If blocks
+without an Else command. Explicit condition snapshots preserve mutually exclusive
+branches when their actions change the condition. Consider structured Else support
+alongside the earlier control-flow recommendation, with nested branches and
+condition-changing callbacks tested. This is a simplification recommendation,
+not a performance claim or a native change made during the MVP work.
+
 Add measured scene/object costs and new recommendations as implementation and
 full games expose them. Keep utilities and packaging work on separate lists.

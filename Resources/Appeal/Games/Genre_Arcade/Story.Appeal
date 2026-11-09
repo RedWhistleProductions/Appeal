@@ -1,0 +1,242 @@
+Define_Function Story_Setup
+    Set_Var A_Button1 "Read / search"
+    Set_Var A_Button2 "Take brass key"
+    Set_Var A_Button3 "Unlock lighthouse"
+    Set_Var A_Button4 "Sail away"
+    Set_Var A_Status "A storm is coming. A note is nailed to the lighthouse door."
+End_Function
+Define_Function Story_Act
+    If Var A_Command == 1
+    {
+        Set_Var A_Flag 1
+        Set_Var A_Status "The note reads: the key rests beneath the blue stone."
+    }
+    If Var A_Command == 2
+    {
+        Set_Var A_Branch17 0
+        If Var A_Flag == 1 { Set_Var A_Branch17 1 }
+        If Var A_Branch17 == 1
+        {
+            Set_Var A_Resource 1
+            Set_Var A_Status "You lift the blue stone and pocket the brass key."
+        }
+        If Var A_Branch17 == 0 { Set_Var A_Status "You search the beach without knowing where to look." }
+    }
+    If Var A_Command == 3
+    {
+        Set_Var A_Branch18 0
+        If Var A_Resource == 1 { Set_Var A_Branch18 1 }
+        If Var A_Branch18 == 1
+        { Call Arcade_Win }
+        If Var A_Branch18 == 0 { Set_Var A_Status "The lighthouse door is locked. Find its key." }
+    }
+    If Var A_Command == 4 { Call Arcade_Lose }
+End_Function
+
+Define_Function Novel_Setup
+    Set_Var A_Button1 "Listen to Eve"
+    Set_Var A_Button2 "Listen to Adam"
+    Set_Var A_Button3 "Trust Eve to lead"
+    Set_Var A_Button4 "Leave without them"
+    Set_Var A_Status "Eve: I know the valley. Adam: I can carry supplies, but I fear the pass."
+End_Function
+Define_Function Novel_Act
+    If Var A_Command == 1
+    {
+        Set_Var A_Flag 1
+        Set_Var A_Status "Eve: I promised my sister I would bring everyone home. Let me scout."
+    }
+    If Var A_Command == 2
+    {
+        Set_Var A_Flag2 1
+        Set_Var A_Status "Adam: Eve knows this trail. If you trust her, I will follow with the supplies."
+    }
+    If Var A_Command == 3
+    {
+        Set_Var A_Branch20 0
+        If Var A_Flag == 1 { Set_Var A_Branch20 1 }
+        If Var A_Branch20 == 1
+        {
+            Set_Var A_Branch19 0
+            If Var A_Flag2 == 1 { Set_Var A_Branch19 1 }
+            If Var A_Branch19 == 1
+            { Call Arcade_Win }
+            If Var A_Branch19 == 0 { Set_Var A_Status "Eve: Please hear Adam out before deciding for both of us." }
+        }
+        If Var A_Branch20 == 0 { Set_Var A_Status "Eve: You have not asked why I want to lead." }
+    }
+    If Var A_Command == 4 { Call Arcade_Lose }
+End_Function
+
+Define_Function Hotspot_Setup
+    Set_Var A_Button1 "Inspect fountain"
+    Set_Var A_Button2 "Pick flower"
+    Set_Var A_Button3 "Use key on gate"
+    Set_Var A_Button4 "Inspect gate"
+    Set_Var A_Status "The gardener left a flower request beside the locked garden gate."
+End_Function
+Define_Function Hotspot_Act
+    If Var A_Command == 1
+    {
+        Set_Var A_Flag 1
+        Set_Var A_Status "A small key glints beneath the fountain. Added to your inventory."
+    }
+    If Var A_Command == 2
+    {
+        Set_Var A_Flag2 1
+        Set_Var A_Status "You pick a fallen flower for the gardener."
+    }
+    If Var A_Command == 3
+    {
+        Set_Var A_Branch22 0
+        If Var A_Flag == 1 { Set_Var A_Branch22 1 }
+        If Var A_Branch22 == 1
+        {
+            Set_Var A_Branch21 0
+            If Var A_Flag2 == 1 { Set_Var A_Branch21 1 }
+            If Var A_Branch21 == 1
+            { Call Arcade_Win }
+            If Var A_Branch21 == 0 { Set_Var A_Status "The gate opens, but the gardener still needs a flower." }
+        }
+        If Var A_Branch22 == 0 { Set_Var A_Status "The gate needs a key. Try the fountain." }
+    }
+    If Var A_Command == 4 { Set_Var A_Status "The plaque reads: bring a flower and return my fountain key." }
+End_Function
+
+Define_Function Quiz_Setup
+    Set_Var A_Phase 1
+    Set_Var A_Button1 "Mercury / 8 / Pacific"
+    Set_Var A_Button2 "Venus / 6 / Atlantic"
+    Set_Var A_Button3 "Earth / 4 / Arctic"
+    Set_Var A_Button4 "Skip question"
+    Call Quiz_Room_Text
+End_Function
+Define_Function Quiz_Room_Text
+    If Var A_Phase == 1 { Set_Var A_Status "Question 1: Which planet is closest to the Sun?" }
+    If Var A_Phase == 2 { Set_Var A_Status "Question 2: How many legs does an adult insect have?" }
+    If Var A_Phase == 3 { Set_Var A_Status "Question 3: Which ocean is the largest?" }
+End_Function
+Define_Function Quiz_Act
+    Set_Var A_Right 1
+    If Var A_Phase == 2 { Set_Var A_Right 2 }
+    If Var A_Command == Var A_Right { Set_Var A_Score (Add Var A_Score 1) }
+    Set_Var A_Phase (Add Var A_Phase 1)
+    Set_Var A_Branch24 0
+    If Var A_Phase > 3 { Set_Var A_Branch24 1 }
+    If Var A_Branch24 == 1
+    {
+        Set_Var A_Branch23 0
+        If Var A_Score >= 2 { Set_Var A_Branch23 1 }
+        If Var A_Branch23 == 1
+        { Call Arcade_Win }
+        If Var A_Branch23 == 0 { Call Arcade_Lose }
+    }
+    If Var A_Branch24 == 0 { Call Quiz_Room_Text }
+End_Function
+
+Define_Function Puzzle_Setup
+    Set_Var A_Button1 "Flip lanterns A + B"
+    Set_Var A_Button2 "Flip lanterns B + C"
+    Set_Var A_Button3 "Flip lantern A"
+    Set_Var A_Button4 "Inspect lanterns"
+    Set_Var A_Lamp1 0
+    Set_Var A_Lamp2 0
+    Set_Var A_Lamp3 0
+    Set_Var A_Status "All lanterns are dark. Their values appear in the counters below."
+End_Function
+Define_Function Puzzle_Act
+    If Var A_Command == 1
+    {
+        Set_Var A_Lamp1 (Subtract 1 Var A_Lamp1)
+        Set_Var A_Lamp2 (Subtract 1 Var A_Lamp2)
+    }
+    If Var A_Command == 2
+    {
+        Set_Var A_Lamp2 (Subtract 1 Var A_Lamp2)
+        Set_Var A_Lamp3 (Subtract 1 Var A_Lamp3)
+    }
+    If Var A_Command == 3 { Set_Var A_Lamp1 (Subtract 1 Var A_Lamp1) }
+    Set_Var A_Resource Var A_Lamp1
+    Set_Var A_Enemy Var A_Lamp2
+    Set_Var A_Score Var A_Lamp3
+    If Var A_Lamp1 == 1
+    {
+        If Var A_Lamp2 == 1
+        {
+            If Var A_Lamp3 == 1 { Call Arcade_Win }
+        }
+    }
+    If Var A_Step >= 6 { Call Arcade_Lose }
+End_Function
+
+Define_Function Stones_Setup
+    Set_Var A_Resource 8
+    Set_Var A_Button1 "Take one stone"
+    Set_Var A_Button2 "Take two stones"
+    Set_Var A_Button3 "Inspect pile"
+    Set_Var A_Button4 "Concede"
+    Set_Var A_Status "Eight stones. Take the last to win. Leave a multiple of three to your opponent."
+End_Function
+Define_Function Stones_Act
+    If Var A_Command <= 2
+    {
+        If Var A_Command <= Var A_Resource
+        {
+            Set_Var A_Resource (Subtract Var A_Resource Var A_Command)
+            Set_Var A_Branch25 0
+            If Var A_Resource == 0 { Set_Var A_Branch25 1 }
+            If Var A_Branch25 == 1
+            { Call Arcade_Win }
+            If Var A_Branch25 == 0 {
+                // Opponent takes remainder modulo three, or one from a losing pile.
+                Set_Var A_Take Var A_Resource
+                Loop While Var A_Take > 2 { Set_Var A_Take (Subtract Var A_Take 3) }
+                If Var A_Take == 0 { Set_Var A_Take 1 }
+                Set_Var A_Resource (Subtract Var A_Resource Var A_Take)
+                Set_Var A_Status "The opponent has taken its stones. Your turn."
+                If Var A_Resource == 0 { Call Arcade_Lose }
+            }
+        }
+    }
+    If Var A_Command == 4 { Call Arcade_Lose }
+End_Function
+
+Define_Function Golf_Setup
+    Set_Var A_Last_Shot 0
+    Set_Var A_Resource 1
+    Set_Var A_Enemy 1
+    Set_Var A_Button1 "Increase power (wraps 1..5)"
+    Set_Var A_Button2 "Adjust aim (wraps -2..2)"
+    Set_Var A_Button3 "Take shot"
+    Set_Var A_Button4 "Read wind"
+    Set_Var A_Status "Cup at distance 12. Power adds 3 distance each; wind adds 1; aim adjusts distance."
+End_Function
+Define_Function Golf_Act
+    If Var A_Command == 1
+    {
+        Set_Var A_Resource (Add Var A_Resource 1)
+        If Var A_Resource > 5 { Set_Var A_Resource 1 }
+    }
+    If Var A_Command == 2
+    {
+        Set_Var A_Flag (Add Var A_Flag 1)
+        If Var A_Flag > 2 { Set_Var A_Flag -2 }
+    }
+    If Var A_Command == 3
+    {
+        Set_Var A_Phase (Add Var A_Phase 1)
+        Set_Var A_Last_Shot (Add (Multiply Var A_Resource 3) (Add Var A_Enemy Var A_Flag))
+        If Var A_Last_Shot >= 11
+        {
+            If Var A_Last_Shot <= 13 { Set_Var A_Score (Add Var A_Score 1) }
+        }
+        If Var A_Score >= 3 { Call Arcade_Win }
+        If Var A_Phase >= 5 { Call Arcade_Lose }
+        If Var A_Page == Play
+        {
+            Set_Var A_Enemy (Subtract 0 Var A_Enemy)
+            Set_Var A_Status "Wind reversed. Adjust power and aim before the next shot."
+        }
+    }
+    If Var A_Command == 4 { Set_Var A_Status "Wind is the enemy/wind counter. Aim is the flag/aim counter. Target distance is 12, tolerance 1." }
+End_Function

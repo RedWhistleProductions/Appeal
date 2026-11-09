@@ -1,5 +1,18 @@
 # Game genre readiness
 
+## Genre Arcade integration (2026-11-09)
+
+[Bananas Genre Arcade](../Resources/Appeal/Games/Genre_Arcade/README.md) now offers
+23 short ruleset challenges plus a bounded sandbox challenge using current assets.
+All 31 categories appear in its [coverage table](../Resources/Appeal/Games/Genre_Arcade/Coverage.md).
+Seven categories still have no playable demo: rhythm, four 3D categories and the
+two online categories. Several playable challenges deliberately simplify movement,
+physics, shooting or simulation; their limits are listed in the game's README.
+All 24 challenge wins, selected losses, a continuous session, persistent medals,
+pause/replay and native UI/render paths were tested. These abbreviated examples
+do not establish complete representative games for all those genres, so the
+provisional percentages below remain unchanged.
+
 Updated 2026-11-08 after the Step 1–8 MVPs and the Five Questions game. These are provisional planning
 estimates of readiness to build a basic representative game using Appeal scripts,
 existing modules/plugins, and external assets. They exclude utilities, packaging,
